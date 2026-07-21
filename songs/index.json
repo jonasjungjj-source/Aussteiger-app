@@ -1,0 +1,418 @@
+[
+  {
+    "id": "cocaine",
+    "title": "Cocaine",
+    "artist": "Eric Clapton",
+    "file": "cocaine.md",
+    "bpm": 105,
+    "capo": 2,
+    "singer": "Andy"
+  },
+  {
+    "id": "lookin-out-my-back-door",
+    "title": "Lookin Out My Back Door",
+    "artist": "Creedence Clearwater Revival",
+    "file": "lookin-out-my-back-door.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "ring-of-fire",
+    "title": "Ring of Fire",
+    "artist": "Johnny Cash",
+    "file": "ring-of-fire.md",
+    "capo": 1,
+    "singer": "Tom"
+  },
+  {
+    "id": "wagon-wheel",
+    "title": "Wagon Wheel",
+    "artist": "Old Crow Medicine Show / Darius Rucker",
+    "file": "wagon-wheel.md",
+    "capo": 1,
+    "singer": "Tom"
+  },
+  {
+    "id": "jolene",
+    "title": "Jolene",
+    "artist": "Dolly Parton",
+    "file": "jolene.md",
+    "singer": "Nicole"
+  },
+  {
+    "id": "whiskey-in-the-jar",
+    "title": "Whiskey in the Jar",
+    "artist": "Traditional / Thin Lizzy",
+    "file": "whiskey-in-the-jar.md",
+    "bpm": 133,
+    "capo": 3,
+    "singer": "Tom"
+  },
+  {
+    "id": "summertime",
+    "title": "Summertime",
+    "artist": "George Gershwin",
+    "file": "summertime.md",
+    "bpm": 73,
+    "singer": "Tom"
+  },
+  {
+    "id": "i-m-on-fire",
+    "title": "I'm on Fire",
+    "artist": "Bruce Springsteen",
+    "file": "i-m-on-fire.md",
+    "bpm": 82,
+    "capo": 3,
+    "singer": "Alle / Tom"
+  },
+  {
+    "id": "simple-man",
+    "title": "Simple Man",
+    "artist": "Lynyrd Skynyrd",
+    "file": "simple-man.md",
+    "bpm": 60,
+    "capo": 3,
+    "singer": "Tom"
+  },
+  {
+    "id": "one-horse-town",
+    "title": "One Horse Town",
+    "artist": "Blackberry Smoke",
+    "file": "one-horse-town.md",
+    "bpm": 120,
+    "capo": 1,
+    "singer": "Tom"
+  },
+  {
+    "id": "sittin-on-the-dock-of-the-bay",
+    "title": "(Sittin' On) The Dock of the Bay",
+    "artist": "Otis Redding",
+    "file": "sittin-on-the-dock-of-the-bay.md",
+    "bpm": 100,
+    "capo": 7,
+    "singer": "Tom"
+  },
+  {
+    "id": "in-the-sun",
+    "title": "In the Sun",
+    "artist": "Joseph Arthur",
+    "file": "in-the-sun.md",
+    "bpm": 120,
+    "singer": "Tom"
+  },
+  {
+    "id": "folsom-prison-blues",
+    "title": "Folsom Prison Blues",
+    "artist": "Johnny Cash",
+    "file": "folsom-prison-blues.md",
+    "bpm": 111,
+    "singer": "Tom"
+  },
+  {
+    "id": "jambalaya-on-the-bayou",
+    "title": "Jambalaya (On the Bayou)",
+    "artist": "Hank Williams",
+    "file": "jambalaya-on-the-bayou.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "don-t-forget",
+    "title": "Don't Forget",
+    "artist": "The Magic Mumble Jumble",
+    "file": "don-t-forget.md",
+    "capo": 3,
+    "singer": "Tom"
+  },
+  {
+    "id": "what-s-up",
+    "title": "What's Up?",
+    "artist": "4 Non Blondes",
+    "file": "what-s-up.md",
+    "bpm": 134,
+    "singer": "Diana"
+  },
+  {
+    "id": "hotel-california",
+    "title": "Hotel California",
+    "artist": "Eagles",
+    "file": "hotel-california.md",
+    "bpm": 140,
+    "capo": 2,
+    "singer": "Tom / Andy"
+  },
+  {
+    "id": "stumblin-in",
+    "title": "Stumblin' In",
+    "artist": "Chris Norman & Suzi Quatro",
+    "file": "stumblin-in.md",
+    "singer": "Diana / Tom"
+  },
+  {
+    "id": "go-du-bleibst-heut-nacht-bei-mir",
+    "title": "Gö, du bleibst heut Nacht bei mir",
+    "artist": "STS",
+    "file": "go-du-bleibst-heut-nacht-bei-mir.md",
+    "bpm": 150,
+    "singer": "Andy"
+  },
+  {
+    "id": "ham-kummst",
+    "title": "Ham kummst",
+    "artist": "Seiler und Speer",
+    "file": "ham-kummst.md",
+    "bpm": 125,
+    "singer": "Tom"
+  },
+  {
+    "id": "principessa",
+    "title": "Principessa",
+    "artist": "Pupo",
+    "file": "principessa.md",
+    "bpm": 150,
+    "singer": "Tom"
+  },
+  {
+    "id": "wellerman",
+    "title": "Wellerman",
+    "artist": "Traditional / Nathan Evans",
+    "file": "wellerman.md",
+    "bpm": 160,
+    "singer": "Nicole"
+  },
+  {
+    "id": "i-m-a-believer",
+    "title": "I'm a Believer",
+    "artist": "The Monkees",
+    "file": "i-m-a-believer.md",
+    "singer": "Diana"
+  },
+  {
+    "id": "hello-josephine",
+    "title": "Hello Josephine",
+    "artist": "Fats Domino",
+    "file": "hello-josephine.md",
+    "bpm": 130,
+    "singer": "Andy"
+  },
+  {
+    "id": "the-wanderer",
+    "title": "The Wanderer",
+    "artist": "Dion",
+    "file": "the-wanderer.md",
+    "bpm": 114,
+    "capo": 2,
+    "singer": "Tom"
+  },
+  {
+    "id": "brown-eyed-girl",
+    "title": "Brown Eyed Girl",
+    "artist": "Van Morrison",
+    "file": "brown-eyed-girl.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "perfect",
+    "title": "Perfect",
+    "artist": "Fairground Attraction",
+    "file": "perfect.md",
+    "singer": "Diana"
+  },
+  {
+    "id": "weusd-a-herz-hast-wia-a-bergwerk",
+    "title": "Weus’d a Herz hast wia a Bergwerk",
+    "artist": "Rainhard Fendrich",
+    "file": "weusd-a-herz-hast-wia-a-bergwerk.md",
+    "bpm": 140,
+    "singer": "Tom"
+  },
+  {
+    "id": "kalt-und-kalter",
+    "title": "Kalt und kälter",
+    "artist": "STS",
+    "file": "kalt-und-kalter.md",
+    "bpm": 130,
+    "singer": "Tom"
+  },
+  {
+    "id": "irgendwann-bleib-i-dann-dort",
+    "title": "Irgendwann bleib i dann dort",
+    "artist": "STS",
+    "file": "irgendwann-bleib-i-dann-dort.md",
+    "bpm": 120,
+    "capo": 4,
+    "singer": "Tom"
+  },
+  {
+    "id": "older-women",
+    "title": "Older Women",
+    "artist": "Ronnie McDowell",
+    "file": "older-women.md"
+  },
+  {
+    "id": "fur-immer-jung",
+    "title": "Für immer jung",
+    "artist": "Wolfgang Ambros",
+    "file": "fur-immer-jung.md",
+    "bpm": 100,
+    "capo": 2,
+    "singer": "Tom"
+  },
+  {
+    "id": "grovater",
+    "title": "Großvater",
+    "artist": "STS",
+    "file": "grovater.md",
+    "bpm": 79,
+    "singer": "Tom"
+  },
+  {
+    "id": "wish-you-were-here",
+    "title": "Wish You Were Here",
+    "artist": "Pink Floyd",
+    "file": "wish-you-were-here.md",
+    "bpm": 60,
+    "singer": "Andy"
+  },
+  {
+    "id": "bitch",
+    "title": "Bitch",
+    "artist": "Meredith Brooks",
+    "file": "bitch.md",
+    "singer": "Diana / Nicole"
+  },
+  {
+    "id": "valerie",
+    "title": "Valerie",
+    "artist": "Mark Ronson feat. Amy Winehouse",
+    "file": "valerie.md",
+    "singer": "Diana"
+  },
+  {
+    "id": "the-road-to-hell",
+    "title": "The Road to Hell",
+    "artist": "Chris Rea",
+    "file": "the-road-to-hell.md",
+    "bpm": 124,
+    "singer": "Tom"
+  },
+  {
+    "id": "don-t-stop-believin",
+    "title": "Don't Stop Believin'",
+    "artist": "Journey",
+    "file": "don-t-stop-believin.md",
+    "bpm": 136,
+    "capo": 4,
+    "singer": "Diana"
+  },
+  {
+    "id": "bad-moon-rising",
+    "title": "Bad Moon Rising",
+    "artist": "Creedence Clearwater Revival",
+    "file": "bad-moon-rising.md",
+    "bpm": 180,
+    "singer": "Tom"
+  },
+  {
+    "id": "old-time-rock-and-roll",
+    "title": "Old Time Rock and Roll",
+    "artist": "Bob Seger",
+    "file": "old-time-rock-and-roll.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "runaround-sue",
+    "title": "Runaround Sue",
+    "artist": "Dion",
+    "file": "runaround-sue.md",
+    "bpm": 80,
+    "capo": 1,
+    "singer": "Tom"
+  },
+  {
+    "id": "macho-macho",
+    "title": "Macho Macho",
+    "artist": "Rainhard Fendrich",
+    "file": "macho-macho.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "sex-bomb",
+    "title": "Sex Bomb",
+    "artist": "Tom Jones",
+    "file": "sex-bomb.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "sweet-caroline",
+    "title": "Sweet Caroline",
+    "artist": "Neil Diamond",
+    "file": "sweet-caroline.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "uber-den-wolken",
+    "title": "Über den Wolken",
+    "artist": "Reinhard Mey",
+    "file": "uber-den-wolken.md",
+    "capo": 2,
+    "singer": "Tom"
+  },
+  {
+    "id": "1000-und-1-nacht-zoom",
+    "title": "1000 und 1 Nacht (Zoom!)",
+    "artist": "Klaus Lage",
+    "file": "1000-und-1-nacht-zoom.md",
+    "capo": 2,
+    "singer": "Tom"
+  },
+  {
+    "id": "tanz-um-dein-leben",
+    "title": "Tanz um dein Leben",
+    "artist": "Henning Wehland",
+    "file": "tanz-um-dein-leben.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "furstenfeld",
+    "title": "Fürstenfeld",
+    "artist": "STS",
+    "file": "furstenfeld.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "griechischer-wein",
+    "title": "Griechischer Wein",
+    "artist": "Udo Jürgens",
+    "file": "griechischer-wein.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "der-affe-und-ich",
+    "title": "Der Affe und ich",
+    "artist": "Henning Wehland",
+    "file": "der-affe-und-ich.md",
+    "capo": 3,
+    "singer": "Tom"
+  },
+  {
+    "id": "take-me-home-country-roads",
+    "title": "Take Me Home, Country Roads",
+    "artist": "John Denver",
+    "file": "take-me-home-country-roads.md",
+    "bpm": 133,
+    "singer": "Tom"
+  },
+  {
+    "id": "hymn",
+    "title": "Hymn",
+    "artist": "Barclay James Harvest",
+    "file": "hymn.md",
+    "singer": "Tom"
+  },
+  {
+    "id": "aloha-heja-he",
+    "title": "Aloha Heja He",
+    "artist": "Achim Reichel",
+    "file": "aloha-heja-he.md",
+    "singer": "Tom"
+  }
+]
