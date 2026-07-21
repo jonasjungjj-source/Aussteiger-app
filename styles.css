@@ -20,3 +20,5 @@ select{min-height:48px;border:1px solid var(--line);border-radius:14px;backgroun
 .transport-buttons{grid-template-columns:repeat(4,1fr)}
 .row-actions .favorite{color:var(--accent)}
 @media(max-width:720px){.library-controls{grid-template-columns:1fr}.transport-buttons{grid-template-columns:1fr 1fr}.setlist-toolbar{display:grid}.setlist-toolbar .select-label{width:100%}}
+
+.nav-link{display:flex;align-items:center;min-height:44px;border-radius:13px;padding:.65rem .9rem;color:var(--text);text-decoration:none}.nav-link:active{transform:scale(.98)}

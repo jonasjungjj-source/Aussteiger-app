@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akkordlexikon – Aussteiger</title>
+  <style>
+    :root {
+      --paper: #fffdf6;
+      --ink: #1f2328;
+      --muted: #68707b;
+      --line: #d9d4c7;
+      --accent: #d97706;
+      --accent-soft: #fff1d6;
+      --green: #18794e;
+      --card: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #ece9e1;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    .sheet {
+      width: min(1200px, calc(100% - 28px));
+      margin: 28px auto;
+      padding: 34px;
+      background: var(--paper);
+      border-radius: 24px;
+      box-shadow: 0 18px 50px rgba(30, 24, 12, .13);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 28px;
+      align-items: end;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 6vw, 5.2rem);
+      line-height: .9;
+      letter-spacing: -.06em;
+    }
+
+    .subtitle {
+      margin: 13px 0 0;
+      color: var(--muted);
+      max-width: 680px;
+      font-size: 1rem;
+    }
+
+    .legend {
+      min-width: 245px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 16px;
+      font-size: .9rem;
+    }
+
+    .legend strong { color: var(--accent); }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -.025em;
+    }
+
+    .section-title span {
+      padding: 5px 9px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      font-size: .73rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .chord-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .chord-card {
+      min-width: 0;
+      padding: 12px 10px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      break-inside: avoid;
+    }
+
+    .chord-card h3 {
+      margin: 0;
+      text-align: center;
+      font-size: 1.25rem;
+    }
+
+    .diagram {
+      width: 100%;
+      max-width: 145px;
+      margin: 7px auto 0;
+      display: block;
+    }
+
+    .tip-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    .tip {
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: white;
+    }
+
+    .tip h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .tip p, .tip ul {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .tip ul { padding-left: 18px; }
+
+    .progressions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .progression {
+      padding: 15px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    .progression strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--green);
+    }
+
+    .progression code {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 800;
+      white-space: normal;
+    }
+
+
+
+    .songbook-tools {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .song-list { display: grid; gap: 9px; }
+
+    .song-row {
+      display: grid;
+      grid-template-columns: 1.3fr .65fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: white;
+    }
+
+    .song-row h3 { margin: 0; font-size: 1rem; }
+    .song-row small { color: var(--muted); }
+    .song-chords { color: var(--accent); font-weight: 900; }
+    .level { font-size: .8rem; font-weight: 900; text-transform: uppercase; }
+    .level.easy { color: var(--green); }
+    .level.medium { color: var(--accent); }
+    .level.advanced { color: #a33; }
+
+    .song-link {
+      display: inline-block;
+      padding: 7px 10px;
+      border-radius: 9px;
+      background: var(--ink);
+      color: white;
+      font-size: .8rem;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .add-song {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px dashed #b8ad96;
+      border-radius: 14px;
+      background: #fffaf0;
+    }
+
+    .add-song h3 { margin: 0 0 10px; }
+    .add-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1fr .7fr;
+      gap: 9px;
+    }
+
+    .add-actions { display: flex; gap: 9px; margin-top: 9px; }
+    .secondary { background: #6b7280; }
+
+
+
+    .song-page-list { display: grid; gap: 22px; margin-top: 18px; }
+    .song-page {
+      padding: 28px;
+      border: 2px solid var(--ink);
+      border-radius: 20px;
+      background: white;
+      break-inside: avoid;
+    }
+    .song-page-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: start;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .song-page h3 { margin: 0; font-size: 1.8rem; letter-spacing: -.035em; }
+    .song-meta { color: var(--muted); margin-top: 3px; }
+    .song-key {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .song-sections {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .song-section-box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--paper);
+    }
+    .song-section-box strong {
+      display: block;
+      color: var(--green);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 7px;
+    }
+    .song-section-box code {
+      font-size: 1.08rem;
+      font-weight: 900;
+      color: var(--ink);
+      white-space: normal;
+    }
+    .song-practice-note {
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .print-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 26px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: var(--ink);
+      color: white;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover { opacity: .88; }
+
+    footer {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: center;
+      font-size: .85rem;
+    }
+
+    @media (max-width: 950px) {
+      header { display: block; }
+      .legend { margin-top: 18px; }
+      .chord-grid { grid-template-columns: repeat(3, 1fr); }
+      .tip-grid, .progressions { grid-template-columns: 1fr 1fr; }
+      .song-row { grid-template-columns: 1fr 1fr; }
+      .song-row .song-name { grid-column: 1 / -1; }
+      .add-grid { grid-template-columns: 1fr 1fr; }
+      .song-sections { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .sheet { padding: 20px; margin: 12px auto; }
+      .chord-grid { grid-template-columns: repeat(2, 1fr); }
+      .tip-grid, .progressions { grid-template-columns: 1fr; }
+      .songbook-tools, .song-row, .add-grid { grid-template-columns: 1fr; }
+      .song-row .song-name { grid-column: auto; }
+      .song-page { padding: 18px; }
+      .song-page-head { display: block; }
+      .song-key { display: inline-block; margin-top: 8px; }
+    }
+
+    .app-nav { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 10px max(12px, env(safe-area-inset-left)); background: rgba(31,35,40,.96); color: white; backdrop-filter: blur(12px); }
+    .app-nav a { color: white; text-decoration: none; font-weight: 800; }
+    .app-nav strong { text-align: center; }
+    .app-nav button { justify-self: end; padding: 8px 12px; background: white; color: #1f2328; }
+    @media (max-width:560px) { .app-nav { grid-template-columns: auto 1fr auto; } .app-nav strong { font-size:.9rem; } }
+
+    @media print {
+      @page { size: landscape; margin: 8mm; }
+      body { background: white; }
+      .app-nav { display:none; }
+      .sheet {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      h1 { font-size: 34px; }
+      .subtitle { font-size: 10px; }
+      header { padding-bottom: 10px; }
+      .legend { padding: 8px; font-size: 8px; }
+      .section { margin-top: 12px; }
+      .section-title { margin-bottom: 7px; }
+      .section-title h2 { font-size: 14px; }
+      .chord-grid { gap: 6px; }
+      .chord-card { padding: 5px; border-radius: 7px; }
+      .chord-card h3 { font-size: 12px; }
+      .diagram { max-width: 95px; margin-top: 2px; }
+      .tip-grid, .progressions { gap: 6px; }
+      .songbook-tools, .add-song { display: none; }
+      .song-list { gap: 4px; }
+      .song-row { padding: 5px; grid-template-columns: 1.2fr .5fr 1fr; gap: 5px; border-radius: 6px; }
+      .song-row h3, .song-chords, .level { font-size: 7px; }
+      .song-row small, .song-link { font-size: 6px; }
+      .song-link { padding: 3px 5px; }
+      .tip, .progression { padding: 7px; border-radius: 7px; }
+      .tip h3, .progression strong, .progression code { font-size: 9px; }
+      .tip p, .tip ul, footer { font-size: 7px; }
+
+      .song-page-list { gap: 0; }
+      .song-page {
+        min-height: 180mm;
+        padding: 12mm;
+        border: 0;
+        border-radius: 0;
+        break-after: page;
+        page-break-after: always;
+      }
+      .song-page:last-child { break-after: auto; page-break-after: auto; }
+      .song-page h3 { font-size: 24px; }
+      .song-meta, .song-practice-note { font-size: 10px; }
+      .song-sections { gap: 8px; }
+      .song-section-box { padding: 10px; }
+      .song-section-box strong { font-size: 8px; }
+      .song-section-box code { font-size: 13px; }
+
+      .print-row { display: none; }
+      footer { margin-top: 8px; padding-top: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-nav"><a href="./index.html">← Zur Band-App</a><strong>Akkordlexikon</strong><button type="button" onclick="window.print()">Drucken</button></div>
+  <main class="sheet">
+    <header>
+      <div>
+        <h1>Gitarren-Akkorde<br>Spickzettel</h1>
+        <p class="subtitle">Wichtige Akkordgriffe von offenen Anfängerakkorden bis zu Barré-, Sept- und Erweiterungsakkorden. Standardstimmung: E A D G H E.</p>
+      </div>
+      <div class="legend">
+        <div><strong>●</strong> Finger placement</div>
+        <div><strong>○</strong> Play the string open</div>
+        <div><strong>×</strong> Do not play the string</div>
+        <div><strong>1–4</strong> Index, middle, ring, pinky</div>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-title">
+        <h2>Wichtige offene Akkorde</h2>
+        <span>Hier starten</span>
+      </div>
+      <div class="chord-grid" id="openChords"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <h2>Moll- und Septakkorde</h2>
+        <span>Mehr Farbe</span>
+      </div>
+      <div class="chord-grid" id="seventhChords"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <h2>Barré- und Erweiterungsakkorde</h2>
+        <span>Fortgeschritten</span>
+      </div>
+      <div class="chord-grid" id="advancedChords"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <h2>Schnellhilfe</h2>
+        <span>Technique</span>
+      </div>
+      <div class="tip-grid">
+        <article class="tip">
+          <h3>How to read a diagram</h3>
+          <p>The vertical lines are strings. The left line is the low E string, and the right line is the high E string. Horizontal lines are frets.</p>
+        </article>
+        <article class="tip">
+          <h3>Make chords ring clearly</h3>
+          <ul>
+            <li>Press close behind the fret.</li>
+            <li>Curve your fingers.</li>
+            <li>Keep your thumb relaxed.</li>
+          </ul>
+        </article>
+        <article class="tip">
+          <h3>Practice changes</h3>
+          <p>Choose two chords. Switch every four beats at 60 BPM. Add speed only when the change is smooth and every note rings.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <h2>Nützliche Akkordfolgen</h2>
+        <span>Play songs</span>
+      </div>
+      <div class="progressions">
+        <div class="progression"><strong>Pop</strong><code>G · D · Em · C</code></div>
+        <div class="progression"><strong>Classic</strong><code>C · G · Am · F</code></div>
+        <div class="progression"><strong>Folk</strong><code>D · G · A · D</code></div>
+        <div class="progression"><strong>Blues</strong><code>A7 · D7 · E7</code></div>
+      </div>
+    </section>
+
+
+
+    <section class="section" id="songbook">
+      <div class="section-title">
+        <h2>Übungssongs</h2>
+        <span>Growing library</span>
+      </div>
+
+      <div class="songbook-tools">
+        <input class="field" id="songSearch" type="search" placeholder="Search song, artist, or chord…">
+        <select class="field" id="songLevel">
+          <option value="all">All levels</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div class="song-list" id="songList"></div>
+
+      <form class="add-song" id="addSongForm">
+        <h3>Add another song</h3>
+        <div class="add-grid">
+          <input class="field" id="newTitle" required placeholder="Song title">
+          <input class="field" id="newArtist" required placeholder="Artist">
+          <input class="field" id="newChords" required placeholder="Chords, e.g. G D Em C">
+          <select class="field" id="newLevel">
+            <option value="easy">Easy</option>
+            <option value="medium">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="add-actions">
+          <button type="submit">Add to songbook</button>
+          <button class="secondary" id="clearCustom" type="button">Clear my added songs</button>
+        </div>
+      </form>
+    </section>
+
+
+
+    <section class="section" id="progressionPages">
+      <div class="section-title">
+        <h2>Akkordfolgen der Songs</h2>
+        <span>Print-ready</span>
+      </div>
+      <p class="subtitle">Simplified practice arrangements only. Each page shows chord order and song sections without lyrics or external links.</p>
+      <div class="song-page-list" id="songPageList"></div>
+    </section>
+
+    <div class="print-row">
+      <button onclick="window.print()">Akkordblatt drucken</button>
+    </div>
+
+    <footer>Langsam üben: Saubere Töne und ein gleichmäßiger Rhythmus sind wichtiger als Geschwindigkeit.</footer>
+  </main>
+
+  <script>
+    const groups = {
+      openChords: [
+        { name: "C", frets: ["x",3,2,0,1,0], fingers: [0,3,2,0,1,0] },
+        { name: "D", frets: ["x","x",0,2,3,2], fingers: [0,0,0,1,3,2] },
+        { name: "E", frets: [0,2,2,1,0,0], fingers: [0,2,3,1,0,0] },
+        { name: "G", frets: [3,2,0,0,0,3], fingers: [2,1,0,0,0,3] },
+        { name: "A", frets: ["x",0,2,2,2,0], fingers: [0,0,1,2,3,0] },
+        { name: "Em", frets: [0,2,2,0,0,0], fingers: [0,2,3,0,0,0] }
+      ],
+      seventhChords: [
+        { name: "Am", frets: ["x",0,2,2,1,0], fingers: [0,0,2,3,1,0] },
+        { name: "Dm", frets: ["x","x",0,2,3,1], fingers: [0,0,0,2,3,1] },
+        { name: "A7", frets: ["x",0,2,0,2,0], fingers: [0,0,1,0,2,0] },
+        { name: "D7", frets: ["x","x",0,2,1,2], fingers: [0,0,0,2,1,3] },
+        { name: "E7", frets: [0,2,0,1,0,0], fingers: [0,2,0,1,0,0] },
+        { name: "G7", frets: [3,2,0,0,0,1], fingers: [3,2,0,0,0,1] }
+      ],
+      advancedChords: [
+        { name: "F", frets: [1,3,3,2,1,1], fingers: [1,3,4,2,1,1], barre: 1 },
+        { name: "Bm", frets: ["x",2,4,4,3,2], fingers: [0,1,3,4,2,1], barre: 2 },
+        { name: "Cmaj7", frets: ["x",3,2,0,0,0], fingers: [0,3,2,0,0,0] },
+        { name: "Dsus2", frets: ["x","x",0,2,3,0], fingers: [0,0,0,1,3,0] },
+        { name: "Asus4", frets: ["x",0,2,2,3,0], fingers: [0,0,1,2,3,0] },
+        { name: "Cadd9", frets: ["x",3,2,0,3,3], fingers: [0,2,1,0,3,4] }
+      ]
+    };
+
+    function diagram(chord) {
+      const width = 150;
+      const height = 170;
+      const left = 22;
+      const top = 35;
+      const stringGap = 21;
+      const fretGap = 24;
+
+      let svg = `<svg class="diagram" viewBox="0 0 ${width} ${height}" role="img" aria-label="${chord.name} chord diagram">`;
+
+      for (let s = 0; s < 6; s++) {
+        const x = left + s * stringGap;
+        svg += `<line x1="${x}" y1="${top}" x2="${x}" y2="${top + 5 * fretGap}" stroke="#333" stroke-width="1.2"/>`;
+      }
+
+      for (let f = 0; f <= 5; f++) {
+        const y = top + f * fretGap;
+        svg += `<line x1="${left}" y1="${y}" x2="${left + 5 * stringGap}" y2="${y}" stroke="#333" stroke-width="${f === 0 ? 4 : 1.2}"/>`;
+      }
+
+      if (chord.barre) {
+        const y = top + (chord.barre - .5) * fretGap;
+        svg += `<line x1="${left}" y1="${y}" x2="${left + 5 * stringGap}" y2="${y}" stroke="#d97706" stroke-width="12" stroke-linecap="round"/>`;
+      }
+
+      chord.frets.forEach((fret, i) => {
+        const x = left + i * stringGap;
+
+        if (fret === "x") {
+          svg += `<text x="${x}" y="21" text-anchor="middle" font-size="15" font-weight="800" fill="#a33">×</text>`;
+        } else if (fret === 0) {
+          svg += `<circle cx="${x}" cy="17" r="5" fill="none" stroke="#18794e" stroke-width="2"/>`;
+        } else if (!chord.barre || fret !== chord.barre) {
+          const y = top + (fret - .5) * fretGap;
+          svg += `<circle cx="${x}" cy="${y}" r="8.5" fill="#d97706"/>`;
+          if (chord.fingers[i]) {
+            svg += `<text x="${x}" y="${y + 3.5}" text-anchor="middle" font-size="9" font-weight="900" fill="white">${chord.fingers[i]}</text>`;
+          }
+        }
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderGroup(id, chords) {
+      const container = document.getElementById(id);
+      chords.forEach(chord => {
+        const card = document.createElement("article");
+        card.className = "chord-card";
+        card.innerHTML = `<h3>${chord.name}</h3>${diagram(chord)}`;
+        container.appendChild(card);
+      });
+    }
+
+    Object.entries(groups).forEach(([id, chords]) => renderGroup(id, chords));
+
+    const starterSongs = [
+      {title:"Horse with No Name", artist:"America", level:"easy", chords:"Em · D"},
+      {title:"Eleanor Rigby", artist:"The Beatles", level:"easy", chords:"Em · C"},
+      {title:"Bad Moon Rising", artist:"Creedence Clearwater Revival", level:"easy", chords:"D · A · G"},
+      {title:"Knockin’ on Heaven’s Door", artist:"Bob Dylan", level:"easy", chords:"G · D · Am · C"},
+      {title:"Stand by Me", artist:"Ben E. King", level:"easy", chords:"G · Em · C · D"},
+      {title:"Three Little Birds", artist:"Bob Marley & The Wailers", level:"easy", chords:"A · D · E"},
+      {title:"Wish You Were Here", artist:"Pink Floyd", level:"medium", chords:"G · C · D · Am · Em"},
+      {title:"Wonderwall", artist:"Oasis", level:"medium", chords:"Em · G · D · A · C"},
+      {title:"House of the Rising Sun", artist:"The Animals", level:"medium", chords:"Am · C · D · F · E"},
+      {title:"Hotel California", artist:"Eagles", level:"medium", chords:"Bm · F♯ · A · E · G · D · Em"},
+      {title:"Creep", artist:"Radiohead", level:"medium", chords:"G · B · C · Cm"},
+      {title:"Blackbird", artist:"The Beatles", level:"advanced", chords:"Moving shapes / fingerstyle"},
+      {title:"Little Wing", artist:"Jimi Hendrix", level:"advanced", chords:"Em · G · Am · Bm · C"},
+      {title:"Neon", artist:"John Mayer", level:"advanced", chords:"Cm · E♭ · B♭ · A♭"},
+      {title:"Landslide", artist:"Fleetwood Mac", level:"advanced", chords:"C · G · Am · D"},
+      {title:"What Goes Around… Comes Around", artist:"Justin Timberlake", level:"medium", chords:"Am · C · G · D", key:"Am", sections:[
+        ["Intro / Verse", "Am · C · G · D"],
+        ["Pre-Chorus", "Am · C · G · D"],
+        ["Chorus", "Am · C · G · D"],
+        ["Bridge / Outro", "Am · C · G · D"]
+      ]}
+    ];
+
+
+    const songArrangements = {
+      "Horse with No Name": {key:"Em", sections:[["Main groove","Em · D"],["Verse","Em · D"],["Chorus","Em · D"],["Outro","Em · D"]], note:"Keep a steady two-chord groove and focus on relaxed strumming."},
+      "Eleanor Rigby": {key:"Em", sections:[["Verse","Em · C"],["Turnaround","C · Em"],["Chorus","Em · C"],["Ending","C · Em"]], note:"Use short, controlled strums to imitate the tight rhythmic feel."},
+      "Bad Moon Rising": {key:"D", sections:[["Intro","D · A · G · D"],["Verse","D · A · G · D"],["Chorus","G · D · A · G · D"],["Outro","D · A · G · D"]], note:"Bright, even down-up strumming works well."},
+      "Knockin’ on Heaven’s Door": {key:"G", sections:[["Verse","G · D · Am · Am"],["Response","G · D · C · C"],["Chorus loop","G · D · Am · Am"],["Alternate loop","G · D · C · C"]], note:"Let each chord ring and keep the tempo calm."},
+      "Stand by Me": {key:"G", sections:[["Main loop","G · Em · C · D"],["Verse","G · Em · C · D"],["Chorus","G · Em · C · D"],["Outro","G · Em · C · D"]], note:"Repeat the four-chord loop with a steady backbeat."},
+      "Three Little Birds": {key:"A", sections:[["Intro","A · D · A"],["Verse","A · E · A"],["Chorus","A · D · A · E"],["Outro","A · D · A"]], note:"Use light off-beat strums for a reggae-inspired feel."},
+      "Wish You Were Here": {key:"G", sections:[["Intro / Verse","G · C · D · Am"],["Turnaround","G · D · C"],["Chorus","C · D · Am · G"],["Outro","G · C · G"]], note:"Practice the chord loop separately from the recognizable lead parts."},
+      "Wonderwall": {key:"Em", sections:[["Verse","Em · G · D · A"],["Build","C · D · Em"],["Chorus","C · Em · G · Em"],["Outro","Em · G · D · A"]], note:"Keep common fingers anchored where possible and use a repeating eighth-note pattern."},
+      "House of the Rising Sun": {key:"Am", sections:[["Main pattern","Am · C · D · F"],["Turnaround","Am · C · E · E"],["Verse repeat","Am · C · D · F"],["Ending","Am · E · Am"]], note:"Arpeggiate from the bass string toward the high strings."},
+      "Hotel California": {key:"Bm", sections:[["Verse loop","Bm · F♯ · A · E"],["Continuation","G · D · Em · F♯"],["Chorus","G · D · F♯ · Bm"],["Turnaround","G · D · Em · F♯"]], note:"Practice the eight-chord verse loop slowly before increasing tempo."},
+      "Creep": {key:"G", sections:[["Main loop","G · B · C · Cm"],["Verse","G · B · C · Cm"],["Chorus","G · B · C · Cm"],["Outro","G · B · C · Cm"]], note:"The major-to-minor change from C to Cm creates the signature color."},
+      "Blackbird": {key:"G", sections:[["Main idea","G shapes · Am shapes"],["Climb","Moving two-note shapes"],["Middle section","C-family moving shapes"],["Return","Main moving pattern"]], note:"This is a fingerstyle outline; learn it as small moving shapes rather than full strummed chords."},
+      "Little Wing": {key:"Em", sections:[["Intro / Verse","Em · G · Am · Em"],["Movement","Bm · Am · C · G"],["Turnaround","F · C · D"],["Return","Em · G · Am · Em"]], note:"Use partial chords, double-stops, and gentle embellishments instead of rigid full shapes."},
+      "Neon": {key:"Cm", sections:[["Main groove","Cm · E♭ · B♭ · A♭"],["Verse","Cm · E♭ · B♭ · A♭"],["Chorus","A♭ · B♭ · Cm"],["Outro","Cm · E♭ · B♭ · A♭"]], note:"Treat this as an advanced rhythmic study; simplify to block chords first."},
+      "Landslide": {key:"C", sections:[["Main picking loop","C · G · Am · G"],["Verse","C · G · Am · G"],["Chorus","C · G · Am · D"],["Outro","C · G · Am · G"]], note:"Keep the picking pattern even and let shared notes ring between changes."},
+      "What Goes Around… Comes Around": {key:"Am", sections:[["Intro / Verse","Am · C · G · D"],["Pre-Chorus","Am · C · G · D"],["Chorus","Am · C · G · D"],["Bridge / Outro","Am · C · G · D"]], note:"Use the repeating four-chord cycle as a simplified acoustic practice arrangement."}
+    };
+
+    function arrangementFor(song) {
+      if (song.sections) return {key: song.key || "—", sections: song.sections, note: song.note || "Repeat each section slowly and keep the beat steady."};
+      return songArrangements[song.title] || {
+        key: "—",
+        sections: [["Main progression", song.chords], ["Verse practice", song.chords], ["Chorus practice", song.chords], ["Outro", song.chords]],
+        note: "User-added practice page. Adjust the section order to match your preferred arrangement."
+      };
+    }
+
+    function renderSongPages() {
+      const songs = [...starterSongs, ...getCustomSongs()];
+      const container = document.getElementById("songPageList");
+      container.innerHTML = "";
+      songs.forEach((song, index) => {
+        const arrangement = arrangementFor(song);
+        const page = document.createElement("article");
+        page.className = "song-page";
+        page.innerHTML = `
+          <div class="song-page-head">
+            <div>
+              <h3>${index + 1}. ${song.title}</h3>
+              <div class="song-meta">${song.artist} · ${song.level === "medium" ? "Intermediate" : song.level}</div>
+            </div>
+            <div class="song-key">Key: ${arrangement.key}</div>
+          </div>
+          <div class="song-sections">
+            ${arrangement.sections.map(section => `<div class="song-section-box"><strong>${section[0]}</strong><code>${section[1]}</code></div>`).join("")}
+          </div>
+          <p class="song-practice-note"><strong>Practice note:</strong> ${arrangement.note}</p>
+        `;
+        container.appendChild(page);
+      });
+    }
+
+    function getCustomSongs() {
+      try { return JSON.parse(localStorage.getItem("guitarCustomSongs") || "[]"); }
+      catch { return []; }
+    }
+
+    function renderSongs() {
+      const query = document.getElementById("songSearch").value.toLowerCase().trim();
+      const selectedLevel = document.getElementById("songLevel").value;
+      const songs = [...starterSongs, ...getCustomSongs()];
+      const list = document.getElementById("songList");
+      const filtered = songs.filter(song => {
+        const haystack = `${song.title} ${song.artist} ${song.chords}`.toLowerCase();
+        return haystack.includes(query) && (selectedLevel === "all" || song.level === selectedLevel);
+      });
+
+      list.innerHTML = filtered.length ? "" : "<div class='song-row'><div class='song-name'><h3>No matching songs</h3><small>Try another search.</small></div></div>";
+      filtered.forEach(song => {
+        const row = document.createElement("article");
+        row.className = "song-row";
+        row.innerHTML = `
+          <div class="song-name"><h3>${song.title}</h3><small>${song.artist}</small></div>
+          <div class="level ${song.level}">${song.level === "medium" ? "Intermediate" : song.level}</div>
+          <div class="song-chords">${song.chords}</div>
+          <small>Progression page below</small>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    document.getElementById("songSearch").addEventListener("input", renderSongs);
+    document.getElementById("songLevel").addEventListener("change", renderSongs);
+
+    document.getElementById("addSongForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const custom = getCustomSongs();
+      custom.push({
+        title: document.getElementById("newTitle").value.trim(),
+        artist: document.getElementById("newArtist").value.trim(),
+        chords: document.getElementById("newChords").value.trim().replace(/\s+/g, " · "),
+        level: document.getElementById("newLevel").value
+      });
+      localStorage.setItem("guitarCustomSongs", JSON.stringify(custom));
+      event.target.reset();
+      renderSongs();
+      renderSongPages();
+    });
+
+    document.getElementById("clearCustom").addEventListener("click", () => {
+      localStorage.removeItem("guitarCustomSongs");
+      renderSongs();
+      renderSongPages();
+    });
+
+    renderSongs();
+    renderSongPages();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');
+  </script>
+</body>
+</html>

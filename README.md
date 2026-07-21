@@ -1,18 +1,8 @@
-# Aussteiger Band-App v4
+# Aussteiger Band-App – Version 5
 
-GitHub-Pages-fähige Offline-PWA mit kompletter Songbibliothek.
+GitHub-Pages-kompatible Offline-PWA mit Songbibliothek, mehreren Setlisten, Favoriten, lokalem Songeditor, Auto-Scroll und integriertem Akkordlexikon.
 
-## Neu in Version 4
+## Veröffentlichung
+Alle Dateien und Ordner aus diesem Verzeichnis direkt in das Stammverzeichnis des GitHub-Pages-Repositories hochladen.
 
-- Alle Songs aus `songs.json` sichtbar
-- Suche nach Titel, Interpret, Genre und Tags
-- Filter für aktive Setliste, Public Domain und Favoriten
-- Mehrere lokale Setlisten erstellen, umbenennen und löschen
-- Favoriten
-- Lokaler Songeditor
-- JSON-Backup und Wiederherstellung
-- Auto-Scroll, Dark Mode, Kontrast, Schriftgröße und Zeilenabstand
-
-## GitHub Pages
-
-Alle Dateien aus diesem Ordner direkt in die oberste Ebene des Repositorys hochladen. Danach GitHub Pages aus dem Branch aktivieren.
+Das Akkordlexikon ist über das Seitenmenü erreichbar und wird vom Service Worker offline zwischengespeichert.
