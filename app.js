@@ -8,14 +8,17 @@ const STORAGE = {
   speed: 'band-speed',
   display: 'band-display',
   overrides: 'band-song-overrides',
-  favorites: 'band-v4-favorites'
+  favorites: 'band-v4-favorites',
+  libraries: 'band-v6-libraries',
+  importedSongs: 'band-v6-imported-songs'
 };
 
 const state = {
   songs: [], baseSongs: [], defaultSetlists: [], setlists: [], activeSetlistId: '',
   currentId: localStorage.getItem(STORAGE.current),
   scrollSpeed: Number(localStorage.getItem(STORAGE.speed) || 45),
-  scrolling: false, lastTs: 0, overrides: {}, favorites: new Set()
+  scrolling: false, lastTs: 0, overrides: {}, favorites: new Set(),
+  libraries: [], importedSongs: []
 };
 
 async function getJSON(path) {
@@ -49,10 +52,132 @@ function loadLocalState() {
   state.setlists = Array.isArray(storedLists) ? normalizeSetlists(storedLists) : structuredClone(state.defaultSetlists);
   state.activeSetlistId = localStorage.getItem(STORAGE.activeSetlist) || state.setlists[0]?.id || '';
   if (!state.setlists.some(list => list.id === state.activeSetlistId)) state.activeSetlistId = state.setlists[0]?.id || '';
+  state.libraries = safeParse(localStorage.getItem(STORAGE.libraries), []);
+  state.importedSongs = safeParse(localStorage.getItem(STORAGE.importedSongs), []);
 }
 
 function mergeSongs() {
-  state.songs = state.baseSongs.map(song => ({ ...song, ...(state.overrides[song.id] || {}) }));
+  const base = state.baseSongs.map(item => ({ ...item, library: 'core' }));
+  const imported = state.importedSongs.map(item => ({ ...item }));
+  state.songs = [...base, ...imported].map(item => ({ ...item, ...(state.overrides[item.id] || {}) }));
+}
+
+function saveLibraries() {
+  localStorage.setItem(STORAGE.libraries, JSON.stringify(state.libraries));
+  localStorage.setItem(STORAGE.importedSongs, JSON.stringify(state.importedSongs));
+  mergeSongs();
+}
+
+function slugify(text) {
+  return String(text || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '') || 'song';
+}
+
+function uniqueSongId(baseId) {
+  const existing = new Set([...state.baseSongs, ...state.importedSongs].map(item => item.id));
+  if (!existing.has(baseId)) return baseId;
+  let index = 2; let candidate = `${baseId}-${index}`;
+  while (existing.has(candidate)) { index += 1; candidate = `${baseId}-${index}`; }
+  return candidate;
+}
+
+function parseChordProText(text, filename) {
+  const lines = String(text).replace(/\r\n?/g, '\n').split('\n');
+  let title = '', artist = '', key = '', capo = '';
+  const content = [];
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const directive = line.match(/^\{\s*([a-z_]+)\s*:?\s*(.*?)\s*\}$/i);
+    if (directive) {
+      const name = directive[1].toLowerCase(); const value = directive[2].trim();
+      if (['title', 't'].includes(name)) title = value;
+      else if (['artist', 'subtitle', 'st'].includes(name)) artist = value;
+      else if (name === 'key') key = value;
+      else if (name === 'capo') capo = value;
+      continue;
+    }
+    if (/^\{(start_of|end_of|soc|eoc|sot|eot|comment)/i.test(line)) continue;
+    content.push(rawLine);
+  }
+  const fallbackName = filename.replace(/\.[^.]+$/, '');
+  if (!title) {
+    const guess = fallbackName.split(/\s*-\s*/);
+    if (guess.length >= 2) { artist = artist || guess[0].trim(); title = guess.slice(1).join(' - ').trim(); }
+    else title = fallbackName;
+  }
+  return { title: title || fallbackName, artist, key: key || undefined, capo: capo ? Number(capo) : undefined, content: content.join('\n').trim() };
+}
+
+async function importSongFiles(fileList) {
+  const files = [...fileList]; if (!files.length) return;
+  const libraryName = prompt('Name für diese Songbibliothek (z. B. „Hochzeitsband Setlist“):', files[0].name.replace(/\.[^.]+$/, ''));
+  if (!libraryName?.trim()) return;
+  const libraryId = `lib-${slugify(libraryName)}-${Date.now().toString(36)}`;
+  const newSongs = [];
+  let failCount = 0;
+  for (const file of files) {
+    try {
+      const text = await file.text();
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith('.json')) {
+        const parsed = JSON.parse(text);
+        const items = Array.isArray(parsed) ? parsed : Array.isArray(parsed.songs) ? parsed.songs : [parsed];
+        items.forEach(item => {
+          if (!item || (!item.title && !item.content && !item.lyrics)) return;
+          const id = uniqueSongId(item.id ? String(item.id) : slugify(`${item.title || 'song'}-${item.artist || ''}`));
+          newSongs.push({
+            id, library: libraryId,
+            title: String(item.title || id), artist: String(item.artist || ''),
+            genre: item.genre || '', tags: Array.isArray(item.tags) ? item.tags : [],
+            key: item.key || undefined, bpm: item.bpm ? Number(item.bpm) : undefined,
+            capo: item.capo !== undefined ? Number(item.capo) : undefined, singer: item.singer || '',
+            content: String(item.content || item.lyrics || '')
+          });
+        });
+      } else if (lower.endsWith('.cho') || lower.endsWith('.crd') || lower.endsWith('.pro') || lower.endsWith('.chopro') || lower.endsWith('.txt')) {
+        const song = parseChordProText(text, file.name);
+        const id = uniqueSongId(slugify(`${song.title}-${song.artist}`));
+        newSongs.push({ id, library: libraryId, ...song, tags: [] });
+      } else { failCount += 1; }
+    } catch (error) { failCount += 1; console.error(error); }
+  }
+  if (!newSongs.length) { alert('Keine passenden Songs gefunden. Unterstützt werden .json, .cho, .crd, .pro und .txt Dateien.'); return; }
+  state.libraries.push({ id: libraryId, name: libraryName.trim(), importedAt: new Date().toISOString(), count: newSongs.length });
+  state.importedSongs.push(...newSongs);
+  saveLibraries(); renderAll(); renderLibraryFilterOptions();
+  alert(`${newSongs.length} Song(s) in neue Bibliothek „${libraryName.trim()}“ importiert${failCount ? ` (${failCount} Datei(en) übersprungen)` : ''}.`);
+}
+
+function removeLibrary(libraryId) {
+  const lib = state.libraries.find(item => item.id === libraryId); if (!lib) return;
+  if (!confirm(`Bibliothek „${lib.name}“ und ihre ${lib.count} Song(s) wirklich löschen?`)) return;
+  state.libraries = state.libraries.filter(item => item.id !== libraryId);
+  state.importedSongs = state.importedSongs.filter(item => item.library !== libraryId);
+  saveLibraries(); renderAll(); renderLibraryFilterOptions(); renderLibrariesManager();
+}
+
+function renderLibraryFilterOptions() {
+  const select = $('#libraryFilter'); if (!select) return;
+  const current = select.value;
+  [...select.querySelectorAll('option[data-library]')].forEach(option => option.remove());
+  state.libraries.forEach(lib => {
+    const option = document.createElement('option');
+    option.value = `lib:${lib.id}`; option.dataset.library = '1';
+    option.textContent = `Bibliothek: ${lib.name} (${lib.count})`;
+    select.append(option);
+  });
+  if ([...select.options].some(option => option.value === current)) select.value = current;
+}
+
+function renderLibrariesManager() {
+  const host = $('#librariesManager'); if (!host) return; host.innerHTML = '';
+  if (!state.libraries.length) { host.innerHTML = '<p class="empty">Noch keine Songbibliotheken importiert.</p>'; return; }
+  state.libraries.forEach(lib => {
+    const row = document.createElement('div'); row.className = 'picker-item';
+    row.innerHTML = `<div><strong>${esc(lib.name)}</strong><small>${lib.count} Song(s) · importiert ${new Date(lib.importedAt).toLocaleDateString('de')}</small></div><button type="button">Entfernen</button>`;
+    row.querySelector('button').onclick = () => removeLibrary(lib.id);
+    host.append(row);
+  });
 }
 
 function saveSetlists() {
@@ -79,14 +204,23 @@ function meta(item) { return [item.key && `Tonart ${item.key}`, item.bpm && `${i
 function searchable(item) { return [item.title, item.artist, item.genre, ...(item.tags || [])].join(' ').toLowerCase(); }
 function isPublicDomain(item) { return item.tags?.some(tag => /public domain|gemeinfrei/i.test(tag)) || /public domain|gemeinfrei/i.test(item.source?.lyricsLicense || ''); }
 
+function dismissSplash() {
+  const splash = $('#splash'); if (!splash) return;
+  let dismissed = false;
+  const hide = () => { if (dismissed) return; dismissed = true; splash.classList.add('hide'); setTimeout(() => splash.remove(), 550); };
+  splash.addEventListener('click', hide, { once: true });
+  setTimeout(hide, 2200);
+}
+
 async function init() {
   try {
     state.baseSongs = await getJSON('./songs.json');
     state.defaultSetlists = normalizeSetlists(await getJSON('./setlists.json'));
-    loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderAll();
+    loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
     if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js', document.baseURI), { scope: './' }).catch(console.error);
+    dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
     $('#errorBanner').textContent = `App konnte nicht geladen werden: ${error.message}`;
@@ -109,6 +243,7 @@ function bindUI() {
   $('#favoriteCurrentBtn').onclick = () => toggleFavorite(state.currentId);
   $('#editSongBtn').onclick = openEditor; $('#saveSongBtn').onclick = saveEditedSong; $('#deleteOverrideBtn').onclick = deleteOverride;
   $('#exportBtn').onclick = exportData; $('#importFile').onchange = importData;
+  $('#importSongsFile').onchange = event => { importSongFiles(event.target.files); event.target.value = ''; };
   $('#speedRange').value = state.scrollSpeed; $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
   $('#speedRange').oninput = event => { state.scrollSpeed = Number(event.target.value); $('#speedValue').textContent = `${state.scrollSpeed} px/s`; localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); };
   ['darkToggle','contrastToggle','fontRange','lineRange'].forEach(id => $(`#${id}`).oninput = saveSettings);
@@ -159,6 +294,7 @@ function filteredSongs(query, filter) {
   if (filter === 'setlist') { const ids = new Set(activeSetlist()?.songs || []); items = items.filter(item => ids.has(item.id)); }
   if (filter === 'public-domain') items = items.filter(isPublicDomain);
   if (filter === 'favorites') items = items.filter(item => state.favorites.has(item.id));
+  if (filter?.startsWith('lib:')) { const libId = filter.slice(4); items = items.filter(item => item.library === libId); }
   if (q) items = items.filter(item => searchable(item).includes(q));
   return [...items].sort((a, b) => a.title.localeCompare(b.title, 'de'));
 }

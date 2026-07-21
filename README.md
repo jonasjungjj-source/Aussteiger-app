@@ -1,4 +1,4 @@
-# Aussteiger Band-App – Version 5
+# Aussteiger Band-App – Version 6
 
 GitHub-Pages-kompatible Offline-PWA mit Songbibliothek, mehreren Setlisten, Favoriten, lokalem Songeditor, Auto-Scroll und integriertem Akkordlexikon.
 

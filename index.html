@@ -3,23 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b0d10">
+  <meta name="theme-color" content="#cfbda9">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Aussteiger">
+  <meta name="apple-mobile-web-app-title" content="AusSteiger">
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./assets/icons/icon-180.png">
   <link rel="stylesheet" href="./styles.css">
-  <title>Aussteiger Band-App</title>
+  <title>AusSteiger & Friends</title>
 </head>
 <body>
+<div id="splash">
+  <img src="./assets/images/logo.jpg" alt="AusSteiger & Friends Logo">
+  <div class="splash-name">AusSteiger &amp; Friends</div>
+  <div class="splash-tag">Die Live Akustik Band mit dem besonderen Sound!</div>
+  <div class="splash-hint">Tippen zum Starten</div>
+</div>
 <header class="topbar">
   <button id="menuBtn" class="icon-btn" aria-label="Menü öffnen">☰</button>
-  <div class="title-block"><strong>Aussteiger</strong><span id="viewTitle">Setlisten</span></div>
+  <div class="title-block"><strong>AusSteiger &amp; Friends</strong><span id="viewTitle">Setlisten</span></div>
   <button id="settingsBtn" class="icon-btn" aria-label="Anzeige einstellen">Aa</button>
 </header>
 <aside id="drawer" class="drawer" aria-hidden="true">
-  <div class="drawer-title">Band-App</div>
+  <div class="drawer-title">AusSteiger &amp; Friends</div>
   <nav>
     <button data-view="setlists" class="nav-item active">Setlisten</button>
     <button data-view="library" class="nav-item">Alle Songs</button>
@@ -86,10 +92,15 @@
   </section>
 
   <section id="aboutView" class="view prose">
-    <h2>Version 5 – GitHub Pages</h2>
+    <h2>Version 7 – GitHub Pages</h2>
     <p>Alle Songs aus <code>songs.json</code> werden in der Bibliothek angezeigt. Im Menü findest du zusätzlich ein offline verfügbares Akkordlexikon mit Griffbildern und Übungshilfen. Du kannst mehrere lokale Setlisten anlegen, Favoriten markieren und Songs durchsuchen.</p>
     <p>Bearbeitungen, Setlisten und Favoriten werden nur lokal im Browser gespeichert. Nutze Export und Import für ein Backup oder den Gerätewechsel.</p>
     <div class="toolbar wrap"><button id="exportBtn">Daten exportieren</button><label class="file-btn">Daten importieren<input id="importFile" type="file" accept="application/json"></label></div>
+    <h2>Songs importieren</h2>
+    <p class="hint">Importiere eine eigene Songbibliothek: JSON-Dateien im Songformat, oder einzelne ChordPro-Dateien (.cho, .crd, .pro) bzw. .txt-Dateien (Mehrfachauswahl möglich). Jeder Import legt eine eigene, benannte Bibliothek an, die danach im Filter-Menü unter „Alle Songs“ auswählbar ist.</p>
+    <div class="toolbar wrap"><label class="file-btn">Song-Dateien wählen<input id="importSongsFile" type="file" accept=".json,.cho,.crd,.pro,.chopro,.txt" multiple></label></div>
+    <h3>Importierte Bibliotheken</h3>
+    <div id="librariesManager" class="picker-list"></div>
   </section>
 </main>
 
