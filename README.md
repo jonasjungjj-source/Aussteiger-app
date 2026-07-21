@@ -1,33 +1,17 @@
-# Aussteiger Band App v3 – GitHub Pages
+# Aussteiger Band App v3 – Combined
 
-Diese Version ist für ein GitHub-Pages-Projekt unter einer Unteradresse wie
-`https://BENUTZER.github.io/Aussteiger-app/` vorbereitet.
+GitHub-Pages-Version der Band-App mit:
 
-## Upload
-
-Lade **den Inhalt dieses Ordners** in das Hauptverzeichnis des Repositorys hoch. `index.html` muss direkt im Repository-Root liegen.
-
-Benötigte Dateien und Ordner:
-
-- `index.html`
-- `app.js`
-- `styles.css`
-- `manifest.json`
-- `service-worker.js`
-- `songs.json`
-- `setlists.json`
-- `assets/`
+- ursprünglicher Aussteiger-Setliste
+- zusätzlicher Bibliothek mit Public-Domain-Songs
+- Lyrics und Akkorden aus `public domain songs.json`
+- Auto-Scroll mit variabler Geschwindigkeit
+- Dark Mode, Kontrastmodus, Schriftgröße und Zeilenabstand
+- lokalem Song-Editor sowie Import/Export
+- Offline-PWA über Service Worker
 
 ## GitHub Pages
 
-Unter **Settings → Pages**:
+Alle Dateien und den Ordner `assets` in das Hauptverzeichnis des Repositorys hochladen. Danach unter **Settings → Pages** den Branch `main` und `/(root)` auswählen.
 
-- Source: `Deploy from a branch`
-- Branch: `main`
-- Folder: `/ (root)`
-
-## Nach einem Update
-
-Safari kann noch eine alte Offline-Version anzeigen. Seite neu laden; falls nötig die Web-App vom Home-Bildschirm löschen und erneut hinzufügen.
-
-Songänderungen werden ausschließlich im lokalen Browser-Speicher des jeweiligen iPhones/iPads gespeichert. Über „Daten exportieren“ regelmäßig ein Backup erzeugen.
+Die vorhandene Setliste bleibt Standard. Die Public-Domain-Songs stehen in der Song-Bibliothek zur Auswahl und können zur Setliste hinzugefügt werden.

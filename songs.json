@@ -414,5 +414,2188 @@
     "artist": "Achim Reichel",
     "singer": "Tom",
     "content": "## Achim Reichel\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "amazing-grace",
+    "title": "Amazing Grace",
+    "artist": "John Newton / Traditional",
+    "year": 1779,
+    "genre": "Hymn / Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 72,
+    "duration": 220,
+    "tags": [
+      "Hymn",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2",
+      "Verse 3"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Amazing grace, how sweet the sound\nThat saved a wretch like me\nI once was lost, but now am found\nWas blind, but now I see\n\n'Twas grace that taught my heart to fear\nAnd grace my fears relieved\nHow precious did that grace appear\nThe hour I first believed\n\nThrough many dangers, toils, and snares\nI have already come\n'Tis grace hath brought me safe thus far\nAnd grace will lead me home",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\n[G]Amazing [C]grace, how [G]sweet the [D]sound\nThat [G]saved a [Em]wretch like [D]me\nI [G]once was [C]lost, but [G]now am [D]found\nWas [G]blind, but [D]now I [G]see\n\n[Verse 2]\n'Twas [G]grace that [C]taught my [G]heart to [D]fear\nAnd [G]grace my [Em]fears re-[D]lieved\nHow [G]precious [C]did that [G]grace ap-[D]pear\nThe [G]hour I [D]first be-[G]lieved\n\n[Verse 3]\nThrough [G]many [C]dangers, [G]toils, and [D]snares\nI [G]have al-[Em]ready [D]come\n'Tis [G]grace hath [C]brought me [G]safe thus [D]far\nAnd [G]grace will [D]lead me [G]home",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Amazing [C]grace, how [G]sweet the [D]sound\nThat [G]saved a [Em]wretch like [D]me\nI [G]once was [C]lost, but [G]now am [D]found\nWas [G]blind, but [D]now I [G]see"
+      },
+      {
+        "title": "Verse 2",
+        "content": "'Twas [G]grace that [C]taught my [G]heart to [D]fear\nAnd [G]grace my [Em]fears re-[D]lieved\nHow [G]precious [C]did that [G]grace ap-[D]pear\nThe [G]hour I [D]first be-[G]lieved"
+      },
+      {
+        "title": "Verse 3",
+        "content": "Through [G]many [C]dangers, [G]toils, and [D]snares\nI [G]have al-[Em]ready [D]come\n'Tis [G]grace hath [C]brought me [G]safe thus [D]far\nAnd [G]grace will [D]lead me [G]home"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "oh-susanna",
+    "title": "Oh! Susanna",
+    "artist": "Stephen Foster",
+    "year": 1848,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 150,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus",
+      "Verse 2",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "I come from Alabama with a banjo on my knee\nI'm goin' to Louisiana, my true love for to see\nIt rained all night the day I left, the weather it was dry\nThe sun so hot I froze to death, Susanna don't you cry\n\nOh, Susanna, oh don't you cry for me\nFor I come from Alabama with a banjo on my knee",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\nI [D]come from Alabama with a [G]banjo on my [D]knee\nI'm [D]goin' to Louisiana, my [A7]true love for to [D]see\n\n[Chorus]\nOh, [D]Susanna, oh [G]don't you cry for [D]me\nFor I [D]come from Alabama with a [A7]banjo on my [D]knee",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "I [D]come from Alabama with a [G]banjo on my [D]knee\nI'm [D]goin' to Louisiana, my [A7]true love for to [D]see"
+      },
+      {
+        "title": "Chorus",
+        "content": "Oh, [D]Susanna, oh [G]don't you cry for [D]me\nFor I [D]come from Alabama with a [A7]banjo on my [D]knee"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "home-on-the-range",
+    "title": "Home on the Range",
+    "artist": "Brewster Higley / Traditional",
+    "year": 1873,
+    "genre": "Cowboy / Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 180,
+    "tags": [
+      "Folk",
+      "Cowboy",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Oh, give me a home where the buffalo roam\nWhere the deer and the antelope play\nWhere seldom is heard a discouraging word\nAnd the skies are not cloudy all day\n\nHome, home on the range\nWhere the deer and the antelope play\nWhere seldom is heard a discouraging word\nAnd the skies are not cloudy all day",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nOh, [G]give me a home where the [C]buffalo [G]roam\nWhere the [D]deer and the ante-[G]lope play\n\n[Chorus]\n[G]Home, home on the [C]range\nWhere the [G]deer and the ante-[D]lope [G]play",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Oh, [G]give me a home where the [C]buffalo [G]roam\nWhere the [D]deer and the ante-[G]lope play"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Home, home on the [C]range\nWhere the [G]deer and the ante-[D]lope [G]play"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "shenandoah",
+    "title": "Shenandoah",
+    "artist": "Traditional",
+    "year": 1800,
+    "genre": "Sea Shanty / Folk",
+    "key": "Am",
+    "capo": 0,
+    "bpm": 65,
+    "duration": 210,
+    "tags": [
+      "Folk",
+      "Sea Shanty",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Oh Shenandoah, I long to hear you\nAway, you rolling river\nOh Shenandoah, I long to hear you\nAway, I'm bound away, 'cross the wide Missouri\n\nOh Shenandoah, I love your daughter\nAway, you rolling river\nFor her I've crossed the rolling water\nAway, I'm bound away, 'cross the wide Missouri",
+    "chords": "Am, Dm, C, G, E",
+    "content": "[Verse 1]\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[G]Away, you [C]rolling [G]river\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Oh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[G]Away, you [C]rolling [G]river\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "drunken-sailor",
+    "title": "What Shall We Do with the Drunken Sailor?",
+    "artist": "Traditional",
+    "year": 1830,
+    "genre": "Sea Shanty / Folk",
+    "key": "Dm",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 165,
+    "tags": [
+      "Folk",
+      "Sea Shanty",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "What shall we do with a drunken sailor?\nWhat shall we do with a drunken sailor?\nWhat shall we do with a drunken sailor?\nEarly in the morning\n\nHooray and up she rises\nHooray and up she rises\nHooray and up she rises\nEarly in the morning",
+    "chords": "Dm, C",
+    "content": "[Verse 1]\nWhat shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\n[Dm]Early in the [C]morning\n\n[Verse 2]\n[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Early in the [C]morning",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "What shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\n[Dm]Early in the [C]morning"
+      },
+      {
+        "title": "Verse 2",
+        "content": "[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Early in the [C]morning"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "scarborough-fair",
+    "title": "Scarborough Fair",
+    "artist": "Traditional",
+    "year": 1670,
+    "genre": "English Folk Ballad",
+    "key": "Dm",
+    "capo": 0,
+    "bpm": 80,
+    "duration": 240,
+    "tags": [
+      "Folk",
+      "Ballad",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Are you going to Scarborough Fair?\nParsley, sage, rosemary, and thyme\nRemember me to one who lives there\nFor she once was a true love of mine\n\nTell her to make me a cambric shirt\nParsley, sage, rosemary, and thyme\nWithout no seam nor needlework\nThen she'll be a true love of mine",
+    "chords": "Dm, C, Bb, A",
+    "content": "[Verse 1]\nAre you [Dm]going to Scarborough [C]Fair?\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nRe-[Dm]member me to one who [C]lives there\nFor she [Bb]once was a true love of [A]mine",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Are you [Dm]going to Scarborough [C]Fair?\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nRe-[Dm]member me to one who [C]lives there\nFor she [Bb]once was a true love of [A]mine"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "greensleeves",
+    "title": "Greensleeves",
+    "artist": "Traditional",
+    "year": 1580,
+    "genre": "English Folk / Renaissance",
+    "key": "Am",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 200,
+    "tags": [
+      "Folk",
+      "Renaissance",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Alas, my love, you do me wrong\nTo cast me off discourteously\nFor I have loved you well and long\nDelighting in your company\n\nGreensleeves was all my joy\nGreensleeves was my delight\nGreensleeves was my heart of gold\nAnd who but my lady Greensleeves",
+    "chords": "Am, C, G, Em, F, E7",
+    "content": "[Verse 1]\n[Am]Alas, my [C]love, you [G]do me [Em]wrong\nTo [Am]cast me [F]off dis-[E7]courteous-[Am]ly\n\n[Chorus]\n[C]Greensleeves was [G]all my [Am]joy\n[C]Greensleeves was [G]my de-[E7]light",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[Am]Alas, my [C]love, you [G]do me [Em]wrong\nTo [Am]cast me [F]off dis-[E7]courteous-[Am]ly"
+      },
+      {
+        "title": "Chorus",
+        "content": "[C]Greensleeves was [G]all my [Am]joy\n[C]Greensleeves was [G]my de-[E7]light"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "auld-lang-syne",
+    "title": "Auld Lang Syne",
+    "artist": "Robert Burns / Traditional",
+    "year": 1788,
+    "genre": "Scottish Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 80,
+    "duration": 190,
+    "tags": [
+      "Folk",
+      "Scottish",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Should auld acquaintance be forgot\nAnd never brought to mind?\nShould auld acquaintance be forgot\nAnd auld lang syne?\n\nFor auld lang syne, my dear\nFor auld lang syne\nWe'll take a cup of kindness yet\nFor auld lang syne",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\nShould [G]auld ac-[C]quaintance [G]be for-[D]got\nAnd [G]never brought to [Em]mind?\nShould [G]auld ac-[C]quaintance [G]be for-[D]got\nAnd [G]auld lang [D]syne?\n\n[Chorus]\nFor [G]auld lang [C]syne, my [G]dear\nFor [G]auld lang [D]syne\nWe'll [G]take a [C]cup of [G]kindness [D]yet\nFor [G]auld lang [D]syne",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Should [G]auld ac-[C]quaintance [G]be for-[D]got\nAnd [G]never brought to [Em]mind?\nShould [G]auld ac-[C]quaintance [G]be for-[D]got\nAnd [G]auld lang [D]syne?"
+      },
+      {
+        "title": "Chorus",
+        "content": "For [G]auld lang [C]syne, my [G]dear\nFor [G]auld lang [D]syne\nWe'll [G]take a [C]cup of [G]kindness [D]yet\nFor [G]auld lang [D]syne"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "danny-boy",
+    "title": "Danny Boy",
+    "artist": "Frederic Weatherly / Traditional (Londonderry Air)",
+    "year": 1913,
+    "genre": "Irish Ballad",
+    "key": "G",
+    "capo": 0,
+    "bpm": 66,
+    "duration": 230,
+    "tags": [
+      "Folk",
+      "Irish",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Oh Danny boy, the pipes, the pipes are calling\nFrom glen to glen, and down the mountain side\nThe summer's gone, and all the roses falling\n'Tis you, 'tis you must go and I must bide\n\nBut come ye back when summer's in the meadow\nOr when the valley's hushed and white with snow\n'Tis I'll be here in sunshine or in shadow\nOh Danny boy, oh Danny boy, I love you so",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\nOh [G]Danny boy, the [C]pipes, the [G]pipes are [D]calling\nFrom [Em]glen to glen, and [C]down the [D]mountain [G]side",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Oh [G]Danny boy, the [C]pipes, the [G]pipes are [D]calling\nFrom [Em]glen to glen, and [C]down the [D]mountain [G]side"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "coming-round-the-mountain",
+    "title": "She'll Be Coming 'Round the Mountain",
+    "artist": "Traditional",
+    "year": 1899,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 130,
+    "duration": 140,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "She'll be coming 'round the mountain when she comes\nShe'll be coming 'round the mountain when she comes\nShe'll be coming 'round the mountain\nShe'll be coming 'round the mountain\nShe'll be coming 'round the mountain when she comes\n\nShe'll be driving six white horses when she comes\nShe'll be driving six white horses when she comes\nShe'll be driving six white horses\nShe'll be driving six white horses\nShe'll be driving six white horses when she comes",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\nShe'll be [D]coming 'round the mountain when she [G]comes\nShe'll be [D]coming 'round the mountain when she [A7]comes\nShe'll be [D]coming 'round the mountain\nShe'll be [G]coming 'round the mountain\nShe'll be [D]coming 'round the [A7]mountain when she [D]comes",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "She'll be [D]coming 'round the mountain when she [G]comes\nShe'll be [D]coming 'round the mountain when she [A7]comes\nShe'll be [D]coming 'round the mountain\nShe'll be [G]coming 'round the mountain\nShe'll be [D]coming 'round the [A7]mountain when she [D]comes"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "buffalo-gals",
+    "title": "Buffalo Gals",
+    "artist": "Cool White (John Hodges) / Traditional",
+    "year": 1844,
+    "genre": "American Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 160,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "As I was walking down the street\nDown the street, down the street\nA pretty little girl I chanced to meet\nUnder the silvery moon\n\nBuffalo gals, won't you come out tonight\nCome out tonight, come out tonight\nBuffalo gals, won't you come out tonight\nAnd dance by the light of the moon",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nAs I was [G]walking down the [C]street\nDown the [G]street, down the [D]street\nA [G]pretty little girl I [C]chanced to [G]meet\nUnder the [D]silvery [G]moon\n\n[Chorus]\n[G]Buffalo gals, won't you [C]come out to-[G]night\nCome out to-[D]night, come out to-[G]night\n[G]Buffalo gals, won't you [C]come out to-[G]night\nAnd [D]dance by the light of the [G]moon",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "As I was [G]walking down the [C]street\nDown the [G]street, down the [D]street\nA [G]pretty little girl I [C]chanced to [G]meet\nUnder the [D]silvery [G]moon"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Buffalo gals, won't you [C]come out to-[G]night\nCome out to-[D]night, come out to-[G]night\n[G]Buffalo gals, won't you [C]come out to-[G]night\nAnd [D]dance by the light of the [G]moon"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "skip-to-my-lou",
+    "title": "Skip to My Lou",
+    "artist": "Traditional",
+    "year": 1840,
+    "genre": "American Folk / Children's",
+    "key": "D",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 140,
+    "tags": [
+      "Folk",
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Lost my partner, what'll I do?\nLost my partner, what'll I do?\nLost my partner, what'll I do?\nSkip to my Lou, my darling\n\nSkip, skip, skip to my Lou\nSkip, skip, skip to my Lou\nSkip, skip, skip to my Lou\nSkip to my Lou, my darling",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\nLost my [D]partner, what'll I [G]do?\nLost my [D]partner, what'll I [A7]do?\nLost my [D]partner, what'll I [G]do?\n[D]Skip to my [A7]Lou, my [D]darling",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Lost my [D]partner, what'll I [G]do?\nLost my [D]partner, what'll I [A7]do?\nLost my [D]partner, what'll I [G]do?\n[D]Skip to my [A7]Lou, my [D]darling"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "turkey-in-the-straw",
+    "title": "Turkey in the Straw",
+    "artist": "Traditional",
+    "year": 1834,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 130,
+    "duration": 120,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "As I was a-goin' down the road\nWith a tired team and a heavy load\nI cracked my whip and the leader sprung\nI says day-day to the wagon tongue\n\nTurkey in the straw, turkey in the hay\nRoll 'em up and twist 'em up a high tuckahaw\nAnd hit 'em up a tune called turkey in the straw",
+    "chords": "D, G, A",
+    "content": "[Verse 1]\nAs I was a-[D]goin' down the road\nWith a [G]tired team and a heavy [D]load\nI [D]cracked my whip and the leader [G]sprung\nI says [A]day-day to the wagon [D]tongue",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "As I was a-[D]goin' down the road\nWith a [G]tired team and a heavy [D]load\nI [D]cracked my whip and the leader [G]sprung\nI says [A]day-day to the wagon [D]tongue"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "yankee-doodle",
+    "title": "Yankee Doodle",
+    "artist": "Traditional",
+    "year": 1755,
+    "genre": "American Folk / Patriotic",
+    "key": "D",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 100,
+    "tags": [
+      "Folk",
+      "Patriotic",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Yankee Doodle went to town, a-riding on a pony\nStuck a feather in his cap and called it macaroni\n\nYankee Doodle, keep it up, Yankee Doodle dandy\nMind the music and the step, and with the girls be handy",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\n[D]Yankee Doodle went to town, a-[G]riding on a [D]pony\nStuck a [A7]feather in his cap and called it macaro-[D]ni\n\n[Chorus]\n[D]Yankee Doodle, keep it [G]up, Yankee Doodle [D]dandy\nMind the [A7]music and the step, and with the girls be [D]handy",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[D]Yankee Doodle went to town, a-[G]riding on a [D]pony\nStuck a [A7]feather in his cap and called it macaro-[D]ni"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]Yankee Doodle, keep it [G]up, Yankee Doodle [D]dandy\nMind the [A7]music and the step, and with the girls be [D]handy"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "red-river-valley",
+    "title": "Red River Valley",
+    "artist": "Traditional",
+    "year": 1896,
+    "genre": "American / Cowboy Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 200,
+    "tags": [
+      "Folk",
+      "Cowboy",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "From this valley they say you are going\nWe will miss your bright eyes and sweet smile\nFor they say you are taking the sunshine\nThat has brightened our pathway a while\n\nCome and sit by my side if you love me\nDo not hasten to bid me adieu\nBut remember the Red River Valley\nAnd the one who has loved you so true",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\nFrom this [G]valley they say you are [C]going\nWe will [G]miss your bright [D]eyes and sweet [G]smile\nFor they [Em]say you are taking the [C]sunshine\nThat has [G]brightened our [D]pathway a [G]while",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "From this [G]valley they say you are [C]going\nWe will [G]miss your bright [D]eyes and sweet [G]smile\nFor they [Em]say you are taking the [C]sunshine\nThat has [G]brightened our [D]pathway a [G]while"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "on-top-of-old-smoky",
+    "title": "On Top of Old Smoky",
+    "artist": "Traditional",
+    "year": 1900,
+    "genre": "Appalachian Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 75,
+    "duration": 190,
+    "tags": [
+      "Folk",
+      "Appalachian",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "On top of old Smoky, all covered with snow\nI lost my true lover for courtin' too slow\n\nFor courtin's a pleasure, and parting is grief\nAnd a false-hearted lover is worse than a thief",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nOn [G]top of old [C]Smoky, all [G]covered with [D]snow\nI [G]lost my true [C]lover for [G]courtin' too [D]slow",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "On [G]top of old [C]Smoky, all [G]covered with [D]snow\nI [G]lost my true [C]lover for [G]courtin' too [D]slow"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "john-henry",
+    "title": "John Henry",
+    "artist": "Traditional",
+    "year": 1900,
+    "genre": "American Folk Ballad",
+    "key": "Am",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 240,
+    "tags": [
+      "Folk",
+      "Ballad",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "John Henry was a little baby boy\nSitting on his daddy's knee\nHe picked up a hammer and a little piece of steel\nSaid, 'Hammer's gonna be the death of me, Lord, Lord\nHammer's gonna be the death of me'\n\nJohn Henry said to his captain\n'A man ain't nothin' but a man\nBut before I let that steam drill beat me down\nI'll die with a hammer in my hand, Lord, Lord\nI'll die with a hammer in my hand'",
+    "chords": "Am, G, C, E7",
+    "content": "[Verse 1]\n[Am]John Henry was a little baby [G]boy\nSitting on his [Am]daddy's [C]knee\nHe [Am]picked up a hammer and a little piece of [G]steel\nSaid, [Am]hammer's gonna be the death of me, [E7]Lord, [Am]Lord\nHammer's gonna be the death of [Am]me",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[Am]John Henry was a little baby [G]boy\nSitting on his [Am]daddy's [C]knee\nHe [Am]picked up a hammer and a little piece of [G]steel\nSaid, [Am]hammer's gonna be the death of me, [E7]Lord, [Am]Lord\nHammer's gonna be the death of [Am]me"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "tom-dooley",
+    "title": "Tom Dooley",
+    "artist": "Traditional",
+    "year": 1866,
+    "genre": "Appalachian Folk Ballad",
+    "key": "D",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 170,
+    "tags": [
+      "Folk",
+      "Ballad",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "I met her on the mountain\nThere I took her life\nMet her on the mountain\nStabbed her with my knife\n\nHang down your head, Tom Dooley\nHang down your head and cry\nHang down your head, Tom Dooley\nPoor boy, you're bound to die",
+    "chords": "D, G, A",
+    "content": "[Verse 1]\nI [D]met her on the [G]mountain\nThere I [D]took her [A]life\n[D]Met her on the [G]mountain\nStabbed her with my [D]knife\n\n[Chorus]\n[D]Hang down your head, [G]Tom Doo-[D]ley\nHang down your [A]head and [D]cry\n[D]Hang down your head, [G]Tom Doo-[D]ley\nPoor boy, you're [A]bound to [D]die",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "I [D]met her on the [G]mountain\nThere I [D]took her [A]life\n[D]Met her on the [G]mountain\nStabbed her with my [D]knife"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]Hang down your head, [G]Tom Doo-[D]ley\nHang down your [A]head and [D]cry\n[D]Hang down your head, [G]Tom Doo-[D]ley\nPoor boy, you're [A]bound to [D]die"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "swing-low-sweet-chariot",
+    "title": "Swing Low, Sweet Chariot",
+    "artist": "Traditional Spiritual",
+    "year": 1862,
+    "genre": "Spiritual",
+    "key": "G",
+    "capo": 0,
+    "bpm": 70,
+    "duration": 210,
+    "tags": [
+      "Spiritual",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Chorus",
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Swing low, sweet chariot\nComing for to carry me home\nSwing low, sweet chariot\nComing for to carry me home\n\nI looked over Jordan, and what did I see\nComing for to carry me home\nA band of angels coming after me\nComing for to carry me home",
+    "chords": "G, C, D, Em",
+    "content": "[Chorus]\n[G]Swing low, sweet [C]chariot\nComing for to [G]carry me [D]home\n[G]Swing low, sweet [C]chariot\nComing for to [G]carry me [D]home\n\n[Verse 1]\nI [G]looked over [C]Jordan, and [G]what did I [D]see\nComing for to [Em]carry me [C]home\nA [G]band of angels [C]coming after [G]me\nComing for to [D]carry me [G]home",
+    "sections": [
+      {
+        "title": "Chorus",
+        "content": "[G]Swing low, sweet [C]chariot\nComing for to [G]carry me [D]home\n[G]Swing low, sweet [C]chariot\nComing for to [G]carry me [D]home"
+      },
+      {
+        "title": "Verse 1",
+        "content": "I [G]looked over [C]Jordan, and [G]what did I [D]see\nComing for to [Em]carry me [C]home\nA [G]band of angels [C]coming after [G]me\nComing for to [D]carry me [G]home"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "when-the-saints-go-marching-in",
+    "title": "When the Saints Go Marching In",
+    "artist": "Traditional Gospel",
+    "year": 1896,
+    "genre": "Gospel / Jazz Standard",
+    "key": "C",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 150,
+    "tags": [
+      "Gospel",
+      "Jazz",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Oh, when the saints go marching in\nOh, when the saints go marching in\nOh Lord, I want to be in that number\nWhen the saints go marching in",
+    "chords": "C, F, G7",
+    "content": "[Verse 1]\nOh, [C]when the saints go [F]marching [C]in\nOh, when the [C]saints go [G7]marching [C]in\nOh [C]Lord, I want to [F]be in that [C]number\nWhen the [G7]saints go [C]marching [G7]in",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Oh, [C]when the saints go [F]marching [C]in\nOh, when the [C]saints go [G7]marching [C]in\nOh [C]Lord, I want to [F]be in that [C]number\nWhen the [G7]saints go [C]marching [G7]in"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "michael-row-the-boat-ashore",
+    "title": "Michael, Row the Boat Ashore",
+    "artist": "Traditional Spiritual",
+    "year": 1863,
+    "genre": "Spiritual",
+    "key": "G",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 160,
+    "tags": [
+      "Spiritual",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Michael, row the boat ashore, hallelujah\nMichael, row the boat ashore, hallelujah\n\nSister, help to trim the sail, hallelujah\nSister, help to trim the sail, hallelujah",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "go-down-moses",
+    "title": "Go Down, Moses",
+    "artist": "Traditional Spiritual",
+    "year": 1862,
+    "genre": "Spiritual",
+    "key": "Am",
+    "capo": 0,
+    "bpm": 65,
+    "duration": 200,
+    "tags": [
+      "Spiritual",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "When Israel was in Egypt's land\nLet my people go\nOppressed so hard they could not stand\nLet my people go\n\nGo down, Moses, way down in Egypt's land\nTell old Pharaoh to let my people go",
+    "chords": "Am, Dm, E7, G",
+    "content": "[Verse 1]\nWhen [Am]Israel was in [Dm]Egypt's [Am]land\nLet my [E7]people [Am]go\nOp-[Am]pressed so hard they [Dm]could not [Am]stand\nLet my [E7]people [Am]go\n\n[Chorus]\nGo [Am]down, Moses, [Dm]way down in [Am]Egypt's land\nTell old [E7]Pharaoh to let my [Am]people go",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "When [Am]Israel was in [Dm]Egypt's [Am]land\nLet my [E7]people [Am]go\nOp-[Am]pressed so hard they [Dm]could not [Am]stand\nLet my [E7]people [Am]go"
+      },
+      {
+        "title": "Chorus",
+        "content": "Go [Am]down, Moses, [Dm]way down in [Am]Egypt's land\nTell old [E7]Pharaoh to let my [Am]people go"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "nobody-knows-the-trouble",
+    "title": "Nobody Knows the Trouble I've Seen",
+    "artist": "Traditional Spiritual",
+    "year": 1867,
+    "genre": "Spiritual",
+    "key": "Em",
+    "capo": 0,
+    "bpm": 65,
+    "duration": 210,
+    "tags": [
+      "Spiritual",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Nobody knows the trouble I've seen\nNobody knows my sorrow\nNobody knows the trouble I've seen\nGlory hallelujah\n\nSometimes I'm up, sometimes I'm down\nOh, yes, Lord\nSometimes I'm almost to the ground\nOh, yes, Lord",
+    "chords": "Em, Am, B7, C, D",
+    "content": "[Verse 1]\n[Em]Nobody knows the [Am]trouble I've [Em]seen\nNobody [B7]knows my [Em]sorrow\n[Em]Nobody knows the [Am]trouble I've [Em]seen\n[C]Glory halle-[B7]lujah",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[Em]Nobody knows the [Am]trouble I've [Em]seen\nNobody [B7]knows my [Em]sorrow\n[Em]Nobody knows the [Am]trouble I've [Em]seen\n[C]Glory halle-[B7]lujah"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "wade-in-the-water",
+    "title": "Wade in the Water",
+    "artist": "Traditional Spiritual",
+    "year": 1901,
+    "genre": "Spiritual",
+    "key": "Dm",
+    "capo": 0,
+    "bpm": 80,
+    "duration": 190,
+    "tags": [
+      "Spiritual",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Chorus",
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Wade in the water\nWade in the water, children\nWade in the water\nGod's gonna trouble the water\n\nWho's that young girl dressed in red\nGod's gonna trouble the water\nMust be the children that Moses led\nGod's gonna trouble the water",
+    "chords": "Dm, C, Bb, A",
+    "content": "[Chorus]\n[Dm]Wade in the [C]water\n[Dm]Wade in the [C]water, [Dm]children\n[Dm]Wade in the [C]water\n[Bb]God's gonna [A]trouble the [Dm]water",
+    "sections": [
+      {
+        "title": "Chorus",
+        "content": "[Dm]Wade in the [C]water\n[Dm]Wade in the [C]water, [Dm]children\n[Dm]Wade in the [C]water\n[Bb]God's gonna [A]trouble the [Dm]water"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "down-by-the-riverside",
+    "title": "Down by the Riverside",
+    "artist": "Traditional Spiritual",
+    "year": 1918,
+    "genre": "Spiritual",
+    "key": "F",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 180,
+    "tags": [
+      "Spiritual",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Gonna lay down my sword and shield\nDown by the riverside\nDown by the riverside\nDown by the riverside\nGonna lay down my sword and shield\nDown by the riverside\nAin't gonna study war no more",
+    "chords": "F, Bb, C7",
+    "content": "[Chorus]\nGonna [F]lay down my sword and [Bb]shield\nDown by the [F]riverside\nDown by the [C7]riverside\nDown by the [F]riverside\nGonna [F]lay down my sword and [Bb]shield\nDown by the [F]riverside\nAin't gonna [C7]study war no [F]more",
+    "sections": [
+      {
+        "title": "Chorus",
+        "content": "Gonna [F]lay down my sword and [Bb]shield\nDown by the [F]riverside\nDown by the [C7]riverside\nDown by the [F]riverside\nGonna [F]lay down my sword and [Bb]shield\nDown by the [F]riverside\nAin't gonna [C7]study war no [F]more"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "this-little-light-of-mine",
+    "title": "This Little Light of Mine",
+    "artist": "Traditional Gospel",
+    "year": 1920,
+    "genre": "Gospel",
+    "key": "C",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 150,
+    "tags": [
+      "Gospel",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "This little light of mine, I'm gonna let it shine\nThis little light of mine, I'm gonna let it shine\nThis little light of mine, I'm gonna let it shine\nLet it shine, let it shine, let it shine",
+    "chords": "C, F, G",
+    "content": "[Verse 1]\nThis [C]little light of mine, I'm gonna [F]let it [C]shine\nThis [C]little light of mine, I'm gonna [G]let it [C]shine\nThis [C]little light of mine, I'm gonna [F]let it [C]shine\n[C]Let it shine, [F]let it shine, [G]let it [C]shine",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "This [C]little light of mine, I'm gonna [F]let it [C]shine\nThis [C]little light of mine, I'm gonna [G]let it [C]shine\nThis [C]little light of mine, I'm gonna [F]let it [C]shine\n[C]Let it shine, [F]let it shine, [G]let it [C]shine"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "kumbaya",
+    "title": "Kumbaya",
+    "artist": "Traditional Spiritual",
+    "year": 1920,
+    "genre": "Spiritual / Folk",
+    "key": "C",
+    "capo": 0,
+    "bpm": 70,
+    "duration": 200,
+    "tags": [
+      "Spiritual",
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Kumbaya, my Lord, kumbaya\nKumbaya, my Lord, kumbaya\nKumbaya, my Lord, kumbaya\nOh Lord, kumbaya\n\nSomeone's crying, Lord, kumbaya\nSomeone's crying, Lord, kumbaya\nSomeone's crying, Lord, kumbaya\nOh Lord, kumbaya",
+    "chords": "C, F, G",
+    "content": "[Verse 1]\n[C]Kumbaya, my [F]Lord, kum-[C]baya\n[C]Kumbaya, my [G]Lord, kum-[C]baya\n[C]Kumbaya, my [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[C]Kumbaya, my [F]Lord, kum-[C]baya\n[C]Kumbaya, my [G]Lord, kum-[C]baya\n[C]Kumbaya, my [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "home-sweet-home",
+    "title": "Home! Sweet Home!",
+    "artist": "John Howard Payne",
+    "year": 1823,
+    "genre": "Parlor Song",
+    "key": "G",
+    "capo": 0,
+    "bpm": 70,
+    "duration": 210,
+    "tags": [
+      "Public Domain",
+      "Classic"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "'Mid pleasures and palaces though we may roam\nBe it ever so humble, there's no place like home\nA charm from the skies seems to hallow us there\nWhich, seek through the world, is ne'er met with elsewhere\n\nHome, home, sweet, sweet home\nThere's no place like home\nThere's no place like home",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\n'Mid [G]pleasures and [C]palaces [G]though we may [D]roam\nBe it [G]ever so [C]humble, there's [G]no place like [D]home\n\n[Chorus]\n[G]Home, home, [C]sweet, sweet [G]home\nThere's [Em]no place like [D]home",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "'Mid [G]pleasures and [C]palaces [G]though we may [D]roam\nBe it [G]ever so [C]humble, there's [G]no place like [D]home"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Home, home, [C]sweet, sweet [G]home\nThere's [Em]no place like [D]home"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "beautiful-dreamer",
+    "title": "Beautiful Dreamer",
+    "artist": "Stephen Foster",
+    "year": 1862,
+    "genre": "Parlor Song",
+    "key": "G",
+    "capo": 0,
+    "bpm": 70,
+    "duration": 220,
+    "tags": [
+      "Public Domain",
+      "Classic"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Beautiful dreamer, wake unto me\nStarlight and dewdrops are waiting for thee\nSounds of the rude world heard in the day\nLulled by the moonlight have all passed away",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\n[G]Beautiful [C]dreamer, [G]wake unto [D]me\nStarlight and [Em]dewdrops are [C]waiting for [D]thee",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Beautiful [C]dreamer, [G]wake unto [D]me\nStarlight and [Em]dewdrops are [C]waiting for [D]thee"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "ash-grove",
+    "title": "The Ash Grove",
+    "artist": "Traditional Welsh",
+    "year": 1862,
+    "genre": "Welsh Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 200,
+    "tags": [
+      "Folk",
+      "Welsh",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Down yonder green valley where streamlets meander\nWhen twilight is fading, I pensively rove\nOr at the bright noontide in solitude wander\nAmid the dark shades of the lonely ash grove",
+    "chords": "G, C, D, Am",
+    "content": "[Verse 1]\n[G]Down yonder green [C]valley where [G]streamlets [D]meander\nWhen [G]twilight is [Am]fading, I [D]pensively [G]rove",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Down yonder green [C]valley where [G]streamlets [D]meander\nWhen [G]twilight is [Am]fading, I [D]pensively [G]rove"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "barbara-allen",
+    "title": "Barbara Allen",
+    "artist": "Traditional",
+    "year": 1690,
+    "genre": "English/Scottish Ballad",
+    "key": "D",
+    "capo": 0,
+    "bpm": 70,
+    "duration": 260,
+    "tags": [
+      "Folk",
+      "Ballad",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "In Scarlet town, where I was born\nThere was a fair maid dwellin'\nMade every youth cry well-a-day\nHer name was Barbara Allen\n\n'Twas in the merry month of May\nWhen green buds all were swellin'\nSweet William came from the west country\nAnd courted Barbara Allen",
+    "chords": "D, G, A",
+    "content": "[Verse 1]\nIn [D]Scarlet town, where I was [G]born\nThere was a [D]fair maid [A]dwellin'\nMade [D]every youth cry [G]well-a-[D]day\nHer [A]name was Barbara [D]Allen",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "In [D]Scarlet town, where I was [G]born\nThere was a [D]fair maid [A]dwellin'\nMade [D]every youth cry [G]well-a-[D]day\nHer [A]name was Barbara [D]Allen"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "water-is-wide",
+    "title": "The Water Is Wide",
+    "artist": "Traditional",
+    "year": 1600,
+    "genre": "Scottish/English Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 65,
+    "duration": 220,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "The water is wide, I cannot get o'er\nAnd neither have I wings to fly\nGive me a boat that can carry two\nAnd both shall row, my love and I\n\nThere is a ship, and she sails the sea\nShe's loaded deep as deep can be\nBut not so deep as the love I'm in\nI know not how I sink or swim",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\nThe [G]water is [C]wide, I [G]cannot get [D]o'er\nAnd [Em]neither have I [C]wings to [D]fly\nGive me a [G]boat that can [C]carry [G]two\nAnd [Em]both shall row, my [D]love and [G]I",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "The [G]water is [C]wide, I [G]cannot get [D]o'er\nAnd [Em]neither have I [C]wings to [D]fly\nGive me a [G]boat that can [C]carry [G]two\nAnd [Em]both shall row, my [D]love and [G]I"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "loch-lomond",
+    "title": "Loch Lomond",
+    "artist": "Traditional Scottish",
+    "year": 1841,
+    "genre": "Scottish Folk",
+    "key": "F",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 210,
+    "tags": [
+      "Folk",
+      "Scottish",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "By yon bonnie banks and by yon bonnie braes\nWhere the sun shines bright on Loch Lomond\nWhere me and my true love were ever wont to gae\nOn the bonnie, bonnie banks of Loch Lomond\n\nOh, ye'll tak' the high road and I'll tak' the low road\nAnd I'll be in Scotland afore ye\nBut me and my true love will never meet again\nOn the bonnie, bonnie banks of Loch Lomond",
+    "chords": "F, Bb, C7, Dm",
+    "content": "[Verse 1]\nBy yon [F]bonnie banks and by yon [Bb]bonnie [F]braes\nWhere the [C7]sun shines bright on Loch Lo-[F]mond\nWhere me and my [Bb]true love were ever wont to [F]gae\nOn the [C7]bonnie, bonnie banks of Loch Lo-[F]mond\n\n[Chorus]\nOh, ye'll [F]tak' the high road and I'll [Bb]tak' the low [F]road\nAnd I'll [C7]be in Scotland afore [F]ye\nBut me and my [Bb]true love will never meet a-[F]gain\nOn the [C7]bonnie, bonnie banks of Loch Lo-[F]mond",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "By yon [F]bonnie banks and by yon [Bb]bonnie [F]braes\nWhere the [C7]sun shines bright on Loch Lo-[F]mond\nWhere me and my [Bb]true love were ever wont to [F]gae\nOn the [C7]bonnie, bonnie banks of Loch Lo-[F]mond"
+      },
+      {
+        "title": "Chorus",
+        "content": "Oh, ye'll [F]tak' the high road and I'll [Bb]tak' the low [F]road\nAnd I'll [C7]be in Scotland afore [F]ye\nBut me and my [Bb]true love will never meet a-[F]gain\nOn the [C7]bonnie, bonnie banks of Loch Lo-[F]mond"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "my-bonnie",
+    "title": "My Bonnie Lies Over the Ocean",
+    "artist": "Traditional Scottish",
+    "year": 1881,
+    "genre": "Scottish Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 160,
+    "tags": [
+      "Folk",
+      "Scottish",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "My Bonnie lies over the ocean\nMy Bonnie lies over the sea\nMy Bonnie lies over the ocean\nOh, bring back my Bonnie to me\n\nBring back, bring back\nOh, bring back my Bonnie to me, to me\nBring back, bring back\nOh, bring back my Bonnie to me",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nMy [G]Bonnie lies over the [C]ocean\nMy [G]Bonnie lies over the [D]sea\nMy [G]Bonnie lies over the [C]ocean\nOh, [D]bring back my Bonnie to [G]me",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "My [G]Bonnie lies over the [C]ocean\nMy [G]Bonnie lies over the [D]sea\nMy [G]Bonnie lies over the [C]ocean\nOh, [D]bring back my Bonnie to [G]me"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "comin-thro-the-rye",
+    "title": "Comin' Thro' the Rye",
+    "artist": "Robert Burns / Traditional",
+    "year": 1782,
+    "genre": "Scottish Folk",
+    "key": "F",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 170,
+    "tags": [
+      "Folk",
+      "Scottish",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Gin a body meet a body\nComin' thro' the rye\nGin a body kiss a body\nNeed a body cry",
+    "chords": "F, Bb, C",
+    "content": "[Verse 1]\n[F]Gin a body meet a [Bb]body\nComin' [F]thro' the [C]rye\n[F]Gin a body kiss a [Bb]body\nNeed a [C]body [F]cry",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[F]Gin a body meet a [Bb]body\nComin' [F]thro' the [C]rye\n[F]Gin a body kiss a [Bb]body\nNeed a [C]body [F]cry"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "row-row-row-your-boat",
+    "title": "Row, Row, Row Your Boat",
+    "artist": "Traditional",
+    "year": 1852,
+    "genre": "Children's / Nursery Rhyme",
+    "key": "C",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 60,
+    "tags": [
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Row, row, row your boat\nGently down the stream\nMerrily, merrily, merrily, merrily\nLife is but a dream",
+    "chords": "C, F, G",
+    "content": "[Verse 1]\n[C]Row, row, row your [C]boat\nGently [C]down the [G]stream\n[C]Merrily, merrily, merrily, [G]merrily\nLife is but a [C]dream",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[C]Row, row, row your [C]boat\nGently [C]down the [G]stream\n[C]Merrily, merrily, merrily, [G]merrily\nLife is but a [C]dream"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "twinkle-twinkle",
+    "title": "Twinkle, Twinkle, Little Star",
+    "artist": "Jane Taylor / Traditional",
+    "year": 1806,
+    "genre": "Children's / Nursery Rhyme",
+    "key": "C",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 90,
+    "tags": [
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Twinkle, twinkle, little star\nHow I wonder what you are\nUp above the world so high\nLike a diamond in the sky\nTwinkle, twinkle, little star\nHow I wonder what you are",
+    "chords": "C, F, G",
+    "content": "[Verse 1]\n[C]Twinkle, twinkle, [F]little [C]star\nHow I [F]wonder what you [C]are\n[F]Up above the [C]world so [G]high\nLike a [C]diamond in the [G]sky\n[C]Twinkle, twinkle, [F]little [C]star\nHow I [F]wonder what you [C]are",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[C]Twinkle, twinkle, [F]little [C]star\nHow I [F]wonder what you [C]are\n[F]Up above the [C]world so [G]high\nLike a [C]diamond in the [G]sky\n[C]Twinkle, twinkle, [F]little [C]star\nHow I [F]wonder what you [C]are"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "london-bridge",
+    "title": "London Bridge Is Falling Down",
+    "artist": "Traditional",
+    "year": 1744,
+    "genre": "Children's / Nursery Rhyme",
+    "key": "F",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 80,
+    "tags": [
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "London Bridge is falling down\nFalling down, falling down\nLondon Bridge is falling down\nMy fair lady",
+    "chords": "F, Bb, C",
+    "content": "[Verse 1]\n[F]London Bridge is [Bb]falling [F]down\nFalling [C]down, falling [F]down\n[F]London Bridge is [Bb]falling [F]down\nMy [C]fair [F]lady",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[F]London Bridge is [Bb]falling [F]down\nFalling [C]down, falling [F]down\n[F]London Bridge is [Bb]falling [F]down\nMy [C]fair [F]lady"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "pop-goes-the-weasel",
+    "title": "Pop Goes the Weasel",
+    "artist": "Traditional",
+    "year": 1853,
+    "genre": "Children's / Nursery Rhyme",
+    "key": "G",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 90,
+    "tags": [
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "All around the mulberry bush\nThe monkey chased the weasel\nThe monkey thought 'twas all in fun\nPop! Goes the weasel",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nAll [G]around the mulberry [C]bush\nThe [G]monkey chased the [D]weasel\nThe [G]monkey thought 'twas [C]all in [G]fun\n[D]Pop! Goes the [G]weasel",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "All [G]around the mulberry [C]bush\nThe [G]monkey chased the [D]weasel\nThe [G]monkey thought 'twas [C]all in [G]fun\n[D]Pop! Goes the [G]weasel"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "oh-my-darling-clementine",
+    "title": "Oh My Darling, Clementine",
+    "artist": "Traditional",
+    "year": 1884,
+    "genre": "American Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 190,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "In a cavern, in a canyon\nExcavating for a mine\nDwelt a miner, forty-niner\nAnd his daughter, Clementine\n\nOh my darling, oh my darling\nOh my darling, Clementine\nYou are lost and gone forever\nDreadful sorry, Clementine",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nIn a [G]cavern, in a [C]canyon\nEx-[G]cavating for a [D]mine\nDwelt a [G]miner, forty-[C]niner\nAnd his [G]daughter, [D]Clementine\n\n[Chorus]\nOh my [G]darling, oh my [C]darling\nOh my [G]darling, [D]Clementine\nYou are [G]lost and gone for-[C]ever\nDreadful [G]sorry, [D]Clementine",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "In a [G]cavern, in a [C]canyon\nEx-[G]cavating for a [D]mine\nDwelt a [G]miner, forty-[C]niner\nAnd his [G]daughter, [D]Clementine"
+      },
+      {
+        "title": "Chorus",
+        "content": "Oh my [G]darling, oh my [C]darling\nOh my [G]darling, [D]Clementine\nYou are [G]lost and gone for-[C]ever\nDreadful [G]sorry, [D]Clementine"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "streets-of-laredo",
+    "title": "The Streets of Laredo",
+    "artist": "Traditional Cowboy Ballad",
+    "year": 1870,
+    "genre": "Cowboy Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 75,
+    "duration": 230,
+    "tags": [
+      "Folk",
+      "Cowboy",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "As I walked out in the streets of Laredo\nAs I walked out in Laredo one day\nI spied a poor cowboy wrapped up in white linen\nWrapped up in white linen as cold as the clay",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nAs I [G]walked out in the streets of La-[C]redo\nAs I [G]walked out in La-[D]redo one [G]day\nI [G]spied a poor cowboy wrapped [C]up in white linen\nWrapped [G]up in white linen as [D]cold as the [G]clay",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "As I [G]walked out in the streets of La-[C]redo\nAs I [G]walked out in La-[D]redo one [G]day\nI [G]spied a poor cowboy wrapped [C]up in white linen\nWrapped [G]up in white linen as [D]cold as the [G]clay"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "la-cucaracha",
+    "title": "La Cucaracha",
+    "artist": "Traditional Mexican",
+    "year": 1910,
+    "genre": "Mexican Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 150,
+    "tags": [
+      "Folk",
+      "Mexican",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "La cucaracha, la cucaracha\nYa no puede caminar\nPorque no tiene, porque le falta\nDinero para gastar",
+    "chords": "G, C, D7",
+    "content": "[Verse 1]\nLa cuca-[G]racha, la cuca-[C]racha\nYa no [G]puede cami-[D7]nar\nPorque no [G]tiene, porque le [C]falta\nDinero [G]para [D7]gastar",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "La cuca-[G]racha, la cuca-[C]racha\nYa no [G]puede cami-[D7]nar\nPorque no [G]tiene, porque le [C]falta\nDinero [G]para [D7]gastar"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "frere-jacques",
+    "title": "Frère Jacques",
+    "artist": "Traditional French",
+    "year": 1780,
+    "genre": "French Folk / Nursery Rhyme",
+    "key": "C",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 70,
+    "tags": [
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Frère Jacques, Frère Jacques\nDormez-vous? Dormez-vous?\nSonnez les matines, sonnez les matines\nDing, dang, dong. Ding, dang, dong",
+    "chords": "C, G",
+    "content": "[Verse 1]\n[C]Frère Jacques, Frère Jacques\nDormez-vous? Dormez-vous?\n[G]Sonnez les matines, sonnez les matines\n[C]Ding, dang, dong. Ding, dang, dong",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[C]Frère Jacques, Frère Jacques\nDormez-vous? Dormez-vous?\n[G]Sonnez les matines, sonnez les matines\n[C]Ding, dang, dong. Ding, dang, dong"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "silent-night",
+    "title": "Silent Night",
+    "artist": "Franz Gruber / Joseph Mohr",
+    "year": 1818,
+    "genre": "Christmas Carol",
+    "key": "C",
+    "capo": 0,
+    "bpm": 60,
+    "duration": 210,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Verse 2"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Silent night, holy night\nAll is calm, all is bright\nRound yon virgin mother and child\nHoly infant so tender and mild\nSleep in heavenly peace\nSleep in heavenly peace\n\nSilent night, holy night\nShepherds quake at the sight\nGlories stream from heaven afar\nHeavenly hosts sing alleluia\nChrist the Savior is born\nChrist the Savior is born",
+    "chords": "C, F, G",
+    "content": "[Verse 1]\n[C]Silent night, [F]holy [C]night\nAll is [G]calm, all is [C]bright\nRound yon [F]virgin mother and [C]child\nHoly [G]infant so tender and [C]mild\nSleep in [F]heavenly [C]peace\nSleep in [G]heavenly [C]peace",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[C]Silent night, [F]holy [C]night\nAll is [G]calm, all is [C]bright\nRound yon [F]virgin mother and [C]child\nHoly [G]infant so tender and [C]mild\nSleep in [F]heavenly [C]peace\nSleep in [G]heavenly [C]peace"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "deck-the-halls",
+    "title": "Deck the Halls",
+    "artist": "Traditional Welsh",
+    "year": 1862,
+    "genre": "Christmas Carol",
+    "key": "G",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 130,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Deck the halls with boughs of holly\nFa la la la la, la la la la\n'Tis the season to be jolly\nFa la la la la, la la la la\nDon we now our gay apparel\nFa la la, la la la, la la la\nTroll the ancient Yuletide carol\nFa la la la la, la la la la",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\n[G]Deck the halls with [C]boughs of [G]holly\nFa la [D]la la la, la la la [G]la\n'Tis the [G]season to be [C]jolly\nFa la [D]la la la, la la la [G]la",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Deck the halls with [C]boughs of [G]holly\nFa la [D]la la la, la la la [G]la\n'Tis the [G]season to be [C]jolly\nFa la [D]la la la, la la la [G]la"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "we-wish-you-a-merry-christmas",
+    "title": "We Wish You a Merry Christmas",
+    "artist": "Traditional English",
+    "year": 1935,
+    "genre": "Christmas Carol",
+    "key": "G",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 100,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "We wish you a merry Christmas\nWe wish you a merry Christmas\nWe wish you a merry Christmas\nAnd a happy New Year",
+    "chords": "G, C, D7",
+    "content": "[Verse 1]\nWe [G]wish you a [C]merry [G]Christmas\nWe [G]wish you a [C]merry [D7]Christmas\nWe [G]wish you a [C]merry [G]Christmas\nAnd a [D7]happy New [G]Year",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "We [G]wish you a [C]merry [G]Christmas\nWe [G]wish you a [C]merry [D7]Christmas\nWe [G]wish you a [C]merry [G]Christmas\nAnd a [D7]happy New [G]Year"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "good-king-wenceslas",
+    "title": "Good King Wenceslas",
+    "artist": "John Mason Neale",
+    "year": 1853,
+    "genre": "Christmas Carol",
+    "key": "G",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 190,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Good King Wenceslas looked out\nOn the feast of Stephen\nWhen the snow lay round about\nDeep and crisp and even",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\n[G]Good King Wenceslas looked [C]out\nOn the [G]feast of [D]Stephen\nWhen the [Em]snow lay round a-[C]bout\nDeep and [G]crisp and [D]even",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Good King Wenceslas looked [C]out\nOn the [G]feast of [D]Stephen\nWhen the [Em]snow lay round a-[C]bout\nDeep and [G]crisp and [D]even"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "jingle-bells",
+    "title": "Jingle Bells",
+    "artist": "James Lord Pierpont",
+    "year": 1857,
+    "genre": "Christmas / Winter Song",
+    "key": "G",
+    "capo": 0,
+    "bpm": 120,
+    "duration": 150,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Dashing through the snow, in a one-horse open sleigh\nO'er the fields we go, laughing all the way\nBells on bobtail ring, making spirits bright\nWhat fun it is to ride and sing a sleighing song tonight\n\nJingle bells, jingle bells, jingle all the way\nOh what fun it is to ride in a one-horse open sleigh",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\n[G]Dashing through the snow, in a [C]one-horse open [G]sleigh\nO'er the [G]fields we go, [D]laughing all the [G]way\n[G]Bells on bobtail ring, making [C]spirits [G]bright\nWhat fun it [G]is to ride and [D]sing a sleighing song to-[G]night\n\n[Chorus]\n[G]Jingle bells, [D]jingle bells, [G]jingle all the [C]way\nOh what [G]fun it is to [D]ride in a one-horse open [G]sleigh",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Dashing through the snow, in a [C]one-horse open [G]sleigh\nO'er the [G]fields we go, [D]laughing all the [G]way\n[G]Bells on bobtail ring, making [C]spirits [G]bright\nWhat fun it [G]is to ride and [D]sing a sleighing song to-[G]night"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Jingle bells, [D]jingle bells, [G]jingle all the [C]way\nOh what [G]fun it is to [D]ride in a one-horse open [G]sleigh"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "o-come-all-ye-faithful",
+    "title": "O Come All Ye Faithful",
+    "artist": "John Francis Wade",
+    "year": 1751,
+    "genre": "Christmas Hymn",
+    "key": "G",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 220,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "O come, all ye faithful, joyful and triumphant\nO come ye, o come ye to Bethlehem\nCome and behold him, born the King of angels\n\nO come, let us adore Him\nO come, let us adore Him\nO come, let us adore Him\nChrist the Lord",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nO [G]come, all ye [C]faithful, [G]joyful and [D]triumphant\nO [G]come ye, o [C]come ye to [D]Bethle-[G]hem\n\n[Chorus]\nO [G]come, let us a-[C]dore [G]Him\nO [G]come, let us a-[D]dore [G]Him\nO [G]come, let us a-[C]dore [G]Him\n[D]Christ the [G]Lord",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "O [G]come, all ye [C]faithful, [G]joyful and [D]triumphant\nO [G]come ye, o [C]come ye to [D]Bethle-[G]hem"
+      },
+      {
+        "title": "Chorus",
+        "content": "O [G]come, let us a-[C]dore [G]Him\nO [G]come, let us a-[D]dore [G]Him\nO [G]come, let us a-[C]dore [G]Him\n[D]Christ the [G]Lord"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "joy-to-the-world",
+    "title": "Joy to the World",
+    "artist": "Isaac Watts / Lowell Mason",
+    "year": 1719,
+    "genre": "Christmas Hymn",
+    "key": "G",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 200,
+    "tags": [
+      "Christmas",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Joy to the world, the Lord is come\nLet earth receive her King\nLet every heart prepare Him room\nAnd heaven and nature sing",
+    "chords": "G, C, D, Em",
+    "content": "[Verse 1]\n[G]Joy to the [C]world, the [G]Lord is [D]come\nLet [G]earth re-[C]ceive her [D]King\nLet [G]every [Em]heart pre-[C]pare Him [D]room\nAnd [G]heaven and [D]nature [G]sing",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[G]Joy to the [C]world, the [G]Lord is [D]come\nLet [G]earth re-[C]ceive her [D]King\nLet [G]every [Em]heart pre-[C]pare Him [D]room\nAnd [G]heaven and [D]nature [G]sing"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "camptown-races",
+    "title": "Camptown Races",
+    "artist": "Stephen Foster",
+    "year": 1850,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 130,
+    "duration": 130,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "The Camptown ladies sing this song, doo-dah, doo-dah\nThe Camptown racetrack's five miles long, oh, the doo-dah day\n\nGoing to run all night, going to run all day\nI'll bet my money on the bobtail nag\nSomebody bet on the bay",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\nThe [D]Camptown ladies sing this song, [G]doo-dah, doo-[D]dah\nThe [D]Camptown racetrack's five miles [A7]long, oh, the [D]doo-dah day\n\n[Chorus]\n[D]Going to run all night, [G]going to run all [D]day\nI'll [D]bet my money on the [A7]bobtail nag\nSomebody [D]bet on the [A7]bay",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "The [D]Camptown ladies sing this song, [G]doo-dah, doo-[D]dah\nThe [D]Camptown racetrack's five miles [A7]long, oh, the [D]doo-dah day"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]Going to run all night, [G]going to run all [D]day\nI'll [D]bet my money on the [A7]bobtail nag\nSomebody [D]bet on the [A7]bay"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "my-old-kentucky-home",
+    "title": "My Old Kentucky Home",
+    "artist": "Stephen Foster",
+    "year": 1853,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 90,
+    "duration": 210,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "The sun shines bright on my old Kentucky home\n'Tis summer, the darkies are gay\nThe corn top's ripe and the meadow's in the bloom\nWhile the birds make music all the day",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\nThe [D]sun shines bright on my [G]old Kentucky [D]home\n'Tis [D]summer, the darkies are [A7]gay",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "The [D]sun shines bright on my [G]old Kentucky [D]home\n'Tis [D]summer, the darkies are [A7]gay"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "old-folks-at-home",
+    "title": "Old Folks at Home (Swanee River)",
+    "artist": "Stephen Foster",
+    "year": 1851,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 80,
+    "duration": 220,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "'Way down upon the Swanee River\nFar, far away\nThere's where my heart is turning ever\nThere's where the old folks stay\n\nAll the world is sad and dreary\nEverywhere I roam\nOh, darkies, how my heart grows weary\nFar from the old folks at home",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\n'Way [D]down upon the Swanee [G]River\nFar, far a-[D]way\nThere's [D]where my heart is turning [A7]ever\nThere's [D]where the old folks [A7]stay",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "'Way [D]down upon the Swanee [G]River\nFar, far a-[D]way\nThere's [D]where my heart is turning [A7]ever\nThere's [D]where the old folks [A7]stay"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "streets-of-cairo",
+    "title": "The Streets of Cairo (Poor Little Country Maid)",
+    "artist": "Traditional / Sol Bloom",
+    "year": 1895,
+    "genre": "American Folk",
+    "key": "Am",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 140,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "There's a place in France, where the ladies wear no pants\nAnd the men don't care, they wear their underwear\nThere's a place in France, where the naked ladies dance\nThere's a hole in the wall where the men can see it all",
+    "chords": "Am, E7",
+    "content": "[Verse 1]\n[Am]There's a place in [E7]France, where the [Am]ladies wear no [E7]pants\nAnd the [Am]men don't care, they [E7]wear their under-[Am]wear",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[Am]There's a place in [E7]France, where the [Am]ladies wear no [E7]pants\nAnd the [Am]men don't care, they [E7]wear their under-[Am]wear"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "polly-wolly-doodle",
+    "title": "Polly Wolly Doodle",
+    "artist": "Traditional",
+    "year": 1880,
+    "genre": "American Folk",
+    "key": "G",
+    "capo": 0,
+    "bpm": 130,
+    "duration": 130,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Oh, I went down south for to see my Sal\nSinging polly wolly doodle all the day\nMy Sal, she is a spunky gal\nSinging polly wolly doodle all the day\n\nFare thee well, fare thee well\nFare thee well, my fairy fay\nFor I'm going to Louisiana for to see my Susyanna\nSinging polly wolly doodle all the day",
+    "chords": "G, C, D7",
+    "content": "[Verse 1]\nOh, I [G]went down south for to [C]see my [G]Sal\nSinging [D7]polly wolly doodle all the [G]day\nMy [G]Sal, she is a [C]spunky [G]gal\nSinging [D7]polly wolly doodle all the [G]day",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Oh, I [G]went down south for to [C]see my [G]Sal\nSinging [D7]polly wolly doodle all the [G]day\nMy [G]Sal, she is a [C]spunky [G]gal\nSinging [D7]polly wolly doodle all the [G]day"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "cindy",
+    "title": "Cindy",
+    "artist": "Traditional Appalachian",
+    "year": 1880,
+    "genre": "Appalachian Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 130,
+    "duration": 150,
+    "tags": [
+      "Folk",
+      "Appalachian",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "You ought to see my Cindy\nShe lives away down south\nShe's so sweet the honey bees\nSurround her mouth\n\nGet along home, Cindy, Cindy\nGet along home, Cindy, Cindy\nGet along home, Cindy, Cindy\nI'll marry you someday",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\nYou ought to [D]see my [G]Cindy\nShe lives a-[D]way down [A7]south\nShe's so [D]sweet the [G]honey bees\nSur-[D]round her [A7]mouth\n\n[Chorus]\n[D]Get along home, [G]Cindy, [D]Cindy\n[D]Get along home, [G]Cindy, [D]Cindy\n[D]Get along home, [G]Cindy, [D]Cindy\nI'll [A7]marry you some-[D]day",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "You ought to [D]see my [G]Cindy\nShe lives a-[D]way down [A7]south\nShe's so [D]sweet the [G]honey bees\nSur-[D]round her [A7]mouth"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]Get along home, [G]Cindy, [D]Cindy\n[D]Get along home, [G]Cindy, [D]Cindy\n[D]Get along home, [G]Cindy, [D]Cindy\nI'll [A7]marry you some-[D]day"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "old-dan-tucker",
+    "title": "Old Dan Tucker",
+    "artist": "Traditional / Dan Emmett",
+    "year": 1843,
+    "genre": "American Folk",
+    "key": "D",
+    "capo": 0,
+    "bpm": 140,
+    "duration": 140,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Old Dan Tucker was a fine old man\nWashed his face in a frying pan\nCombed his hair with a wagon wheel\nDied with a toothache in his heel\n\nGet out the way, old Dan Tucker\nYou're too late to get your supper\nSupper's over and breakfast's cookin'\nOld Dan Tucker just stands there looking",
+    "chords": "D, G, A7",
+    "content": "[Verse 1]\n[D]Old Dan Tucker was a [G]fine old [D]man\nWashed his [D]face in a [A7]frying [D]pan\n[D]Combed his hair with a [G]wagon [D]wheel\nDied with a [D]toothache in his [A7]heel",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "[D]Old Dan Tucker was a [G]fine old [D]man\nWashed his [D]face in a [A7]frying [D]pan\n[D]Combed his hair with a [G]wagon [D]wheel\nDied with a [D]toothache in his [A7]heel"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "arkansas-traveler",
+    "title": "The Arkansas Traveler",
+    "artist": "Traditional",
+    "year": 1840,
+    "genre": "American Folk / Fiddle Tune",
+    "key": "D",
+    "capo": 0,
+    "bpm": 140,
+    "duration": 120,
+    "tags": [
+      "Folk",
+      "Fiddle Tune",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "I'm sitting on my old front porch\nA-watching the world go by\nThe Arkansas Traveler came along one day\nAnd stopped to say hello",
+    "chords": "D, G, A",
+    "content": "[Verse 1]\nI'm [D]sitting on my old front [G]porch\nA-[D]watching the world go [A]by",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "I'm [D]sitting on my old front [G]porch\nA-[D]watching the world go [A]by"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "erie-canal",
+    "title": "Low Bridge (The Erie Canal Song)",
+    "artist": "Thomas S. Allen",
+    "year": 1905,
+    "genre": "American Folk",
+    "key": "Em",
+    "capo": 0,
+    "bpm": 110,
+    "duration": 170,
+    "tags": [
+      "Folk",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1",
+      "Chorus"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "I've got a mule, her name is Sal\nFifteen years on the Erie Canal\nShe's a good old worker and a good old pal\nFifteen years on the Erie Canal\n\nLow bridge, everybody down\nLow bridge, for we're coming to a town\nAnd you'll always know your neighbor\nYou'll always know your pal\nIf you've ever navigated on the Erie Canal",
+    "chords": "Em, Am, B7, D, G",
+    "content": "[Verse 1]\nI've got a [Em]mule, her name is [Am]Sal\nFifteen [Em]years on the [B7]Erie Ca-[Em]nal\nShe's a [Em]good old worker and a [Am]good old [Em]pal\nFifteen [B7]years on the Erie Ca-[Em]nal",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "I've got a [Em]mule, her name is [Am]Sal\nFifteen [Em]years on the [B7]Erie Ca-[Em]nal\nShe's a [Em]good old worker and a [Am]good old [Em]pal\nFifteen [B7]years on the Erie Ca-[Em]nal"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
+  },
+  {
+    "id": "billy-boy",
+    "title": "Billy Boy",
+    "artist": "Traditional English/American",
+    "year": 1870,
+    "genre": "American Folk / Children's",
+    "key": "G",
+    "capo": 0,
+    "bpm": 100,
+    "duration": 150,
+    "tags": [
+      "Folk",
+      "Children's",
+      "Public Domain"
+    ],
+    "notes": "Gemeinfrei (Public Domain / Traditional).",
+    "structure": [
+      "Verse 1"
+    ],
+    "scrollSpeed": 45,
+    "lyrics": "Oh, where have you been, Billy Boy, Billy Boy?\nOh, where have you been, charming Billy?\nI have been to seek a wife\nShe's the joy of my life\nShe's a young thing and cannot leave her mother",
+    "chords": "G, C, D",
+    "content": "[Verse 1]\nOh, where have you [G]been, Billy Boy, Billy [C]Boy?\nOh, where have you [G]been, charming [D]Billy?\nI have [G]been to seek a [C]wife\nShe's the [G]joy of my [D]life\nShe's a [G]young thing and cannot [D]leave her [G]mother",
+    "sections": [
+      {
+        "title": "Verse 1",
+        "content": "Oh, where have you [G]been, Billy Boy, Billy [C]Boy?\nOh, where have you [G]been, charming [D]Billy?\nI have [G]been to seek a [C]wife\nShe's the [G]joy of my [D]life\nShe's a [G]young thing and cannot [D]leave her [G]mother"
+      }
+    ],
+    "source": {
+      "lyricsProvidedByUser": false,
+      "lyricsLicense": "Public Domain",
+      "sourceName": "Gemeinfrei / Traditional"
+    }
   }
 ]
