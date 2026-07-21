@@ -12,13 +12,20 @@ const state = {
 
 async function init() {
   state.songs = await fetch('./songs/index.json').then(r => r.json());
-  if (!state.setlist) state.setlist = state.songs.map(s => s.id);
+  if (!state.setlist) {
+    try {
+      const initialSetlist = await fetch('./setlists/nadine-martin-2026.json').then(r => r.json());
+      state.setlist = initialSetlist.songs.map(item => typeof item === 'string' ? item : item.id);
+    } catch {
+      state.setlist = state.songs.map(s => s.id);
+    }
+  }
   applySettings();
   bindUI();
   renderSetlist();
   renderLibrary();
   if (state.currentId) await openSong(state.currentId, false);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');
 }
 
 function bindUI() {
@@ -27,7 +34,7 @@ function bindUI() {
   $$('.nav-item').forEach(b => b.onclick = () => switchView(b.dataset.view));
   $('#settingsBtn').onclick = () => $('#displaySettings').showModal();
   $('#addSongBtn').onclick = () => { renderPicker(); $('#songPicker').showModal(); };
-  $('#resetSetlistBtn').onclick = () => { if (confirm('Setliste auf Ausgangszustand zurücksetzen?')) { state.setlist = state.songs.map(s=>s.id); saveSetlist(); renderSetlist(); } };
+  $('#resetSetlistBtn').onclick = async () => { if (confirm('Setliste auf Ausgangszustand zurücksetzen?')) { state.setlist = await loadDefaultSetlist(); saveSetlist(); renderSetlist(); } };
   $('#searchInput').oninput = renderLibrary;
   $('#pickerSearch').oninput = renderPicker;
   $('#startStopBtn').onclick = toggleScroll;
@@ -57,6 +64,16 @@ function switchView(name){
   $$('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
   const titles = {setlist:'Setliste',library:'Song-Bibliothek',player:'Player',about:'Hinweise'};
   $('#viewTitle').textContent = titles[name]; closeDrawer();
+}
+
+
+async function loadDefaultSetlist(){
+  try {
+    const data = await fetch('./setlists/nadine-martin-2026.json').then(r => r.json());
+    return data.songs.map(item => typeof item === 'string' ? item : item.id);
+  } catch {
+    return state.songs.map(s => s.id);
+  }
 }
 
 function renderSetlist(){

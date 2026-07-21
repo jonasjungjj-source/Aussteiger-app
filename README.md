@@ -1,27 +1,28 @@
-# Band Setlist PWA
+# Band App
 
-## Starten
-Eine PWA sollte über einen lokalen Webserver geöffnet werden, nicht direkt per Doppelklick.
+Private PWA fuer Setlisten, Songblaetter und automatisches Scrollen.
 
-### Python
+## Struktur
+
+- `index.html` – App-Oberflaeche
+- `app.js` – Navigation, Setliste, Player und Autoscroll
+- `styles.css` – responsives Layout, Dark Mode und Kontrastmodus
+- `manifest.json` – PWA-Metadaten
+- `service-worker.js` – Offline-Cache
+- `songs/` – Markdown-Songblaetter und `index.json`
+- `setlists/` – gespeicherte Ausgangssetlisten
+- `assets/icons/` – App-Symbole
+- `assets/images/` – optionale Bilder
+- `settings/` – Standardwerte
+
+## Lokal starten
+
 ```bash
-cd band-pwa
 python3 -m http.server 8080
 ```
-Dann im Browser öffnen: `http://localhost:8080`
 
-Auf iPhone/iPad in Safari: Teilen -> Zum Home-Bildschirm.
+Danach `http://localhost:8080` oeffnen.
 
-## Songs bearbeiten
-- Markdown-Dateien liegen unter `songs/`.
-- Neue Datei anlegen.
-- Eintrag in `songs/index.json` ergänzen.
-- Eigene Lyrics, Akkorde und Songstruktur in die jeweilige `.md`-Datei schreiben.
+## GitHub Pages
 
-## Bedienung
-- Setliste per Drag & Drop sortieren.
-- Songs hinzufügen/entfernen.
-- Player mit Start/Stopp und variabler Scrollgeschwindigkeit.
-- Leertaste startet/stoppt Autoscroll.
-- Alt + Pfeil links/rechts wechselt den Song.
-- Dark Mode, hoher Kontrast, Schriftgröße, Zeilenabstand und Vollbild.
+Den Inhalt dieses Ordners in das Stammverzeichnis eines Repositorys hochladen und GitHub Pages fuer den Hauptbranch aktivieren.
