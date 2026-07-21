@@ -481,13 +481,21 @@
       "Chorus"
     ],
     "scrollSpeed": 45,
-    "lyrics": "I come from Alabama with a banjo on my knee\nI'm goin' to Louisiana, my true love for to see\nIt rained all night the day I left, the weather it was dry\nThe sun so hot I froze to death, Susanna don't you cry\n\nOh, Susanna, oh don't you cry for me\nFor I come from Alabama with a banjo on my knee",
+    "lyrics": "I come from Alabama with a banjo on my knee\nI'm goin' to Louisiana, my true love for to see\nIt rained all night the day I left, the weather it was dry\nThe sun so hot I froze to death, Susanna don't you cry\n\nOh, Susanna, oh don't you cry for me\nFor I come from Alabama with a banjo on my knee\n\nI dreamed a dream the other night, when everything was still\nI thought I saw Susanna a-coming down the hill\nThe buckwheat cake was in her mouth, the tear was in her eye\nSays I, I'm coming from the south, Susanna don't you cry\n\nOh, Susanna, oh don't you cry for me\nFor I come from Alabama with a banjo on my knee",
     "chords": "D, G, A7",
-    "content": "[Verse 1]\nI [D]come from Alabama with a [G]banjo on my [D]knee\nI'm [D]goin' to Louisiana, my [A7]true love for to [D]see\n\n[Chorus]\nOh, [D]Susanna, oh [G]don't you cry for [D]me\nFor I [D]come from Alabama with a [A7]banjo on my [D]knee",
+    "content": "[Verse 1]\nI [D]come from Alabama with a [G]banjo on my [D]knee\nI'm [D]goin' to Louisiana, my [A7]true love for to [D]see\nIt [D]rained all night the day I left, the [G]weather it was [D]dry\nThe [D]sun so hot I froze to death, Su-[A7]sanna don't you [D]cry\n\n[Chorus]\nOh, [D]Susanna, oh [G]don't you cry for [D]me\nFor I [D]come from Alabama with a [A7]banjo on my [D]knee\n\n[Verse 2]\nI [D]dreamed a dream the other night, when [G]everything was [D]still\nI [D]thought I saw Susanna a-[A7]coming down the [D]hill\nThe [D]buckwheat cake was in her mouth, the [G]tear was in her [D]eye\nSays [D]I, I'm coming from the south, Su-[A7]sanna don't you [D]cry\n\n[Chorus]\nOh, [D]Susanna, oh [G]don't you cry for [D]me\nFor I [D]come from Alabama with a [A7]banjo on my [D]knee",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "I [D]come from Alabama with a [G]banjo on my [D]knee\nI'm [D]goin' to Louisiana, my [A7]true love for to [D]see"
+        "content": "I [D]come from Alabama with a [G]banjo on my [D]knee\nI'm [D]goin' to Louisiana, my [A7]true love for to [D]see\nIt [D]rained all night the day I left, the [G]weather it was [D]dry\nThe [D]sun so hot I froze to death, Su-[A7]sanna don't you [D]cry"
+      },
+      {
+        "title": "Chorus",
+        "content": "Oh, [D]Susanna, oh [G]don't you cry for [D]me\nFor I [D]come from Alabama with a [A7]banjo on my [D]knee"
+      },
+      {
+        "title": "Verse 2",
+        "content": "I [D]dreamed a dream the other night, when [G]everything was [D]still\nI [D]thought I saw Susanna a-[A7]coming down the [D]hill\nThe [D]buckwheat cake was in her mouth, the [G]tear was in her [D]eye\nSays [D]I, I'm coming from the south, Su-[A7]sanna don't you [D]cry"
       },
       {
         "title": "Chorus",
@@ -523,15 +531,15 @@
     "scrollSpeed": 45,
     "lyrics": "Oh, give me a home where the buffalo roam\nWhere the deer and the antelope play\nWhere seldom is heard a discouraging word\nAnd the skies are not cloudy all day\n\nHome, home on the range\nWhere the deer and the antelope play\nWhere seldom is heard a discouraging word\nAnd the skies are not cloudy all day",
     "chords": "G, C, D",
-    "content": "[Verse 1]\nOh, [G]give me a home where the [C]buffalo [G]roam\nWhere the [D]deer and the ante-[G]lope play\n\n[Chorus]\n[G]Home, home on the [C]range\nWhere the [G]deer and the ante-[D]lope [G]play",
+    "content": "[Verse 1]\nOh, [G]give me a home where the [C]buffalo [G]roam\nWhere the [D]deer and the ante-[G]lope play\nWhere [G]seldom is heard a dis-[C]couraging word\nAnd the [G]skies are not [D]cloudy all [G]day\n\n[Chorus]\n[G]Home, home on the [C]range\nWhere the [G]deer and the ante-[D]lope play\nWhere [G]seldom is heard a dis-[C]couraging word\nAnd the [G]skies are not [D]cloudy all [G]day",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "Oh, [G]give me a home where the [C]buffalo [G]roam\nWhere the [D]deer and the ante-[G]lope play"
+        "content": "Oh, [G]give me a home where the [C]buffalo [G]roam\nWhere the [D]deer and the ante-[G]lope play\nWhere [G]seldom is heard a dis-[C]couraging word\nAnd the [G]skies are not [D]cloudy all [G]day"
       },
       {
         "title": "Chorus",
-        "content": "[G]Home, home on the [C]range\nWhere the [G]deer and the ante-[D]lope [G]play"
+        "content": "[G]Home, home on the [C]range\nWhere the [G]deer and the ante-[D]lope play\nWhere [G]seldom is heard a dis-[C]couraging word\nAnd the [G]skies are not [D]cloudy all [G]day"
       }
     ],
     "source": {
@@ -563,11 +571,15 @@
     "scrollSpeed": 45,
     "lyrics": "Oh Shenandoah, I long to hear you\nAway, you rolling river\nOh Shenandoah, I long to hear you\nAway, I'm bound away, 'cross the wide Missouri\n\nOh Shenandoah, I love your daughter\nAway, you rolling river\nFor her I've crossed the rolling water\nAway, I'm bound away, 'cross the wide Missouri",
     "chords": "Am, Dm, C, G, E",
-    "content": "[Verse 1]\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[G]Away, you [C]rolling [G]river\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri",
+    "content": "[Verse 1]\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[G]Away, you [C]rolling [G]river\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri\n\n[Verse 2]\nOh [Am]Shenandoah, I [Dm]love your [Am]daughter\n[G]Away, you [C]rolling [G]river\nFor [Am]her I've crossed the [Dm]rolling [Am]water\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri",
     "sections": [
       {
         "title": "Verse 1",
         "content": "Oh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[G]Away, you [C]rolling [G]river\nOh [Am]Shenandoah, I [Dm]long to hear [Am]you\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri"
+      },
+      {
+        "title": "Verse 2",
+        "content": "Oh [Am]Shenandoah, I [Dm]love your [Am]daughter\n[G]Away, you [C]rolling [G]river\nFor [Am]her I've crossed the [Dm]rolling [Am]water\n[E]Away, I'm bound away, 'cross the wide Mis-[Am]souri"
       }
     ],
     "source": {
@@ -599,15 +611,15 @@
     "scrollSpeed": 45,
     "lyrics": "What shall we do with a drunken sailor?\nWhat shall we do with a drunken sailor?\nWhat shall we do with a drunken sailor?\nEarly in the morning\n\nHooray and up she rises\nHooray and up she rises\nHooray and up she rises\nEarly in the morning",
     "chords": "Dm, C",
-    "content": "[Verse 1]\nWhat shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\n[Dm]Early in the [C]morning\n\n[Verse 2]\n[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Early in the [C]morning",
+    "content": "[Verse 1]\nWhat shall we [Dm]do with a drunken sailor?\nWhat shall we [C]do with a drunken sailor?\nWhat shall we [Dm]do with a drunken sailor?\n[Dm]Early in the [C]morning\n\n[Verse 2]\n[Dm]Hooray and up she rises\n[C]Hooray and up she rises\n[Dm]Hooray and up she rises\n[Dm]Early in the [C]morning",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "What shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\nWhat shall we [Dm]do with a drunken [C]sailor?\n[Dm]Early in the [C]morning"
+        "content": "What shall we [Dm]do with a drunken sailor?\nWhat shall we [C]do with a drunken sailor?\nWhat shall we [Dm]do with a drunken sailor?\n[Dm]Early in the [C]morning"
       },
       {
         "title": "Verse 2",
-        "content": "[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Hooray and up she [C]rises\n[Dm]Early in the [C]morning"
+        "content": "[Dm]Hooray and up she rises\n[C]Hooray and up she rises\n[Dm]Hooray and up she rises\n[Dm]Early in the [C]morning"
       }
     ],
     "source": {
@@ -639,11 +651,15 @@
     "scrollSpeed": 45,
     "lyrics": "Are you going to Scarborough Fair?\nParsley, sage, rosemary, and thyme\nRemember me to one who lives there\nFor she once was a true love of mine\n\nTell her to make me a cambric shirt\nParsley, sage, rosemary, and thyme\nWithout no seam nor needlework\nThen she'll be a true love of mine",
     "chords": "Dm, C, Bb, A",
-    "content": "[Verse 1]\nAre you [Dm]going to Scarborough [C]Fair?\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nRe-[Dm]member me to one who [C]lives there\nFor she [Bb]once was a true love of [A]mine",
+    "content": "[Verse 1]\nAre you [Dm]going to Scarborough [C]Fair?\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nRe-[Dm]member me to one who [C]lives there\nFor she [Bb]once was a true love of [A]mine\n\n[Verse 2]\nTell her to [Dm]make me a cambric [C]shirt\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nWith-[Dm]out no seam nor [C]needlework\nThen she'll [Bb]be a true love of [A]mine",
     "sections": [
       {
         "title": "Verse 1",
         "content": "Are you [Dm]going to Scarborough [C]Fair?\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nRe-[Dm]member me to one who [C]lives there\nFor she [Bb]once was a true love of [A]mine"
+      },
+      {
+        "title": "Verse 2",
+        "content": "Tell her to [Dm]make me a cambric [C]shirt\n[Bb]Parsley, sage, [C]rosemary, and [Dm]thyme\nWith-[Dm]out no seam nor [C]needlework\nThen she'll [Bb]be a true love of [A]mine"
       }
     ],
     "source": {
@@ -675,15 +691,15 @@
     "scrollSpeed": 45,
     "lyrics": "Alas, my love, you do me wrong\nTo cast me off discourteously\nFor I have loved you well and long\nDelighting in your company\n\nGreensleeves was all my joy\nGreensleeves was my delight\nGreensleeves was my heart of gold\nAnd who but my lady Greensleeves",
     "chords": "Am, C, G, Em, F, E7",
-    "content": "[Verse 1]\n[Am]Alas, my [C]love, you [G]do me [Em]wrong\nTo [Am]cast me [F]off dis-[E7]courteous-[Am]ly\n\n[Chorus]\n[C]Greensleeves was [G]all my [Am]joy\n[C]Greensleeves was [G]my de-[E7]light",
+    "content": "[Verse 1]\n[Am]Alas, my [C]love, you [G]do me [Em]wrong\nTo [Am]cast me [F]off dis-[E7]courteous-[Am]ly\nFor [Am]I have [C]loved you [G]well and [Em]long\nDe-[Am]lighting [F]in your [E7]compa-[Am]ny\n\n[Chorus]\n[C]Greensleeves was [G]all my [Am]joy\n[C]Greensleeves was [G]my de-[E7]light\n[C]Greensleeves was my [G]heart of [Am]gold\nAnd [F]who but my [E7]lady [Am]Greensleeves",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "[Am]Alas, my [C]love, you [G]do me [Em]wrong\nTo [Am]cast me [F]off dis-[E7]courteous-[Am]ly"
+        "content": "[Am]Alas, my [C]love, you [G]do me [Em]wrong\nTo [Am]cast me [F]off dis-[E7]courteous-[Am]ly\nFor [Am]I have [C]loved you [G]well and [Em]long\nDe-[Am]lighting [F]in your [E7]compa-[Am]ny"
       },
       {
         "title": "Chorus",
-        "content": "[C]Greensleeves was [G]all my [Am]joy\n[C]Greensleeves was [G]my de-[E7]light"
+        "content": "[C]Greensleeves was [G]all my [Am]joy\n[C]Greensleeves was [G]my de-[E7]light\n[C]Greensleeves was my [G]heart of [Am]gold\nAnd [F]who but my [E7]lady [Am]Greensleeves"
       }
     ],
     "source": {
@@ -755,11 +771,15 @@
     "scrollSpeed": 45,
     "lyrics": "Oh Danny boy, the pipes, the pipes are calling\nFrom glen to glen, and down the mountain side\nThe summer's gone, and all the roses falling\n'Tis you, 'tis you must go and I must bide\n\nBut come ye back when summer's in the meadow\nOr when the valley's hushed and white with snow\n'Tis I'll be here in sunshine or in shadow\nOh Danny boy, oh Danny boy, I love you so",
     "chords": "G, C, D, Em",
-    "content": "[Verse 1]\nOh [G]Danny boy, the [C]pipes, the [G]pipes are [D]calling\nFrom [Em]glen to glen, and [C]down the [D]mountain [G]side",
+    "content": "[Verse 1]\nOh [G]Danny boy, the [C]pipes, the [G]pipes are [D]calling\nFrom [Em]glen to glen, and [C]down the [D]mountain [G]side\nThe [G]summer's gone, and [C]all the [G]roses [D]falling\n'Tis [Em]you, 'tis [C]you must [G]go and [D]I must [G]bide\n\n[Verse 2]\nBut [G]come ye back when [C]summer's [G]in the [D]meadow\nOr [Em]when the valley's [C]hushed and [D]white with [G]snow\n'Tis [G]I'll be here in [C]sunshine [G]or in [D]shadow\nOh [Em]Danny boy, oh [C]Danny boy, I [D]love you [G]so",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "Oh [G]Danny boy, the [C]pipes, the [G]pipes are [D]calling\nFrom [Em]glen to glen, and [C]down the [D]mountain [G]side"
+        "content": "Oh [G]Danny boy, the [C]pipes, the [G]pipes are [D]calling\nFrom [Em]glen to glen, and [C]down the [D]mountain [G]side\nThe [G]summer's gone, and [C]all the [G]roses [D]falling\n'Tis [Em]you, 'tis [C]you must [G]go and [D]I must [G]bide"
+      },
+      {
+        "title": "Verse 2",
+        "content": "But [G]come ye back when [C]summer's [G]in the [D]meadow\nOr [Em]when the valley's [C]hushed and [D]white with [G]snow\n'Tis [G]I'll be here in [C]sunshine [G]or in [D]shadow\nOh [Em]Danny boy, oh [C]Danny boy, I [D]love you [G]so"
       }
     ],
     "source": {
@@ -790,11 +810,15 @@
     "scrollSpeed": 45,
     "lyrics": "She'll be coming 'round the mountain when she comes\nShe'll be coming 'round the mountain when she comes\nShe'll be coming 'round the mountain\nShe'll be coming 'round the mountain\nShe'll be coming 'round the mountain when she comes\n\nShe'll be driving six white horses when she comes\nShe'll be driving six white horses when she comes\nShe'll be driving six white horses\nShe'll be driving six white horses\nShe'll be driving six white horses when she comes",
     "chords": "D, G, A7",
-    "content": "[Verse 1]\nShe'll be [D]coming 'round the mountain when she [G]comes\nShe'll be [D]coming 'round the mountain when she [A7]comes\nShe'll be [D]coming 'round the mountain\nShe'll be [G]coming 'round the mountain\nShe'll be [D]coming 'round the [A7]mountain when she [D]comes",
+    "content": "[Verse 1]\nShe'll be [D]coming 'round the mountain when she [G]comes\nShe'll be [D]coming 'round the mountain when she [A7]comes\nShe'll be [D]coming 'round the mountain\nShe'll be [G]coming 'round the mountain\nShe'll be [D]coming 'round the [A7]mountain when she [D]comes\n\n[Verse 2]\nShe'll be [D]driving six white horses when she [G]comes\nShe'll be [D]driving six white horses when she [A7]comes\nShe'll be [D]driving six white horses\nShe'll be [G]driving six white horses\nShe'll be [D]driving six white [A7]horses when she [D]comes",
     "sections": [
       {
         "title": "Verse 1",
         "content": "She'll be [D]coming 'round the mountain when she [G]comes\nShe'll be [D]coming 'round the mountain when she [A7]comes\nShe'll be [D]coming 'round the mountain\nShe'll be [G]coming 'round the mountain\nShe'll be [D]coming 'round the [A7]mountain when she [D]comes"
+      },
+      {
+        "title": "Verse 2",
+        "content": "She'll be [D]driving six white horses when she [G]comes\nShe'll be [D]driving six white horses when she [A7]comes\nShe'll be [D]driving six white horses\nShe'll be [G]driving six white horses\nShe'll be [D]driving six white [A7]horses when she [D]comes"
       }
     ],
     "source": {
@@ -865,11 +889,15 @@
     "scrollSpeed": 45,
     "lyrics": "Lost my partner, what'll I do?\nLost my partner, what'll I do?\nLost my partner, what'll I do?\nSkip to my Lou, my darling\n\nSkip, skip, skip to my Lou\nSkip, skip, skip to my Lou\nSkip, skip, skip to my Lou\nSkip to my Lou, my darling",
     "chords": "D, G, A7",
-    "content": "[Verse 1]\nLost my [D]partner, what'll I [G]do?\nLost my [D]partner, what'll I [A7]do?\nLost my [D]partner, what'll I [G]do?\n[D]Skip to my [A7]Lou, my [D]darling",
+    "content": "[Verse 1]\nLost my [D]partner, what'll I [G]do?\nLost my [D]partner, what'll I [A7]do?\nLost my [D]partner, what'll I [G]do?\n[D]Skip to my [A7]Lou, my [D]darling\n\n[Verse 2]\n[D]Skip, skip, skip to my [G]Lou\n[D]Skip, skip, skip to my [A7]Lou\n[D]Skip, skip, skip to my [G]Lou\n[D]Skip to my [A7]Lou, my [D]darling",
     "sections": [
       {
         "title": "Verse 1",
         "content": "Lost my [D]partner, what'll I [G]do?\nLost my [D]partner, what'll I [A7]do?\nLost my [D]partner, what'll I [G]do?\n[D]Skip to my [A7]Lou, my [D]darling"
+      },
+      {
+        "title": "Verse 2",
+        "content": "[D]Skip, skip, skip to my [G]Lou\n[D]Skip, skip, skip to my [A7]Lou\n[D]Skip, skip, skip to my [G]Lou\n[D]Skip to my [A7]Lou, my [D]darling"
       }
     ],
     "source": {
@@ -894,16 +922,21 @@
     ],
     "notes": "Gemeinfrei (Public Domain / Traditional).",
     "structure": [
-      "Verse 1"
+      "Verse 1",
+      "Chorus"
     ],
     "scrollSpeed": 45,
     "lyrics": "As I was a-goin' down the road\nWith a tired team and a heavy load\nI cracked my whip and the leader sprung\nI says day-day to the wagon tongue\n\nTurkey in the straw, turkey in the hay\nRoll 'em up and twist 'em up a high tuckahaw\nAnd hit 'em up a tune called turkey in the straw",
     "chords": "D, G, A",
-    "content": "[Verse 1]\nAs I was a-[D]goin' down the road\nWith a [G]tired team and a heavy [D]load\nI [D]cracked my whip and the leader [G]sprung\nI says [A]day-day to the wagon [D]tongue",
+    "content": "[Verse 1]\nAs I was a-[D]goin' down the road\nWith a [G]tired team and a heavy [D]load\nI [D]cracked my whip and the leader [G]sprung\nI says [A]day-day to the wagon [D]tongue\n\n[Chorus]\n[D]Turkey in the straw, turkey in the [G]hay\n[D]Roll 'em up and twist 'em up a high tucka-[A]haw\nAnd [D]hit 'em up a tune called [G]turkey in the [A]straw",
     "sections": [
       {
         "title": "Verse 1",
         "content": "As I was a-[D]goin' down the road\nWith a [G]tired team and a heavy [D]load\nI [D]cracked my whip and the leader [G]sprung\nI says [A]day-day to the wagon [D]tongue"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]Turkey in the straw, turkey in the [G]hay\n[D]Roll 'em up and twist 'em up a high tucka-[A]haw\nAnd [D]hit 'em up a tune called [G]turkey in the [A]straw"
       }
     ],
     "source": {
@@ -975,11 +1008,15 @@
     "scrollSpeed": 45,
     "lyrics": "From this valley they say you are going\nWe will miss your bright eyes and sweet smile\nFor they say you are taking the sunshine\nThat has brightened our pathway a while\n\nCome and sit by my side if you love me\nDo not hasten to bid me adieu\nBut remember the Red River Valley\nAnd the one who has loved you so true",
     "chords": "G, C, D, Em",
-    "content": "[Verse 1]\nFrom this [G]valley they say you are [C]going\nWe will [G]miss your bright [D]eyes and sweet [G]smile\nFor they [Em]say you are taking the [C]sunshine\nThat has [G]brightened our [D]pathway a [G]while",
+    "content": "[Verse 1]\nFrom this [G]valley they say you are [C]going\nWe will [G]miss your bright [D]eyes and sweet [G]smile\nFor they [Em]say you are taking the [C]sunshine\nThat has [G]brightened our [D]pathway a [G]while\n\n[Verse 2]\nCome and [G]sit by my side if you [C]love me\nDo not [G]hasten to [D]bid me ad-[G]ieu\nBut re-[Em]member the Red River [C]Valley\nAnd the [G]one who has [D]loved you so [G]true",
     "sections": [
       {
         "title": "Verse 1",
         "content": "From this [G]valley they say you are [C]going\nWe will [G]miss your bright [D]eyes and sweet [G]smile\nFor they [Em]say you are taking the [C]sunshine\nThat has [G]brightened our [D]pathway a [G]while"
+      },
+      {
+        "title": "Verse 2",
+        "content": "Come and [G]sit by my side if you [C]love me\nDo not [G]hasten to [D]bid me ad-[G]ieu\nBut re-[Em]member the Red River [C]Valley\nAnd the [G]one who has [D]loved you so [G]true"
       }
     ],
     "source": {
@@ -1011,11 +1048,15 @@
     "scrollSpeed": 45,
     "lyrics": "On top of old Smoky, all covered with snow\nI lost my true lover for courtin' too slow\n\nFor courtin's a pleasure, and parting is grief\nAnd a false-hearted lover is worse than a thief",
     "chords": "G, C, D",
-    "content": "[Verse 1]\nOn [G]top of old [C]Smoky, all [G]covered with [D]snow\nI [G]lost my true [C]lover for [G]courtin' too [D]slow",
+    "content": "[Verse 1]\nOn [G]top of old [C]Smoky, all [G]covered with [D]snow\nI [G]lost my true [C]lover for [G]courtin' too [D]slow\n\n[Verse 2]\nFor [G]courtin's a [C]pleasure, and [G]parting is [D]grief\nAnd a [G]false-hearted [C]lover is [G]worse than a [D]thief",
     "sections": [
       {
         "title": "Verse 1",
         "content": "On [G]top of old [C]Smoky, all [G]covered with [D]snow\nI [G]lost my true [C]lover for [G]courtin' too [D]slow"
+      },
+      {
+        "title": "Verse 2",
+        "content": "For [G]courtin's a [C]pleasure, and [G]parting is [D]grief\nAnd a [G]false-hearted [C]lover is [G]worse than a [D]thief"
       }
     ],
     "source": {
@@ -1047,11 +1088,15 @@
     "scrollSpeed": 45,
     "lyrics": "John Henry was a little baby boy\nSitting on his daddy's knee\nHe picked up a hammer and a little piece of steel\nSaid, 'Hammer's gonna be the death of me, Lord, Lord\nHammer's gonna be the death of me'\n\nJohn Henry said to his captain\n'A man ain't nothin' but a man\nBut before I let that steam drill beat me down\nI'll die with a hammer in my hand, Lord, Lord\nI'll die with a hammer in my hand'",
     "chords": "Am, G, C, E7",
-    "content": "[Verse 1]\n[Am]John Henry was a little baby [G]boy\nSitting on his [Am]daddy's [C]knee\nHe [Am]picked up a hammer and a little piece of [G]steel\nSaid, [Am]hammer's gonna be the death of me, [E7]Lord, [Am]Lord\nHammer's gonna be the death of [Am]me",
+    "content": "[Verse 1]\n[Am]John Henry was a little baby [G]boy\nSitting on his [Am]daddy's [C]knee\nHe [Am]picked up a hammer and a little piece of [G]steel\nSaid, [Am]hammer's gonna be the death of me, [E7]Lord, [Am]Lord\nHammer's gonna be the death of [Am]me\n\n[Verse 2]\n[Am]John Henry said to his [G]captain\n'A man ain't [Am]nothin' but a [C]man\nBut be-[Am]fore I let that steam drill beat me [G]down\nI'll [Am]die with a hammer in my hand, [E7]Lord, [Am]Lord\nI'll die with a hammer in my [Am]hand'",
     "sections": [
       {
         "title": "Verse 1",
         "content": "[Am]John Henry was a little baby [G]boy\nSitting on his [Am]daddy's [C]knee\nHe [Am]picked up a hammer and a little piece of [G]steel\nSaid, [Am]hammer's gonna be the death of me, [E7]Lord, [Am]Lord\nHammer's gonna be the death of [Am]me"
+      },
+      {
+        "title": "Verse 2",
+        "content": "[Am]John Henry said to his [G]captain\n'A man ain't [Am]nothin' but a [C]man\nBut be-[Am]fore I let that steam drill beat me [G]down\nI'll [Am]die with a hammer in my hand, [E7]Lord, [Am]Lord\nI'll die with a hammer in my [Am]hand'"
       }
     ],
     "source": {
@@ -1196,11 +1241,15 @@
     "scrollSpeed": 45,
     "lyrics": "Michael, row the boat ashore, hallelujah\nMichael, row the boat ashore, hallelujah\n\nSister, help to trim the sail, hallelujah\nSister, help to trim the sail, hallelujah",
     "chords": "G, C, D",
-    "content": "[Verse 1]\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah",
+    "content": "[Verse 1]\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah\n\n[Verse 2]\n[G]Sister, help to [C]trim the [G]sail, halle-[D]lujah\n[G]Sister, help to [C]trim the [G]sail, halle-[D]lujah",
     "sections": [
       {
         "title": "Verse 1",
         "content": "[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah\n[G]Michael, row the [C]boat a-[G]shore, halle-[D]lujah"
+      },
+      {
+        "title": "Verse 2",
+        "content": "[G]Sister, help to [C]trim the [G]sail, halle-[D]lujah\n[G]Sister, help to [C]trim the [G]sail, halle-[D]lujah"
       }
     ],
     "source": {
@@ -1270,11 +1319,15 @@
     "scrollSpeed": 45,
     "lyrics": "Nobody knows the trouble I've seen\nNobody knows my sorrow\nNobody knows the trouble I've seen\nGlory hallelujah\n\nSometimes I'm up, sometimes I'm down\nOh, yes, Lord\nSometimes I'm almost to the ground\nOh, yes, Lord",
     "chords": "Em, Am, B7, C, D",
-    "content": "[Verse 1]\n[Em]Nobody knows the [Am]trouble I've [Em]seen\nNobody [B7]knows my [Em]sorrow\n[Em]Nobody knows the [Am]trouble I've [Em]seen\n[C]Glory halle-[B7]lujah",
+    "content": "[Verse 1]\n[Em]Nobody knows the [Am]trouble I've [Em]seen\nNobody [B7]knows my [Em]sorrow\n[Em]Nobody knows the [Am]trouble I've [Em]seen\n[C]Glory halle-[B7]lujah\n\n[Chorus]\n[Em]Sometimes I'm up, [Am]sometimes I'm [Em]down\nOh, yes, [B7]Lord\n[Em]Sometimes I'm almost [Am]to the [Em]ground\nOh, [C]yes, [B7]Lord",
     "sections": [
       {
         "title": "Verse 1",
         "content": "[Em]Nobody knows the [Am]trouble I've [Em]seen\nNobody [B7]knows my [Em]sorrow\n[Em]Nobody knows the [Am]trouble I've [Em]seen\n[C]Glory halle-[B7]lujah"
+      },
+      {
+        "title": "Chorus",
+        "content": "[Em]Sometimes I'm up, [Am]sometimes I'm [Em]down\nOh, yes, [B7]Lord\n[Em]Sometimes I'm almost [Am]to the [Em]ground\nOh, [C]yes, [B7]Lord"
       }
     ],
     "source": {
@@ -1305,11 +1358,15 @@
     "scrollSpeed": 45,
     "lyrics": "Wade in the water\nWade in the water, children\nWade in the water\nGod's gonna trouble the water\n\nWho's that young girl dressed in red\nGod's gonna trouble the water\nMust be the children that Moses led\nGod's gonna trouble the water",
     "chords": "Dm, C, Bb, A",
-    "content": "[Chorus]\n[Dm]Wade in the [C]water\n[Dm]Wade in the [C]water, [Dm]children\n[Dm]Wade in the [C]water\n[Bb]God's gonna [A]trouble the [Dm]water",
+    "content": "[Chorus]\n[Dm]Wade in the [C]water\n[Dm]Wade in the [C]water, [Dm]children\n[Dm]Wade in the [C]water\n[Bb]God's gonna [A]trouble the [Dm]water\n\n[Verse 1]\n[Dm]Who's that young girl [C]dressed in red\n[Bb]God's gonna [A]trouble the [Dm]water\n[Dm]Must be the children that [C]Moses led\n[Bb]God's gonna [A]trouble the [Dm]water",
     "sections": [
       {
         "title": "Chorus",
         "content": "[Dm]Wade in the [C]water\n[Dm]Wade in the [C]water, [Dm]children\n[Dm]Wade in the [C]water\n[Bb]God's gonna [A]trouble the [Dm]water"
+      },
+      {
+        "title": "Verse 1",
+        "content": "[Dm]Who's that young girl [C]dressed in red\n[Bb]God's gonna [A]trouble the [Dm]water\n[Dm]Must be the children that [C]Moses led\n[Bb]God's gonna [A]trouble the [Dm]water"
       }
     ],
     "source": {
@@ -1409,11 +1466,15 @@
     "scrollSpeed": 45,
     "lyrics": "Kumbaya, my Lord, kumbaya\nKumbaya, my Lord, kumbaya\nKumbaya, my Lord, kumbaya\nOh Lord, kumbaya\n\nSomeone's crying, Lord, kumbaya\nSomeone's crying, Lord, kumbaya\nSomeone's crying, Lord, kumbaya\nOh Lord, kumbaya",
     "chords": "C, F, G",
-    "content": "[Verse 1]\n[C]Kumbaya, my [F]Lord, kum-[C]baya\n[C]Kumbaya, my [G]Lord, kum-[C]baya\n[C]Kumbaya, my [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya",
+    "content": "[Verse 1]\n[C]Kumbaya, my [F]Lord, kum-[C]baya\n[C]Kumbaya, my [G]Lord, kum-[C]baya\n[C]Kumbaya, my [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya\n\n[Verse 2]\n[C]Someone's crying, [F]Lord, kum-[C]baya\n[C]Someone's crying, [G]Lord, kum-[C]baya\n[C]Someone's crying, [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya",
     "sections": [
       {
         "title": "Verse 1",
         "content": "[C]Kumbaya, my [F]Lord, kum-[C]baya\n[C]Kumbaya, my [G]Lord, kum-[C]baya\n[C]Kumbaya, my [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya"
+      },
+      {
+        "title": "Verse 2",
+        "content": "[C]Someone's crying, [F]Lord, kum-[C]baya\n[C]Someone's crying, [G]Lord, kum-[C]baya\n[C]Someone's crying, [F]Lord, kum-[C]baya\nOh [G]Lord, kum-[C]baya"
       }
     ],
     "source": {
@@ -1444,15 +1505,15 @@
     "scrollSpeed": 45,
     "lyrics": "'Mid pleasures and palaces though we may roam\nBe it ever so humble, there's no place like home\nA charm from the skies seems to hallow us there\nWhich, seek through the world, is ne'er met with elsewhere\n\nHome, home, sweet, sweet home\nThere's no place like home\nThere's no place like home",
     "chords": "G, C, D, Em",
-    "content": "[Verse 1]\n'Mid [G]pleasures and [C]palaces [G]though we may [D]roam\nBe it [G]ever so [C]humble, there's [G]no place like [D]home\n\n[Chorus]\n[G]Home, home, [C]sweet, sweet [G]home\nThere's [Em]no place like [D]home",
+    "content": "[Verse 1]\n'Mid [G]pleasures and [C]palaces [G]though we may [D]roam\nBe it [G]ever so [C]humble, there's [G]no place like [D]home\nA [G]charm from the [C]skies seems to [G]hallow us [D]there\nWhich, [G]seek through the [C]world, is ne'er [G]met with else-[D]where\n\n[Chorus]\n[G]Home, home, [C]sweet, sweet [G]home\nThere's [Em]no place like [D]home\nThere's [Em]no place like [D]home",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "'Mid [G]pleasures and [C]palaces [G]though we may [D]roam\nBe it [G]ever so [C]humble, there's [G]no place like [D]home"
+        "content": "'Mid [G]pleasures and [C]palaces [G]though we may [D]roam\nBe it [G]ever so [C]humble, there's [G]no place like [D]home\nA [G]charm from the [C]skies seems to [G]hallow us [D]there\nWhich, [G]seek through the [C]world, is ne'er [G]met with else-[D]where"
       },
       {
         "title": "Chorus",
-        "content": "[G]Home, home, [C]sweet, sweet [G]home\nThere's [Em]no place like [D]home"
+        "content": "[G]Home, home, [C]sweet, sweet [G]home\nThere's [Em]no place like [D]home\nThere's [Em]no place like [D]home"
       }
     ],
     "source": {
@@ -1482,11 +1543,11 @@
     "scrollSpeed": 45,
     "lyrics": "Beautiful dreamer, wake unto me\nStarlight and dewdrops are waiting for thee\nSounds of the rude world heard in the day\nLulled by the moonlight have all passed away",
     "chords": "G, C, D, Em",
-    "content": "[Verse 1]\n[G]Beautiful [C]dreamer, [G]wake unto [D]me\nStarlight and [Em]dewdrops are [C]waiting for [D]thee",
+    "content": "[Verse 1]\n[G]Beautiful [C]dreamer, [G]wake unto [D]me\nStarlight and [Em]dewdrops are [C]waiting for [D]thee\n[G]Sounds of the [C]rude world [G]heard in the [D]day\nLulled by the [Em]moonlight have [C]all passed a-[D]way",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "[G]Beautiful [C]dreamer, [G]wake unto [D]me\nStarlight and [Em]dewdrops are [C]waiting for [D]thee"
+        "content": "[G]Beautiful [C]dreamer, [G]wake unto [D]me\nStarlight and [Em]dewdrops are [C]waiting for [D]thee\n[G]Sounds of the [C]rude world [G]heard in the [D]day\nLulled by the [Em]moonlight have [C]all passed a-[D]way"
       }
     ],
     "source": {
@@ -1517,11 +1578,11 @@
     "scrollSpeed": 45,
     "lyrics": "Down yonder green valley where streamlets meander\nWhen twilight is fading, I pensively rove\nOr at the bright noontide in solitude wander\nAmid the dark shades of the lonely ash grove",
     "chords": "G, C, D, Am",
-    "content": "[Verse 1]\n[G]Down yonder green [C]valley where [G]streamlets [D]meander\nWhen [G]twilight is [Am]fading, I [D]pensively [G]rove",
+    "content": "[Verse 1]\n[G]Down yonder green [C]valley where [G]streamlets [D]meander\nWhen [G]twilight is [Am]fading, I [D]pensively [G]rove\nOr [G]at the bright [C]noontide in [G]solitude [D]wander\nA-[G]mid the dark [Am]shades of the [D]lonely ash [G]grove",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "[G]Down yonder green [C]valley where [G]streamlets [D]meander\nWhen [G]twilight is [Am]fading, I [D]pensively [G]rove"
+        "content": "[G]Down yonder green [C]valley where [G]streamlets [D]meander\nWhen [G]twilight is [Am]fading, I [D]pensively [G]rove\nOr [G]at the bright [C]noontide in [G]solitude [D]wander\nA-[G]mid the dark [Am]shades of the [D]lonely ash [G]grove"
       }
     ],
     "source": {
@@ -1553,11 +1614,15 @@
     "scrollSpeed": 45,
     "lyrics": "In Scarlet town, where I was born\nThere was a fair maid dwellin'\nMade every youth cry well-a-day\nHer name was Barbara Allen\n\n'Twas in the merry month of May\nWhen green buds all were swellin'\nSweet William came from the west country\nAnd courted Barbara Allen",
     "chords": "D, G, A",
-    "content": "[Verse 1]\nIn [D]Scarlet town, where I was [G]born\nThere was a [D]fair maid [A]dwellin'\nMade [D]every youth cry [G]well-a-[D]day\nHer [A]name was Barbara [D]Allen",
+    "content": "[Verse 1]\nIn [D]Scarlet town, where I was [G]born\nThere was a [D]fair maid [A]dwellin'\nMade [D]every youth cry [G]well-a-[D]day\nHer [A]name was Barbara [D]Allen\n\n[Verse 2]\n'Twas [D]in the merry month of [G]May\nWhen [D]green buds all were [A]swellin'\nSweet [D]William came from the [G]west coun-[D]try\nAnd [A]courted Barbara [D]Allen",
     "sections": [
       {
         "title": "Verse 1",
         "content": "In [D]Scarlet town, where I was [G]born\nThere was a [D]fair maid [A]dwellin'\nMade [D]every youth cry [G]well-a-[D]day\nHer [A]name was Barbara [D]Allen"
+      },
+      {
+        "title": "Verse 2",
+        "content": "'Twas [D]in the merry month of [G]May\nWhen [D]green buds all were [A]swellin'\nSweet [D]William came from the [G]west coun-[D]try\nAnd [A]courted Barbara [D]Allen"
       }
     ],
     "source": {
@@ -1588,11 +1653,15 @@
     "scrollSpeed": 45,
     "lyrics": "The water is wide, I cannot get o'er\nAnd neither have I wings to fly\nGive me a boat that can carry two\nAnd both shall row, my love and I\n\nThere is a ship, and she sails the sea\nShe's loaded deep as deep can be\nBut not so deep as the love I'm in\nI know not how I sink or swim",
     "chords": "G, C, D, Em",
-    "content": "[Verse 1]\nThe [G]water is [C]wide, I [G]cannot get [D]o'er\nAnd [Em]neither have I [C]wings to [D]fly\nGive me a [G]boat that can [C]carry [G]two\nAnd [Em]both shall row, my [D]love and [G]I",
+    "content": "[Verse 1]\nThe [G]water is [C]wide, I [G]cannot get [D]o'er\nAnd [Em]neither have I [C]wings to [D]fly\nGive me a [G]boat that can [C]carry [G]two\nAnd [Em]both shall row, my [D]love and [G]I\n\n[Verse 2]\nThere [G]is a ship, and she [C]sails the [D]sea\nShe's [Em]loaded deep as [C]deep can [D]be\nBut [G]not so deep as the [C]love I'm [G]in\nI [Em]know not how I [D]sink or [G]swim",
     "sections": [
       {
         "title": "Verse 1",
         "content": "The [G]water is [C]wide, I [G]cannot get [D]o'er\nAnd [Em]neither have I [C]wings to [D]fly\nGive me a [G]boat that can [C]carry [G]two\nAnd [Em]both shall row, my [D]love and [G]I"
+      },
+      {
+        "title": "Verse 2",
+        "content": "There [G]is a ship, and she [C]sails the [D]sea\nShe's [Em]loaded deep as [C]deep can [D]be\nBut [G]not so deep as the [C]love I'm [G]in\nI [Em]know not how I [D]sink or [G]swim"
       }
     ],
     "source": {
@@ -1664,11 +1733,15 @@
     "scrollSpeed": 45,
     "lyrics": "My Bonnie lies over the ocean\nMy Bonnie lies over the sea\nMy Bonnie lies over the ocean\nOh, bring back my Bonnie to me\n\nBring back, bring back\nOh, bring back my Bonnie to me, to me\nBring back, bring back\nOh, bring back my Bonnie to me",
     "chords": "G, C, D",
-    "content": "[Verse 1]\nMy [G]Bonnie lies over the [C]ocean\nMy [G]Bonnie lies over the [D]sea\nMy [G]Bonnie lies over the [C]ocean\nOh, [D]bring back my Bonnie to [G]me",
+    "content": "[Verse 1]\nMy [G]Bonnie lies over the [C]ocean\nMy [G]Bonnie lies over the [D]sea\nMy [G]Bonnie lies over the [C]ocean\nOh, [D]bring back my Bonnie to [G]me\n\n[Chorus]\n[G]Bring back, [C]bring back\nOh, [D]bring back my Bonnie to [G]me, to me\n[G]Bring back, [C]bring back\nOh, [D]bring back my Bonnie to [G]me",
     "sections": [
       {
         "title": "Verse 1",
         "content": "My [G]Bonnie lies over the [C]ocean\nMy [G]Bonnie lies over the [D]sea\nMy [G]Bonnie lies over the [C]ocean\nOh, [D]bring back my Bonnie to [G]me"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Bring back, [C]bring back\nOh, [D]bring back my Bonnie to [G]me, to me\n[G]Bring back, [C]bring back\nOh, [D]bring back my Bonnie to [G]me"
       }
     ],
     "source": {
@@ -2012,13 +2085,17 @@
       "Verse 2"
     ],
     "scrollSpeed": 45,
-    "lyrics": "Silent night, holy night\nAll is calm, all is bright\nRound yon virgin mother and child\nHoly infant so tender and mild\nSleep in heavenly peace\nSleep in heavenly peace\n\nSilent night, holy night\nShepherds quake at the sight\nGlories stream from heaven afar\nHeavenly hosts sing alleluia\nChrist the Savior is born\nChrist the Savior is born",
+    "lyrics": "Silent night, holy night\nAll is calm, all is bright\nRound yon virgin mother and child\nHoly infant so tender and mild\nSleep in heavenly peace\nSleep in heavenly peace\n\nSilent night, holy night\nShepherds quake at the sight\nGlories stream from heaven afar\nHavenly hosts sing alleluia\nChrist the Savior is born\nChrist the Savior is born",
     "chords": "C, F, G",
-    "content": "[Verse 1]\n[C]Silent night, [F]holy [C]night\nAll is [G]calm, all is [C]bright\nRound yon [F]virgin mother and [C]child\nHoly [G]infant so tender and [C]mild\nSleep in [F]heavenly [C]peace\nSleep in [G]heavenly [C]peace",
+    "content": "[Verse 1]\n[C]Silent night, [F]holy [C]night\nAll is [G]calm, all is [C]bright\nRound yon [F]virgin mother and [C]child\nHoly [G]infant so tender and [C]mild\nSleep in [F]heavenly [C]peace\nSleep in [G]heavenly [C]peace\n\n[Verse 2]\n[C]Silent night, [F]holy [C]night\nShepherds [G]quake at the [C]sight\nGlories [F]stream from heaven a-[C]far\nHeavenly [G]hosts sing alle-[C]luia\nChrist the [F]Savior is [C]born\nChrist the [G]Savior is [C]born",
     "sections": [
       {
         "title": "Verse 1",
         "content": "[C]Silent night, [F]holy [C]night\nAll is [G]calm, all is [C]bright\nRound yon [F]virgin mother and [C]child\nHoly [G]infant so tender and [C]mild\nSleep in [F]heavenly [C]peace\nSleep in [G]heavenly [C]peace"
+      },
+      {
+        "title": "Verse 2",
+        "content": "[C]Silent night, [F]holy [C]night\nShepherds [G]quake at the [C]sight\nGlories [F]stream from heaven a-[C]far\nHeavenly [G]hosts sing alle-[C]luia\nChrist the [F]Savior is [C]born\nChrist the [G]Savior is [C]born"
       }
     ],
     "source": {
@@ -2048,11 +2125,11 @@
     "scrollSpeed": 45,
     "lyrics": "Deck the halls with boughs of holly\nFa la la la la, la la la la\n'Tis the season to be jolly\nFa la la la la, la la la la\nDon we now our gay apparel\nFa la la, la la la, la la la\nTroll the ancient Yuletide carol\nFa la la la la, la la la la",
     "chords": "G, C, D",
-    "content": "[Verse 1]\n[G]Deck the halls with [C]boughs of [G]holly\nFa la [D]la la la, la la la [G]la\n'Tis the [G]season to be [C]jolly\nFa la [D]la la la, la la la [G]la",
+    "content": "[Verse 1]\n[G]Deck the halls with [C]boughs of [G]holly\nFa la [D]la la la, la la la [G]la\n'Tis the [G]season to be [C]jolly\nFa la [D]la la la, la la la [G]la\n[G]Don we now our [C]gay ap-[G]parel\nFa la [G]la, la la [D]la, la la [G]la\n[G]Troll the ancient [C]Yuletide [G]carol\nFa la [D]la la la, la la la [G]la",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "[G]Deck the halls with [C]boughs of [G]holly\nFa la [D]la la la, la la la [G]la\n'Tis the [G]season to be [C]jolly\nFa la [D]la la la, la la la [G]la"
+        "content": "[G]Deck the halls with [C]boughs of [G]holly\nFa la [D]la la la, la la la [G]la\n'Tis the [G]season to be [C]jolly\nFa la [D]la la la, la la la [G]la\n[G]Don we now our [C]gay ap-[G]parel\nFa la [G]la, la la [D]la, la la [G]la\n[G]Troll the ancient [C]Yuletide [G]carol\nFa la [D]la la la, la la la [G]la"
       }
     ],
     "source": {
@@ -2190,11 +2267,11 @@
     "scrollSpeed": 45,
     "lyrics": "O come, all ye faithful, joyful and triumphant\nO come ye, o come ye to Bethlehem\nCome and behold him, born the King of angels\n\nO come, let us adore Him\nO come, let us adore Him\nO come, let us adore Him\nChrist the Lord",
     "chords": "G, C, D",
-    "content": "[Verse 1]\nO [G]come, all ye [C]faithful, [G]joyful and [D]triumphant\nO [G]come ye, o [C]come ye to [D]Bethle-[G]hem\n\n[Chorus]\nO [G]come, let us a-[C]dore [G]Him\nO [G]come, let us a-[D]dore [G]Him\nO [G]come, let us a-[C]dore [G]Him\n[D]Christ the [G]Lord",
+    "content": "[Verse 1]\nO [G]come, all ye [C]faithful, [G]joyful and [D]triumphant\nO [G]come ye, o [C]come ye to [D]Bethle-[G]hem\n[G]Come and be-[C]hold him, [G]born the King of [D]angels\n\n[Chorus]\nO [G]come, let us a-[C]dore [G]Him\nO [G]come, let us a-[D]dore [G]Him\nO [G]come, let us a-[C]dore [G]Him\n[D]Christ the [G]Lord",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "O [G]come, all ye [C]faithful, [G]joyful and [D]triumphant\nO [G]come ye, o [C]come ye to [D]Bethle-[G]hem"
+        "content": "O [G]come, all ye [C]faithful, [G]joyful and [D]triumphant\nO [G]come ye, o [C]come ye to [D]Bethle-[G]hem\n[G]Come and be-[C]hold him, [G]born the King of [D]angels"
       },
       {
         "title": "Chorus",
@@ -2301,11 +2378,11 @@
     "scrollSpeed": 45,
     "lyrics": "The sun shines bright on my old Kentucky home\n'Tis summer, the darkies are gay\nThe corn top's ripe and the meadow's in the bloom\nWhile the birds make music all the day",
     "chords": "D, G, A7",
-    "content": "[Verse 1]\nThe [D]sun shines bright on my [G]old Kentucky [D]home\n'Tis [D]summer, the darkies are [A7]gay",
+    "content": "[Verse 1]\nThe [D]sun shines bright on my [G]old Kentucky [D]home\n'Tis [D]summer, the darkies are [A7]gay\nThe [D]corn top's ripe and the [G]meadow's in the [D]bloom\nWhile the [D]birds make [A7]music all the [D]day",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "The [D]sun shines bright on my [G]old Kentucky [D]home\n'Tis [D]summer, the darkies are [A7]gay"
+        "content": "The [D]sun shines bright on my [G]old Kentucky [D]home\n'Tis [D]summer, the darkies are [A7]gay\nThe [D]corn top's ripe and the [G]meadow's in the [D]bloom\nWhile the [D]birds make [A7]music all the [D]day"
       }
     ],
     "source": {
@@ -2336,11 +2413,15 @@
     "scrollSpeed": 45,
     "lyrics": "'Way down upon the Swanee River\nFar, far away\nThere's where my heart is turning ever\nThere's where the old folks stay\n\nAll the world is sad and dreary\nEverywhere I roam\nOh, darkies, how my heart grows weary\nFar from the old folks at home",
     "chords": "D, G, A7",
-    "content": "[Verse 1]\n'Way [D]down upon the Swanee [G]River\nFar, far a-[D]way\nThere's [D]where my heart is turning [A7]ever\nThere's [D]where the old folks [A7]stay",
+    "content": "[Verse 1]\n'Way [D]down upon the Swanee [G]River\nFar, far a-[D]way\nThere's [D]where my heart is turning [A7]ever\nThere's [D]where the old folks [A7]stay\n\n[Chorus]\n[D]All the world is sad and [G]dreary\n[D]Everywhere I [A7]roam\nOh, [D]darkies, how my heart grows [G]weary\n[D]Far from the [A7]old folks at [D]home",
     "sections": [
       {
         "title": "Verse 1",
         "content": "'Way [D]down upon the Swanee [G]River\nFar, far a-[D]way\nThere's [D]where my heart is turning [A7]ever\nThere's [D]where the old folks [A7]stay"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]All the world is sad and [G]dreary\n[D]Everywhere I [A7]roam\nOh, [D]darkies, how my heart grows [G]weary\n[D]Far from the [A7]old folks at [D]home"
       }
     ],
     "source": {
@@ -2370,11 +2451,11 @@
     "scrollSpeed": 45,
     "lyrics": "There's a place in France, where the ladies wear no pants\nAnd the men don't care, they wear their underwear\nThere's a place in France, where the naked ladies dance\nThere's a hole in the wall where the men can see it all",
     "chords": "Am, E7",
-    "content": "[Verse 1]\n[Am]There's a place in [E7]France, where the [Am]ladies wear no [E7]pants\nAnd the [Am]men don't care, they [E7]wear their under-[Am]wear",
+    "content": "[Verse 1]\n[Am]There's a place in [E7]France, where the [Am]ladies wear no [E7]pants\nAnd the [Am]men don't care, they [E7]wear their under-[Am]wear\nThere's a [Am]place in [E7]France, where the [Am]naked ladies [E7]dance\nThere's a [Am]hole in the wall where the [E7]men can see it [Am]all",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "[Am]There's a place in [E7]France, where the [Am]ladies wear no [E7]pants\nAnd the [Am]men don't care, they [E7]wear their under-[Am]wear"
+        "content": "[Am]There's a place in [E7]France, where the [Am]ladies wear no [E7]pants\nAnd the [Am]men don't care, they [E7]wear their under-[Am]wear\nThere's a [Am]place in [E7]France, where the [Am]naked ladies [E7]dance\nThere's a [Am]hole in the wall where the [E7]men can see it [Am]all"
       }
     ],
     "source": {
@@ -2405,11 +2486,15 @@
     "scrollSpeed": 45,
     "lyrics": "Oh, I went down south for to see my Sal\nSinging polly wolly doodle all the day\nMy Sal, she is a spunky gal\nSinging polly wolly doodle all the day\n\nFare thee well, fare thee well\nFare thee well, my fairy fay\nFor I'm going to Louisiana for to see my Susyanna\nSinging polly wolly doodle all the day",
     "chords": "G, C, D7",
-    "content": "[Verse 1]\nOh, I [G]went down south for to [C]see my [G]Sal\nSinging [D7]polly wolly doodle all the [G]day\nMy [G]Sal, she is a [C]spunky [G]gal\nSinging [D7]polly wolly doodle all the [G]day",
+    "content": "[Verse 1]\nOh, I [G]went down south for to [C]see my [G]Sal\nSinging [D7]polly wolly doodle all the [G]day\nMy [G]Sal, she is a [C]spunky [G]gal\nSinging [D7]polly wolly doodle all the [G]day\n\n[Chorus]\n[G]Fare thee well, fare thee well\nFare thee [D7]well, my fairy fay\nFor I'm [G]going to Louisiana for to [C]see my Susyanna\nSinging [D7]polly wolly doodle all the [G]day",
     "sections": [
       {
         "title": "Verse 1",
         "content": "Oh, I [G]went down south for to [C]see my [G]Sal\nSinging [D7]polly wolly doodle all the [G]day\nMy [G]Sal, she is a [C]spunky [G]gal\nSinging [D7]polly wolly doodle all the [G]day"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Fare thee well, fare thee well\nFare thee [D7]well, my fairy fay\nFor I'm [G]going to Louisiana for to [C]see my Susyanna\nSinging [D7]polly wolly doodle all the [G]day"
       }
     ],
     "source": {
@@ -2480,11 +2565,15 @@
     "scrollSpeed": 45,
     "lyrics": "Old Dan Tucker was a fine old man\nWashed his face in a frying pan\nCombed his hair with a wagon wheel\nDied with a toothache in his heel\n\nGet out the way, old Dan Tucker\nYou're too late to get your supper\nSupper's over and breakfast's cookin'\nOld Dan Tucker just stands there looking",
     "chords": "D, G, A7",
-    "content": "[Verse 1]\n[D]Old Dan Tucker was a [G]fine old [D]man\nWashed his [D]face in a [A7]frying [D]pan\n[D]Combed his hair with a [G]wagon [D]wheel\nDied with a [D]toothache in his [A7]heel",
+    "content": "[Verse 1]\n[D]Old Dan Tucker was a [G]fine old [D]man\nWashed his [D]face in a [A7]frying [D]pan\n[D]Combed his hair with a [G]wagon [D]wheel\nDied with a [D]toothache in his [A7]heel\n\n[Chorus]\n[D]Get out the way, old [G]Dan [D]Tucker\nYou're [D]too late to [A7]get your [D]supper\n[D]Supper's over and [G]breakfast's [D]cookin'\n[D]Old Dan Tucker just [A7]stands there [D]looking",
     "sections": [
       {
         "title": "Verse 1",
         "content": "[D]Old Dan Tucker was a [G]fine old [D]man\nWashed his [D]face in a [A7]frying [D]pan\n[D]Combed his hair with a [G]wagon [D]wheel\nDied with a [D]toothache in his [A7]heel"
+      },
+      {
+        "title": "Chorus",
+        "content": "[D]Get out the way, old [G]Dan [D]Tucker\nYou're [D]too late to [A7]get your [D]supper\n[D]Supper's over and [G]breakfast's [D]cookin'\n[D]Old Dan Tucker just [A7]stands there [D]looking"
       }
     ],
     "source": {
@@ -2515,11 +2604,11 @@
     "scrollSpeed": 45,
     "lyrics": "I'm sitting on my old front porch\nA-watching the world go by\nThe Arkansas Traveler came along one day\nAnd stopped to say hello",
     "chords": "D, G, A",
-    "content": "[Verse 1]\nI'm [D]sitting on my old front [G]porch\nA-[D]watching the world go [A]by",
+    "content": "[Verse 1]\nI'm [D]sitting on my old front [G]porch\nA-[D]watching the world go [A]by\nThe [D]Arkansas Traveler came a-[G]long one day\nAnd [D]stopped to [A]say hel-[D]lo",
     "sections": [
       {
         "title": "Verse 1",
-        "content": "I'm [D]sitting on my old front [G]porch\nA-[D]watching the world go [A]by"
+        "content": "I'm [D]sitting on my old front [G]porch\nA-[D]watching the world go [A]by\nThe [D]Arkansas Traveler came a-[G]long one day\nAnd [D]stopped to [A]say hel-[D]lo"
       }
     ],
     "source": {
@@ -2550,11 +2639,15 @@
     "scrollSpeed": 45,
     "lyrics": "I've got a mule, her name is Sal\nFifteen years on the Erie Canal\nShe's a good old worker and a good old pal\nFifteen years on the Erie Canal\n\nLow bridge, everybody down\nLow bridge, for we're coming to a town\nAnd you'll always know your neighbor\nYou'll always know your pal\nIf you've ever navigated on the Erie Canal",
     "chords": "Em, Am, B7, D, G",
-    "content": "[Verse 1]\nI've got a [Em]mule, her name is [Am]Sal\nFifteen [Em]years on the [B7]Erie Ca-[Em]nal\nShe's a [Em]good old worker and a [Am]good old [Em]pal\nFifteen [B7]years on the Erie Ca-[Em]nal",
+    "content": "[Verse 1]\nI've got a [Em]mule, her name is [Am]Sal\nFifteen [Em]years on the [B7]Erie Ca-[Em]nal\nShe's a [Em]good old worker and a [Am]good old [Em]pal\nFifteen [B7]years on the Erie Ca-[Em]nal\n\n[Chorus]\n[G]Low bridge, everybody [D]down\n[D]Low bridge, for we're coming to a [G]town\nAnd you'll [G]always know your neighbor\nYou'll [C]always know your pal\nIf you've [G]ever navigated on the [D]Erie Ca-[G]nal",
     "sections": [
       {
         "title": "Verse 1",
         "content": "I've got a [Em]mule, her name is [Am]Sal\nFifteen [Em]years on the [B7]Erie Ca-[Em]nal\nShe's a [Em]good old worker and a [Am]good old [Em]pal\nFifteen [B7]years on the Erie Ca-[Em]nal"
+      },
+      {
+        "title": "Chorus",
+        "content": "[G]Low bridge, everybody [D]down\n[D]Low bridge, for we're coming to a [G]town\nAnd you'll [G]always know your neighbor\nYou'll [C]always know your pal\nIf you've [G]ever navigated on the [D]Erie Ca-[G]nal"
       }
     ],
     "source": {
