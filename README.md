@@ -1,17 +1,18 @@
-# Aussteiger Band App v3 – Combined
+# Aussteiger Band-App v4
 
-GitHub-Pages-Version der Band-App mit:
+GitHub-Pages-fähige Offline-PWA mit kompletter Songbibliothek.
 
-- ursprünglicher Aussteiger-Setliste
-- zusätzlicher Bibliothek mit Public-Domain-Songs
-- Lyrics und Akkorden aus `public domain songs.json`
-- Auto-Scroll mit variabler Geschwindigkeit
-- Dark Mode, Kontrastmodus, Schriftgröße und Zeilenabstand
-- lokalem Song-Editor sowie Import/Export
-- Offline-PWA über Service Worker
+## Neu in Version 4
+
+- Alle Songs aus `songs.json` sichtbar
+- Suche nach Titel, Interpret, Genre und Tags
+- Filter für aktive Setliste, Public Domain und Favoriten
+- Mehrere lokale Setlisten erstellen, umbenennen und löschen
+- Favoriten
+- Lokaler Songeditor
+- JSON-Backup und Wiederherstellung
+- Auto-Scroll, Dark Mode, Kontrast, Schriftgröße und Zeilenabstand
 
 ## GitHub Pages
 
-Alle Dateien und den Ordner `assets` in das Hauptverzeichnis des Repositorys hochladen. Danach unter **Settings → Pages** den Branch `main` und `/(root)` auswählen.
-
-Die vorhandene Setliste bleibt Standard. Die Public-Domain-Songs stehen in der Song-Bibliothek zur Auswahl und können zur Setliste hinzugefügt werden.
+Alle Dateien aus diesem Ordner direkt in die oberste Ebene des Repositorys hochladen. Danach GitHub Pages aus dem Branch aktivieren.

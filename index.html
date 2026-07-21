@@ -2,70 +2,99 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b0d10">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Aussteiger Band App</title>
+  <meta name="apple-mobile-web-app-title" content="Aussteiger">
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./assets/icons/icon-180.png">
   <link rel="stylesheet" href="./styles.css">
+  <title>Aussteiger Band-App</title>
 </head>
 <body>
 <header class="topbar">
-  <button id="menuBtn" class="icon-btn" aria-label="Menü">☰</button>
-  <div class="title-block"><strong id="viewTitle">Setliste</strong><span id="viewSubtitle">Private Probe</span></div>
-  <button id="settingsBtn" class="icon-btn" aria-label="Anzeigeeinstellungen">Aa</button>
+  <button id="menuBtn" class="icon-btn" aria-label="Menü öffnen">☰</button>
+  <div class="title-block"><strong>Aussteiger</strong><span id="viewTitle">Setlisten</span></div>
+  <button id="settingsBtn" class="icon-btn" aria-label="Anzeige einstellen">Aa</button>
 </header>
 <aside id="drawer" class="drawer" aria-hidden="true">
-  <div class="drawer-title">Aussteiger</div>
+  <div class="drawer-title">Band-App</div>
   <nav>
-    <button data-view="setlist" class="nav-item active">Setliste</button>
-    <button data-view="library" class="nav-item">Song-Bibliothek</button>
+    <button data-view="setlists" class="nav-item active">Setlisten</button>
+    <button data-view="library" class="nav-item">Alle Songs</button>
+    <button data-view="favorites" class="nav-item">Favoriten</button>
     <button data-view="player" class="nav-item">Player</button>
     <button data-view="about" class="nav-item">Hinweise</button>
   </nav>
 </aside>
 <div id="backdrop" class="backdrop" hidden></div>
 <main>
-  <section id="setlistView" class="view active">
-    <div class="toolbar wrap">
-      <button id="addSongBtn" class="primary">+ Song</button>
-      <button id="resetSetlistBtn">Zurücksetzen</button>
+  <section id="setlistsView" class="view active">
+    <div class="toolbar wrap setlist-toolbar">
+      <label class="select-label">Aktive Setliste
+        <select id="setlistSelect"></select>
+      </label>
+      <button id="newSetlistBtn">+ Neue Setliste</button>
+      <button id="renameSetlistBtn">Umbenennen</button>
+      <button id="deleteSetlistBtn">Löschen</button>
     </div>
-    <p class="hint">Öffnen startet den Player. Mit ↑ und ↓ lässt sich die Reihenfolge auch auf dem iPhone ändern.</p>
+    <div class="toolbar wrap">
+      <button id="addSongBtn" class="primary">+ Song hinzufügen</button>
+      <button id="resetSetlistBtn">Original wiederherstellen</button>
+    </div>
+    <p id="setlistSummary" class="hint"></p>
     <ol id="setlist" class="song-list"></ol>
   </section>
+
   <section id="libraryView" class="view">
-    <div class="toolbar"><input id="searchInput" type="search" placeholder="Titel oder Interpret suchen"></div>
+    <div class="library-controls">
+      <input id="searchInput" type="search" placeholder="Titel, Interpret, Genre oder Tag suchen">
+      <select id="libraryFilter" aria-label="Songfilter">
+        <option value="all">Alle Songs</option>
+        <option value="setlist">Aktive Setliste</option>
+        <option value="public-domain">Public Domain</option>
+        <option value="favorites">Favoriten</option>
+      </select>
+    </div>
+    <p id="librarySummary" class="hint"></p>
     <div id="library" class="library-grid"></div>
   </section>
+
+  <section id="favoritesView" class="view">
+    <div class="toolbar"><input id="favoriteSearch" type="search" placeholder="Favoriten durchsuchen"></div>
+    <p id="favoriteSummary" class="hint"></p>
+    <div id="favorites" class="library-grid"></div>
+  </section>
+
   <section id="playerView" class="view player-view">
     <div class="player-head">
       <div><h1 id="songTitle">Kein Song gewählt</h1><p id="songMeta" class="subtle"></p></div>
       <div class="song-nav"><button id="prevSongBtn" aria-label="Vorheriger Song">◀</button><button id="nextSongBtn" aria-label="Nächster Song">▶</button></div>
     </div>
-    <article id="songSheet" class="song-sheet"><p>Wähle einen Song aus der Setliste.</p></article>
+    <article id="songSheet" class="song-sheet"><p>Wähle einen Song aus.</p></article>
     <div class="transport">
-      <div class="transport-buttons"><button id="startStopBtn" class="primary big">▶ Start</button><button id="toTopBtn">↥ Anfang</button><button id="editSongBtn">✎ Bearbeiten</button></div>
+      <div class="transport-buttons">
+        <button id="startStopBtn" class="primary big">▶ Start</button>
+        <button id="toTopBtn">↥ Anfang</button>
+        <button id="favoriteCurrentBtn">☆ Favorit</button>
+        <button id="editSongBtn">✎ Bearbeiten</button>
+      </div>
       <label class="speed-label"><span>Geschwindigkeit</span><input id="speedRange" type="range" min="5" max="180" value="45"><output id="speedValue">45 px/s</output></label>
     </div>
   </section>
+
   <section id="aboutView" class="view prose">
-    <h2>Testversion 3 – GitHub Pages</h2>
-    <p>Songtexte, Akkorde und Notizen können direkt auf dem iPhone bearbeitet werden. Änderungen werden nur lokal auf diesem Gerät im Browser gespeichert und nicht zu GitHub hochgeladen.</p>
-    <p>Über Export und Import kannst du deine Daten sichern oder auf ein anderes Gerät übertragen.</p>
+    <h2>Version 4 – GitHub Pages</h2>
+    <p>Alle Songs aus <code>songs.json</code> werden in der Bibliothek angezeigt. Du kannst mehrere lokale Setlisten anlegen, Favoriten markieren und Songs durchsuchen.</p>
+    <p>Bearbeitungen, Setlisten und Favoriten werden nur lokal im Browser gespeichert. Nutze Export und Import für ein Backup oder den Gerätewechsel.</p>
     <div class="toolbar wrap"><button id="exportBtn">Daten exportieren</button><label class="file-btn">Daten importieren<input id="importFile" type="file" accept="application/json"></label></div>
   </section>
 </main>
+
 <dialog id="songPicker"><form method="dialog"><div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div><input id="pickerSearch" type="search" placeholder="Suchen"><div id="pickerList" class="picker-list"></div></form></dialog>
 <dialog id="displaySettings"><form method="dialog"><div class="dialog-head"><h2>Anzeige</h2><button value="cancel">✕</button></div><label class="setting-row">Dark Mode <input id="darkToggle" type="checkbox"></label><label class="setting-row">Hoher Kontrast <input id="contrastToggle" type="checkbox"></label><label>Schriftgröße<input id="fontRange" type="range" min="16" max="42" value="26"><output id="fontValue">26 px</output></label><label>Zeilenabstand<input id="lineRange" type="range" min="120" max="220" value="160"><output id="lineValue">1.6</output></label><button id="fullscreenBtn" type="button">Vollbild umschalten</button></form></dialog>
-
-<dialog id="songEditor"><form method="dialog" id="songEditorForm"><div class="dialog-head"><h2>Song bearbeiten</h2><button value="cancel">✕</button></div><label>Titel<input id="editTitle" type="text"></label><label>Interpret<input id="editArtist" type="text"></label><div class="editor-grid"><label>BPM<input id="editBpm" type="number" min="1" max="300"></label><label>Capo<input id="editCapo" type="number" min="0" max="12"></label><label>Sänger<input id="editSinger" type="text"></label></div><label>Songblatt<textarea id="editContent" rows="18" spellcheck="false" placeholder="[Intro]
-[G] [C] [D]
-
-[Strophe 1]
-Eigenen Text mit [G]Akkorden einfügen …"></textarea></label><p class="hint">Akkorde in eckige Klammern setzen, z. B. <code>[G]</code>, <code>[Am]</code> oder <code>[D/F#]</code>.</p><div class="dialog-actions"><button id="deleteOverrideBtn" type="button">Lokale Änderung löschen</button><button id="saveSongBtn" class="primary" type="button">Speichern</button></div></form></dialog>
+<dialog id="songEditor"><form method="dialog" id="songEditorForm"><div class="dialog-head"><h2>Song bearbeiten</h2><button value="cancel">✕</button></div><label>Titel<input id="editTitle" type="text"></label><label>Interpret<input id="editArtist" type="text"></label><div class="editor-grid"><label>BPM<input id="editBpm" type="number" min="1" max="300"></label><label>Capo<input id="editCapo" type="number" min="0" max="12"></label><label>Sänger<input id="editSinger" type="text"></label></div><label>Songblatt<textarea id="editContent" rows="18" spellcheck="false" placeholder="[Intro]\n[G] [C] [D]\n\n[Strophe 1]\nEigenen Text mit [G]Akkorden einfügen …"></textarea></label><p class="hint">Akkorde in eckige Klammern setzen, z. B. <code>[G]</code>, <code>[Am]</code> oder <code>[D/F#]</code>.</p><div class="dialog-actions"><button id="deleteOverrideBtn" type="button">Lokale Änderung löschen</button><button id="saveSongBtn" class="primary" type="button">Speichern</button></div></form></dialog>
 <div id="errorBanner" class="error-banner" hidden></div>
 <script src="./app.js" type="module"></script>
 </body>
