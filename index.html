@@ -1,117 +1,64 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#111111" />
-  <title>Band Setlist</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Aussteiger Band App</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <button id="menuBtn" class="icon-btn" aria-label="Menü">☰</button>
-    <div>
-      <strong id="viewTitle">Setliste</strong>
-      <div class="subtle" id="viewSubtitle">Private Probe</div>
+<header class="topbar">
+  <button id="menuBtn" class="icon-btn" aria-label="Menü">☰</button>
+  <div class="title-block"><strong id="viewTitle">Setliste</strong><span id="viewSubtitle">Private Probe</span></div>
+  <button id="settingsBtn" class="icon-btn" aria-label="Anzeigeeinstellungen">Aa</button>
+</header>
+<aside id="drawer" class="drawer" aria-hidden="true">
+  <div class="drawer-title">Aussteiger</div>
+  <nav>
+    <button data-view="setlist" class="nav-item active">Setliste</button>
+    <button data-view="library" class="nav-item">Song-Bibliothek</button>
+    <button data-view="player" class="nav-item">Player</button>
+    <button data-view="about" class="nav-item">Hinweise</button>
+  </nav>
+</aside>
+<div id="backdrop" class="backdrop" hidden></div>
+<main>
+  <section id="setlistView" class="view active">
+    <div class="toolbar wrap">
+      <button id="addSongBtn" class="primary">+ Song</button>
+      <button id="resetSetlistBtn">Zurücksetzen</button>
     </div>
-    <button id="settingsBtn" class="icon-btn" aria-label="Anzeige">Aa</button>
-  </header>
-
-  <aside id="drawer" class="drawer" aria-hidden="true">
-    <nav>
-      <button data-view="setlist" class="nav-item active">🎵 Setliste</button>
-      <button data-view="library" class="nav-item">📚 Song-Bibliothek</button>
-      <button data-view="player" class="nav-item">▶ Player</button>
-      <button data-view="about" class="nav-item">ℹ Hinweise</button>
-    </nav>
-  </aside>
-  <div id="backdrop" class="backdrop" hidden></div>
-
-  <main>
-    <section id="setlistView" class="view active">
-      <div class="toolbar wrap">
-        <button id="addSongBtn" class="primary">+ Song hinzufügen</button>
-        <button id="resetSetlistBtn">Setliste zurücksetzen</button>
-      </div>
-      <p class="hint">Reihenfolge per Ziehen ändern. Tippe einen Song an, um ihn im Player zu öffnen.</p>
-      <ol id="setlist" class="song-list"></ol>
-    </section>
-
-    <section id="libraryView" class="view">
-      <div class="toolbar">
-        <input id="searchInput" type="search" placeholder="Titel oder Interpret suchen" />
-      </div>
-      <div id="library" class="library-grid"></div>
-    </section>
-
-    <section id="playerView" class="view player-view">
-      <div class="player-head">
-        <div>
-          <h1 id="songTitle">Kein Song gewählt</h1>
-          <p id="songMeta" class="subtle"></p>
-        </div>
-        <div class="song-nav">
-          <button id="prevSongBtn" aria-label="Vorheriger Song">◀</button>
-          <button id="nextSongBtn" aria-label="Nächster Song">▶</button>
-        </div>
-      </div>
-      <article id="songSheet" class="song-sheet" tabindex="0">
-        <p>Wähle einen Song aus der Setliste oder Bibliothek.</p>
-      </article>
-      <div class="transport">
-        <button id="startStopBtn" class="primary big">▶ Start</button>
-        <button id="toTopBtn">↥ Anfang</button>
-        <label>Geschwindigkeit
-          <input id="speedRange" type="range" min="5" max="180" value="45" />
-          <output id="speedValue">45 px/s</output>
-        </label>
-      </div>
-    </section>
-
-    <section id="aboutView" class="view prose">
-      <h2>Ordnerstruktur</h2>
-      <p>Die Songs liegen als Markdown-Dateien im Ordner <code>songs/</code>. Die Datei <code>songs/index.json</code> enthält die Bibliothek.</p>
-      <h2>Markdown-Format</h2>
-      <pre>---
-title: Ring of Fire
-artist: Johnny Cash
-bpm: 105
-capo: 1
----
-# Ring of Fire
-
-[Intro]
-Akkorde / eigener Probentext …</pre>
-      <p>Die Beispiel-Dateien enthalten bewusst nur Metadaten und Platzhalter. Eigene Texte und Akkorde können direkt ergänzt werden.</p>
-    </section>
-  </main>
-
-  <dialog id="songPicker">
-    <form method="dialog">
-      <div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div>
-      <input id="pickerSearch" type="search" placeholder="Suchen" />
-      <div id="pickerList" class="picker-list"></div>
-    </form>
-  </dialog>
-
-  <dialog id="displaySettings">
-    <form method="dialog">
-      <div class="dialog-head"><h2>Anzeige</h2><button value="cancel">✕</button></div>
-      <label class="setting-row">Dark Mode <input id="darkToggle" type="checkbox" /></label>
-      <label class="setting-row">Hoher Kontrast <input id="contrastToggle" type="checkbox" /></label>
-      <label>Schriftgröße
-        <input id="fontRange" type="range" min="16" max="40" value="24" />
-        <output id="fontValue">24 px</output>
-      </label>
-      <label>Zeilenabstand
-        <input id="lineRange" type="range" min="120" max="220" value="160" />
-        <output id="lineValue">1.6</output>
-      </label>
-      <button id="fullscreenBtn" type="button">Vollbild umschalten</button>
-    </form>
-  </dialog>
-
-  <script src="app.js" type="module"></script>
+    <p class="hint">Öffnen startet den Player. Mit ↑ und ↓ lässt sich die Reihenfolge auch auf dem iPhone ändern.</p>
+    <ol id="setlist" class="song-list"></ol>
+  </section>
+  <section id="libraryView" class="view">
+    <div class="toolbar"><input id="searchInput" type="search" placeholder="Titel oder Interpret suchen"></div>
+    <div id="library" class="library-grid"></div>
+  </section>
+  <section id="playerView" class="view player-view">
+    <div class="player-head">
+      <div><h1 id="songTitle">Kein Song gewählt</h1><p id="songMeta" class="subtle"></p></div>
+      <div class="song-nav"><button id="prevSongBtn" aria-label="Vorheriger Song">◀</button><button id="nextSongBtn" aria-label="Nächster Song">▶</button></div>
+    </div>
+    <article id="songSheet" class="song-sheet"><p>Wähle einen Song aus der Setliste.</p></article>
+    <div class="transport">
+      <div class="transport-buttons"><button id="startStopBtn" class="primary big">▶ Start</button><button id="toTopBtn">↥ Anfang</button></div>
+      <label class="speed-label"><span>Geschwindigkeit</span><input id="speedRange" type="range" min="5" max="180" value="45"><output id="speedValue">45 px/s</output></label>
+    </div>
+  </section>
+  <section id="aboutView" class="view prose">
+    <h2>Testversion 2</h2>
+    <p>Alle Song-Metadaten und Platzhalter liegen in <code>songs.json</code>. Dadurch wird keine GitHub-Webseite mehr als Songtext angezeigt.</p>
+    <p>Setliste, Scrollgeschwindigkeit und Anzeigeeinstellungen werden lokal auf diesem Gerät gespeichert.</p>
+  </section>
+</main>
+<dialog id="songPicker"><form method="dialog"><div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div><input id="pickerSearch" type="search" placeholder="Suchen"><div id="pickerList" class="picker-list"></div></form></dialog>
+<dialog id="displaySettings"><form method="dialog"><div class="dialog-head"><h2>Anzeige</h2><button value="cancel">✕</button></div><label class="setting-row">Dark Mode <input id="darkToggle" type="checkbox"></label><label class="setting-row">Hoher Kontrast <input id="contrastToggle" type="checkbox"></label><label>Schriftgröße<input id="fontRange" type="range" min="16" max="42" value="26"><output id="fontValue">26 px</output></label><label>Zeilenabstand<input id="lineRange" type="range" min="120" max="220" value="160"><output id="lineValue">1.6</output></label><button id="fullscreenBtn" type="button">Vollbild umschalten</button></form></dialog>
+<div id="errorBanner" class="error-banner" hidden></div>
+<script src="./app.js" type="module"></script>
 </body>
 </html>

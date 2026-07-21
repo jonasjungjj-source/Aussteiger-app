@@ -1,28 +1,7 @@
-# Band App
+# Aussteiger Band App – Version 2
 
-Private PWA fuer Setlisten, Songblaetter und automatisches Scrollen.
+Statische PWA für GitHub Pages. Alle Songs stehen in `songs.json`, die Setliste in `setlists.json`.
 
-## Struktur
+## Update auf GitHub
 
-- `index.html` – App-Oberflaeche
-- `app.js` – Navigation, Setliste, Player und Autoscroll
-- `styles.css` – responsives Layout, Dark Mode und Kontrastmodus
-- `manifest.json` – PWA-Metadaten
-- `service-worker.js` – Offline-Cache
-- `songs/` – Markdown-Songblaetter und `index.json`
-- `setlists/` – gespeicherte Ausgangssetlisten
-- `assets/icons/` – App-Symbole
-- `assets/images/` – optionale Bilder
-- `settings/` – Standardwerte
-
-## Lokal starten
-
-```bash
-python3 -m http.server 8080
-```
-
-Danach `http://localhost:8080` oeffnen.
-
-## GitHub Pages
-
-Den Inhalt dieses Ordners in das Stammverzeichnis eines Repositorys hochladen und GitHub Pages fuer den Hauptbranch aktivieren.
+Den Inhalt dieses Ordners in das Hauptverzeichnis des Repositories hochladen und vorhandene Dateien ersetzen. Danach GitHub Pages neu laden. Bei einer alten Anzeige Safari vollständig schließen und die Seite erneut öffnen.

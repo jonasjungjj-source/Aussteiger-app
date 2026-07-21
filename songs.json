@@ -1,0 +1,418 @@
+[
+  {
+    "id": "cocaine",
+    "title": "Cocaine",
+    "artist": "Eric Clapton",
+    "bpm": 105,
+    "capo": 2,
+    "singer": "Andy",
+    "content": "## Eric Clapton\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "lookin-out-my-back-door",
+    "title": "Lookin Out My Back Door",
+    "artist": "Creedence Clearwater Revival",
+    "singer": "Tom",
+    "content": "## Creedence Clearwater Revival\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "ring-of-fire",
+    "title": "Ring of Fire",
+    "artist": "Johnny Cash",
+    "capo": 1,
+    "singer": "Tom",
+    "content": "## Johnny Cash\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "wagon-wheel",
+    "title": "Wagon Wheel",
+    "artist": "Old Crow Medicine Show / Darius Rucker",
+    "capo": 1,
+    "singer": "Tom",
+    "content": "## Old Crow Medicine Show / Darius Rucker\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "jolene",
+    "title": "Jolene",
+    "artist": "Dolly Parton",
+    "singer": "Nicole",
+    "content": "## Dolly Parton\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "whiskey-in-the-jar",
+    "title": "Whiskey in the Jar",
+    "artist": "Traditional / Thin Lizzy",
+    "bpm": 133,
+    "capo": 3,
+    "singer": "Tom",
+    "content": "## Traditional / Thin Lizzy\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "summertime",
+    "title": "Summertime",
+    "artist": "George Gershwin",
+    "bpm": 73,
+    "singer": "Tom",
+    "content": "## George Gershwin\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "i-m-on-fire",
+    "title": "I'm on Fire",
+    "artist": "Bruce Springsteen",
+    "bpm": 82,
+    "capo": 3,
+    "singer": "Alle / Tom",
+    "content": "## Bruce Springsteen\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "simple-man",
+    "title": "Simple Man",
+    "artist": "Lynyrd Skynyrd",
+    "bpm": 60,
+    "capo": 3,
+    "singer": "Tom",
+    "content": "## Lynyrd Skynyrd\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "one-horse-town",
+    "title": "One Horse Town",
+    "artist": "Blackberry Smoke",
+    "bpm": 120,
+    "capo": 1,
+    "singer": "Tom",
+    "content": "## Blackberry Smoke\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "sittin-on-the-dock-of-the-bay",
+    "title": "(Sittin' On) The Dock of the Bay",
+    "artist": "Otis Redding",
+    "bpm": 100,
+    "capo": 7,
+    "singer": "Tom",
+    "content": "## Otis Redding\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "in-the-sun",
+    "title": "In the Sun",
+    "artist": "Joseph Arthur",
+    "bpm": 120,
+    "singer": "Tom",
+    "content": "## Joseph Arthur\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "folsom-prison-blues",
+    "title": "Folsom Prison Blues",
+    "artist": "Johnny Cash",
+    "bpm": 111,
+    "singer": "Tom",
+    "content": "## Johnny Cash\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "jambalaya-on-the-bayou",
+    "title": "Jambalaya (On the Bayou)",
+    "artist": "Hank Williams",
+    "singer": "Tom",
+    "content": "## Hank Williams\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "don-t-forget",
+    "title": "Don't Forget",
+    "artist": "The Magic Mumble Jumble",
+    "capo": 3,
+    "singer": "Tom",
+    "content": "## The Magic Mumble Jumble\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "what-s-up",
+    "title": "What's Up?",
+    "artist": "4 Non Blondes",
+    "bpm": 134,
+    "singer": "Diana",
+    "content": "## 4 Non Blondes\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "hotel-california",
+    "title": "Hotel California",
+    "artist": "Eagles",
+    "bpm": 140,
+    "capo": 2,
+    "singer": "Tom / Andy",
+    "content": "## Eagles\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "stumblin-in",
+    "title": "Stumblin' In",
+    "artist": "Chris Norman & Suzi Quatro",
+    "singer": "Diana / Tom",
+    "content": "## Chris Norman & Suzi Quatro\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "go-du-bleibst-heut-nacht-bei-mir",
+    "title": "Gö, du bleibst heut Nacht bei mir",
+    "artist": "STS",
+    "bpm": 150,
+    "singer": "Andy",
+    "content": "## STS\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "ham-kummst",
+    "title": "Ham kummst",
+    "artist": "Seiler und Speer",
+    "bpm": 125,
+    "singer": "Tom",
+    "content": "## Seiler und Speer\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "principessa",
+    "title": "Principessa",
+    "artist": "Pupo",
+    "bpm": 150,
+    "singer": "Tom",
+    "content": "## Pupo\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "wellerman",
+    "title": "Wellerman",
+    "artist": "Traditional / Nathan Evans",
+    "bpm": 160,
+    "singer": "Nicole",
+    "content": "## Traditional / Nathan Evans\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "i-m-a-believer",
+    "title": "I'm a Believer",
+    "artist": "The Monkees",
+    "singer": "Diana",
+    "content": "## The Monkees\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "hello-josephine",
+    "title": "Hello Josephine",
+    "artist": "Fats Domino",
+    "bpm": 130,
+    "singer": "Andy",
+    "content": "## Fats Domino\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "the-wanderer",
+    "title": "The Wanderer",
+    "artist": "Dion",
+    "bpm": 114,
+    "capo": 2,
+    "singer": "Tom",
+    "content": "## Dion\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "brown-eyed-girl",
+    "title": "Brown Eyed Girl",
+    "artist": "Van Morrison",
+    "singer": "Tom",
+    "content": "## Van Morrison\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "perfect",
+    "title": "Perfect",
+    "artist": "Fairground Attraction",
+    "singer": "Diana",
+    "content": "## Fairground Attraction\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "weusd-a-herz-hast-wia-a-bergwerk",
+    "title": "Weus’d a Herz hast wia a Bergwerk",
+    "artist": "Rainhard Fendrich",
+    "bpm": 140,
+    "singer": "Tom",
+    "content": "## Rainhard Fendrich\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "kalt-und-kalter",
+    "title": "Kalt und kälter",
+    "artist": "STS",
+    "bpm": 130,
+    "singer": "Tom",
+    "content": "## STS\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "irgendwann-bleib-i-dann-dort",
+    "title": "Irgendwann bleib i dann dort",
+    "artist": "STS",
+    "bpm": 120,
+    "capo": 4,
+    "singer": "Tom",
+    "content": "## STS\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "older-women",
+    "title": "Older Women",
+    "artist": "Ronnie McDowell",
+    "content": "## Ronnie McDowell\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "fur-immer-jung",
+    "title": "Für immer jung",
+    "artist": "Wolfgang Ambros",
+    "bpm": 100,
+    "capo": 2,
+    "singer": "Tom",
+    "content": "## Wolfgang Ambros\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "grovater",
+    "title": "Großvater",
+    "artist": "STS",
+    "bpm": 79,
+    "singer": "Tom",
+    "content": "## STS\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "wish-you-were-here",
+    "title": "Wish You Were Here",
+    "artist": "Pink Floyd",
+    "bpm": 60,
+    "singer": "Andy",
+    "content": "## Pink Floyd\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "bitch",
+    "title": "Bitch",
+    "artist": "Meredith Brooks",
+    "singer": "Diana / Nicole",
+    "content": "## Meredith Brooks\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "valerie",
+    "title": "Valerie",
+    "artist": "Mark Ronson feat. Amy Winehouse",
+    "singer": "Diana",
+    "content": "## Mark Ronson feat. Amy Winehouse\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "the-road-to-hell",
+    "title": "The Road to Hell",
+    "artist": "Chris Rea",
+    "bpm": 124,
+    "singer": "Tom",
+    "content": "## Chris Rea\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "don-t-stop-believin",
+    "title": "Don't Stop Believin'",
+    "artist": "Journey",
+    "bpm": 136,
+    "capo": 4,
+    "singer": "Diana",
+    "content": "## Journey\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "bad-moon-rising",
+    "title": "Bad Moon Rising",
+    "artist": "Creedence Clearwater Revival",
+    "bpm": 180,
+    "singer": "Tom",
+    "content": "## Creedence Clearwater Revival\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "old-time-rock-and-roll",
+    "title": "Old Time Rock and Roll",
+    "artist": "Bob Seger",
+    "singer": "Tom",
+    "content": "## Bob Seger\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "runaround-sue",
+    "title": "Runaround Sue",
+    "artist": "Dion",
+    "bpm": 80,
+    "capo": 1,
+    "singer": "Tom",
+    "content": "## Dion\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "macho-macho",
+    "title": "Macho Macho",
+    "artist": "Rainhard Fendrich",
+    "singer": "Tom",
+    "content": "## Rainhard Fendrich\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "sex-bomb",
+    "title": "Sex Bomb",
+    "artist": "Tom Jones",
+    "singer": "Tom",
+    "content": "## Tom Jones\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "sweet-caroline",
+    "title": "Sweet Caroline",
+    "artist": "Neil Diamond",
+    "singer": "Tom",
+    "content": "## Neil Diamond\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "uber-den-wolken",
+    "title": "Über den Wolken",
+    "artist": "Reinhard Mey",
+    "capo": 2,
+    "singer": "Tom",
+    "content": "## Reinhard Mey\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "1000-und-1-nacht-zoom",
+    "title": "1000 und 1 Nacht (Zoom!)",
+    "artist": "Klaus Lage",
+    "capo": 2,
+    "singer": "Tom",
+    "content": "## Klaus Lage\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "tanz-um-dein-leben",
+    "title": "Tanz um dein Leben",
+    "artist": "Henning Wehland",
+    "singer": "Tom",
+    "content": "## Henning Wehland\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "furstenfeld",
+    "title": "Fürstenfeld",
+    "artist": "STS",
+    "singer": "Tom",
+    "content": "## STS\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "griechischer-wein",
+    "title": "Griechischer Wein",
+    "artist": "Udo Jürgens",
+    "singer": "Tom",
+    "content": "## Udo Jürgens\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "der-affe-und-ich",
+    "title": "Der Affe und ich",
+    "artist": "Henning Wehland",
+    "capo": 3,
+    "singer": "Tom",
+    "content": "## Henning Wehland\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "take-me-home-country-roads",
+    "title": "Take Me Home, Country Roads",
+    "artist": "John Denver",
+    "bpm": 133,
+    "singer": "Tom",
+    "content": "## John Denver\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "hymn",
+    "title": "Hymn",
+    "artist": "Barclay James Harvest",
+    "singer": "Tom",
+    "content": "## Barclay James Harvest\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  },
+  {
+    "id": "aloha-heja-he",
+    "title": "Aloha Heja He",
+    "artist": "Achim Reichel",
+    "singer": "Tom",
+    "content": "## Achim Reichel\n\n[Intro]\nAkkorde hier eintragen …\n\n[Strophe 1]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Refrain]\nEigene Lyrics und Akkorde hier eintragen …\n\n[Notizen]\nArrangement, Einsätze, Soli oder Dynamik notieren …"
+  }
+]

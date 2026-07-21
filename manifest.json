@@ -1,20 +1,11 @@
 {
-  "name": "Band Setlist",
-  "short_name": "Setlist",
-  "description": "Private Setlisten-, Songtext- und Autoscroll-App fuer Proben und Auftritte.",
-  "lang": "de",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "any",
-  "background_color": "#0f1115",
-  "theme_color": "#111111",
-  "icons": [
-    {
-      "src": "assets/icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "name":"Aussteiger Band App",
+  "short_name":"Aussteiger",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#0b0d10",
+  "theme_color":"#0b0d10",
+  "description":"Private Setlisten- und Songblatt-App mit Auto-Scroll.",
+  "icons":[{"src":"./assets/icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }
