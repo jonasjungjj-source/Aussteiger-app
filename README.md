@@ -1,12 +1,33 @@
-# Aussteiger Band App v3
+# Aussteiger Band App v3 – GitHub Pages
 
-Private PWA für Setlisten, Songblätter und automatisches Scrollen.
+Diese Version ist für ein GitHub-Pages-Projekt unter einer Unteradresse wie
+`https://BENUTZER.github.io/Aussteiger-app/` vorbereitet.
 
-## Neu in v3
+## Upload
 
-- Songtexte, Akkorde und Metadaten direkt in der App bearbeiten
-- lokale Speicherung im Browser
-- Export und Import als JSON-Backup
-- variable Scrollgeschwindigkeit, Dark Mode, Kontrast, Schriftgröße und Zeilenabstand
+Lade **den Inhalt dieses Ordners** in das Hauptverzeichnis des Repositorys hoch. `index.html` muss direkt im Repository-Root liegen.
 
-Akkorde im Songblatt in eckige Klammern schreiben, z. B. `[G]`, `[Am]`, `[D/F#]`.
+Benötigte Dateien und Ordner:
+
+- `index.html`
+- `app.js`
+- `styles.css`
+- `manifest.json`
+- `service-worker.js`
+- `songs.json`
+- `setlists.json`
+- `assets/`
+
+## GitHub Pages
+
+Unter **Settings → Pages**:
+
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/ (root)`
+
+## Nach einem Update
+
+Safari kann noch eine alte Offline-Version anzeigen. Seite neu laden; falls nötig die Web-App vom Home-Bildschirm löschen und erneut hinzufügen.
+
+Songänderungen werden ausschließlich im lokalen Browser-Speicher des jeweiligen iPhones/iPads gespeichert. Über „Daten exportieren“ regelmäßig ein Backup erzeugen.

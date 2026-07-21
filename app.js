@@ -3,7 +3,7 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 const STORAGE = { setlist:'band-setlist', current:'band-current', speed:'band-speed', display:'band-display', overrides:'band-song-overrides' };
 const state = { songs: [], baseSongs: [], setlist: [], currentId: localStorage.getItem(STORAGE.current), scrollSpeed: Number(localStorage.getItem(STORAGE.speed) || 45), scrolling: false, lastTs: 0, overrides: {} };
 
-async function getJSON(path) { const r = await fetch(path, { cache: 'no-store' }); if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`); return r.json(); }
+async function getJSON(path) { const url = new URL(path, document.baseURI); const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`); return r.json(); }
 function loadOverrides(){ try { state.overrides = JSON.parse(localStorage.getItem(STORAGE.overrides) || '{}') || {}; } catch { state.overrides = {}; } }
 function mergeSongs(){ state.songs = state.baseSongs.map(s => ({...s, ...(state.overrides[s.id] || {})})); }
 function saveOverrides(){ localStorage.setItem(STORAGE.overrides, JSON.stringify(state.overrides)); mergeSongs(); }
@@ -16,7 +16,10 @@ async function init() {
     state.setlist = Array.isArray(saved) ? saved : lists[0].songs.map(x => typeof x === 'string' ? x : x.id);
     bindUI(); applySettings(); renderSetlist(); renderLibrary();
     await openSong(state.currentId && song(state.currentId) ? state.currentId : state.setlist[0], false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');
+    if ('serviceWorker' in navigator) {
+      const swUrl = new URL('./service-worker.js', document.baseURI);
+      navigator.serviceWorker.register(swUrl, { scope: './' }).catch(console.error);
+    }
   } catch (err) { const b = $('#errorBanner'); b.hidden = false; b.textContent = `App konnte nicht geladen werden: ${err.message}`; console.error(err); }
 }
 
