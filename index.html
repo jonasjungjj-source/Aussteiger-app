@@ -46,18 +46,25 @@
     </div>
     <article id="songSheet" class="song-sheet"><p>Wähle einen Song aus der Setliste.</p></article>
     <div class="transport">
-      <div class="transport-buttons"><button id="startStopBtn" class="primary big">▶ Start</button><button id="toTopBtn">↥ Anfang</button></div>
+      <div class="transport-buttons"><button id="startStopBtn" class="primary big">▶ Start</button><button id="toTopBtn">↥ Anfang</button><button id="editSongBtn">✎ Bearbeiten</button></div>
       <label class="speed-label"><span>Geschwindigkeit</span><input id="speedRange" type="range" min="5" max="180" value="45"><output id="speedValue">45 px/s</output></label>
     </div>
   </section>
   <section id="aboutView" class="view prose">
-    <h2>Testversion 2</h2>
-    <p>Alle Song-Metadaten und Platzhalter liegen in <code>songs.json</code>. Dadurch wird keine GitHub-Webseite mehr als Songtext angezeigt.</p>
-    <p>Setliste, Scrollgeschwindigkeit und Anzeigeeinstellungen werden lokal auf diesem Gerät gespeichert.</p>
+    <h2>Testversion 3</h2>
+    <p>Songtexte, Akkorde und Notizen können direkt auf dem iPhone bearbeitet werden. Änderungen werden nur lokal im Browser gespeichert.</p>
+    <p>Über Export und Import kannst du deine Daten sichern oder auf ein anderes Gerät übertragen.</p>
+    <div class="toolbar wrap"><button id="exportBtn">Daten exportieren</button><label class="file-btn">Daten importieren<input id="importFile" type="file" accept="application/json"></label></div>
   </section>
 </main>
 <dialog id="songPicker"><form method="dialog"><div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div><input id="pickerSearch" type="search" placeholder="Suchen"><div id="pickerList" class="picker-list"></div></form></dialog>
 <dialog id="displaySettings"><form method="dialog"><div class="dialog-head"><h2>Anzeige</h2><button value="cancel">✕</button></div><label class="setting-row">Dark Mode <input id="darkToggle" type="checkbox"></label><label class="setting-row">Hoher Kontrast <input id="contrastToggle" type="checkbox"></label><label>Schriftgröße<input id="fontRange" type="range" min="16" max="42" value="26"><output id="fontValue">26 px</output></label><label>Zeilenabstand<input id="lineRange" type="range" min="120" max="220" value="160"><output id="lineValue">1.6</output></label><button id="fullscreenBtn" type="button">Vollbild umschalten</button></form></dialog>
+
+<dialog id="songEditor"><form method="dialog" id="songEditorForm"><div class="dialog-head"><h2>Song bearbeiten</h2><button value="cancel">✕</button></div><label>Titel<input id="editTitle" type="text"></label><label>Interpret<input id="editArtist" type="text"></label><div class="editor-grid"><label>BPM<input id="editBpm" type="number" min="1" max="300"></label><label>Capo<input id="editCapo" type="number" min="0" max="12"></label><label>Sänger<input id="editSinger" type="text"></label></div><label>Songblatt<textarea id="editContent" rows="18" spellcheck="false" placeholder="[Intro]
+[G] [C] [D]
+
+[Strophe 1]
+Eigenen Text mit [G]Akkorden einfügen …"></textarea></label><p class="hint">Akkorde in eckige Klammern setzen, z. B. <code>[G]</code>, <code>[Am]</code> oder <code>[D/F#]</code>.</p><div class="dialog-actions"><button id="deleteOverrideBtn" type="button">Lokale Änderung löschen</button><button id="saveSongBtn" class="primary" type="button">Speichern</button></div></form></dialog>
 <div id="errorBanner" class="error-banner" hidden></div>
 <script src="./app.js" type="module"></script>
 </body>
