@@ -6,7 +6,7 @@
   "scope": "./",
   "display": "standalone",
   "background_color": "#cfbda9",
-  "theme_color": "#cfbda9",
+  "theme_color": "#121212",
   "description": "Private Setlisten- und Songblatt-App mit Auto-Scroll.",
   "icons": [
     {"src": "./assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
