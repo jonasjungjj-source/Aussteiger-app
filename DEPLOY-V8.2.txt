@@ -1,0 +1,13 @@
+Aussteiger Band-App Version 8.2
+
+Neu:
+- Chordie-Suche direkt aus der App
+- Nutzer-gesteuerter Import von kopierten Lyrics und Akkorden
+- Automatische Erkennung typischer Akkordzeilen
+- Lokale Speicherung als Bibliothek "Chordie / Zwischenablage"
+
+Deployment:
+1. ZIP entpacken.
+2. Den gesamten Inhalt in das Stammverzeichnis des GitHub-Repositories hochladen.
+3. Vorhandene Dateien ersetzen und committen.
+4. GitHub Pages / GitHub Actions deployt automatisch.

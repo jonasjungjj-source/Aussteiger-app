@@ -81,6 +81,88 @@ function uniqueSongId(baseId) {
   return candidate;
 }
 
+function isChordToken(token) {
+  return /^[A-G](?:#|b)?(?:(?:m|min|maj|dim|aug|sus|add)?\d*)?(?:\/[A-G](?:#|b)?)?$/.test(token);
+}
+
+function normalizePastedSongText(text) {
+  const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  return lines.map(raw => {
+    const line = raw.trim();
+    if (!line) return '';
+    if (/^https?:\/\//i.test(line)) return '';
+    const tokens = line.split(/\s+/).filter(Boolean);
+    const chordCount = tokens.filter(token => isChordToken(token.replace(/[|:(),]/g, ''))).length;
+    if (tokens.length && chordCount / tokens.length >= 0.65) {
+      return tokens.map(token => {
+        const clean = token.replace(/[|:(),]/g, '');
+        return isChordToken(clean) ? `[${clean}]` : token;
+      }).join(' ');
+    }
+    return raw.replace(/(^|\s)([A-G](?:#|b)?(?:(?:m|min|maj|dim|aug|sus|add)?\d*)?(?:\/[A-G](?:#|b)?)?)(?=\s|$)/g, '$1[$2]');
+  }).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function ensureClipboardLibrary() {
+  let lib = state.libraries.find(item => item.id === 'lib-clipboard-imports');
+  if (!lib) {
+    lib = { id: 'lib-clipboard-imports', name: 'Chordie / Zwischenablage', importedAt: new Date().toISOString(), count: 0 };
+    state.libraries.push(lib);
+  }
+  return lib;
+}
+
+function openChordieImport() {
+  const current = song(state.currentId);
+  $('#chordieSongTitle').value = current?.title || '';
+  $('#chordieArtist').value = current?.artist || '';
+  $('#chordiePasteText').value = '';
+  $('#chordieImportStatus').textContent = '';
+  $('#chordieImportDialog').showModal();
+}
+
+function searchChordie() {
+  const title = $('#chordieSongTitle').value.trim();
+  const artist = $('#chordieArtist').value.trim();
+  const query = [title, artist].filter(Boolean).join(' ');
+  if (!query) { $('#chordieImportStatus').textContent = 'Bitte zuerst einen Songtitel eingeben.'; return; }
+  const url = `https://www.chordie.com/results.php?q=${encodeURIComponent(query)}&np=0&ps=10`;
+  window.open(url, '_blank', 'noopener,noreferrer');
+  $('#chordieImportStatus').textContent = 'Chordie wurde geöffnet. Dort eine Fassung auswählen und den Songtext mit Akkorden kopieren.';
+}
+
+async function readClipboardIntoImporter() {
+  const status = $('#chordieImportStatus');
+  try {
+    if (!navigator.clipboard?.readText) throw new Error('Zwischenablage-API nicht verfügbar');
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) throw new Error('Zwischenablage ist leer');
+    $('#chordiePasteText').value = text;
+    status.textContent = `${text.length} Zeichen eingefügt. Bitte kurz prüfen und dann importieren.`;
+  } catch (error) {
+    status.textContent = 'Automatisches Einfügen wurde blockiert. Tippe in das Textfeld und wähle manuell „Einfügen“.';
+    $('#chordiePasteText').focus();
+  }
+}
+
+function saveClipboardSong() {
+  const title = $('#chordieSongTitle').value.trim();
+  const artist = $('#chordieArtist').value.trim();
+  const raw = $('#chordiePasteText').value;
+  const status = $('#chordieImportStatus');
+  if (!title) { status.textContent = 'Bitte einen Songtitel eingeben.'; return; }
+  if (!raw.trim()) { status.textContent = 'Bitte zuerst Lyrics und Akkorde einfügen.'; return; }
+  const content = normalizePastedSongText(raw);
+  const library = ensureClipboardLibrary();
+  const id = uniqueSongId(slugify(`${title}-${artist || 'import'}`));
+  state.importedSongs.push({ id, library: library.id, title, artist, tags: ['Zwischenablage-Import'], source: { site: 'Chordie', importedByUser: true }, content });
+  library.count = state.importedSongs.filter(item => item.library === library.id).length;
+  library.importedAt = new Date().toISOString();
+  saveLibraries(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
+  $('#chordieImportDialog').close();
+  openSong(id);
+}
+
 function parseChordProText(text, filename) {
   const lines = String(text).replace(/\r\n?/g, '\n').split('\n');
   let title = '', artist = '', key = '', capo = '';
@@ -219,7 +301,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=8.0', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=8.2', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -244,6 +326,10 @@ function bindUI() {
   $('#editSongBtn').onclick = openEditor; $('#saveSongBtn').onclick = saveEditedSong; $('#deleteOverrideBtn').onclick = deleteOverride;
   $('#exportBtn').onclick = exportData; $('#importFile').onchange = importData;
   $('#importSongsFile').onchange = event => { importSongFiles(event.target.files); event.target.value = ''; };
+  $('#openChordieImportBtn').onclick = openChordieImport;
+  $('#searchChordieBtn').onclick = searchChordie;
+  $('#readClipboardBtn').onclick = readClipboardIntoImporter;
+  $('#saveClipboardSongBtn').onclick = saveClipboardSong;
   $('#speedRange').value = state.scrollSpeed; $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
   $('#speedRange').oninput = event => { state.scrollSpeed = Number(event.target.value); $('#speedValue').textContent = `${state.scrollSpeed} px/s`; localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); };
   ['darkToggle','contrastToggle','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
@@ -339,7 +425,7 @@ function openEditor() { const item = song(state.currentId); if (!item) return; $
 function saveEditedSong() { const id = state.currentId; if (!id) return; state.overrides[id] = { title: $('#editTitle').value.trim(), artist: $('#editArtist').value.trim(), bpm: Number($('#editBpm').value) || undefined, capo: $('#editCapo').value === '' ? undefined : Number($('#editCapo').value), singer: $('#editSinger').value.trim(), content: $('#editContent').value }; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 function deleteOverride() { const id = state.currentId; if (!id || !state.overrides[id] || !confirm('Lokale Änderungen für diesen Song löschen?')) return; delete state.overrides[id]; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 
-function exportData() { const data = { version: 8, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v8-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: 8.2, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v8-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }

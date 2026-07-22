@@ -1,7 +1,7 @@
-const CACHE = 'aussteiger-bandapp-v8-0-final-1';
+const CACHE = 'aussteiger-bandapp-v8-2-chordie';
 const APP_SHELL = [
   './', './index.html', './chords.html',
-  './app.js?v=8.0', './styles.css?v=8.0', './manifest.json?v=8.0',
+  './app.js?v=8.2', './styles.css?v=8.2', './manifest.json?v=8.2',
   './songs.json', './setlists.json',
   './assets/images/logo.jpg', './assets/icons/icon.svg',
   './assets/icons/icon-180.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png'

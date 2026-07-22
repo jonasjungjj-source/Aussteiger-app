@@ -14,3 +14,16 @@ Alle Dateien und Ordner aus diesem Verzeichnis direkt in das Stammverzeichnis de
 - Der Dark Mode verwendet neutrales Schwarz und Grau ohne Brauntöne.
 
 Bei einer installierten älteren PWA-Version die App vom Home-Bildschirm entfernen, alle offenen Tabs schließen und anschließend neu hinzufügen.
+
+
+## Chordie-Recherche (Version 8.2)
+
+Unter `research/chordie-links.html` stehen Suchlinks für alle Songs der Playlist Nadine und Martin. Aus rechtlichen Gründen enthält das Paket keine kopierten Liedtexte oder vollständigen Akkordblätter.
+
+
+## Neu in Version 8.2
+
+- Chordie-Suche direkt aus der App öffnen
+- Nutzer-gesteuerter Import von Lyrics und Akkorden über die Zwischenablage
+- Automatische Erkennung typischer Akkordzeilen und Umwandlung in die farbige Songblatt-Darstellung
+- Speicherung ausschließlich lokal im Browser
