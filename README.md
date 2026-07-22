@@ -1,29 +1,25 @@
-# Aussteiger Band-App – Version 8.0
+# Aussteiger Band-App – Version 9.0
 
-GitHub-Pages-kompatible Offline-PWA mit Songbibliothek, mehreren Setlisten, Favoriten, lokalem Songeditor, Auto-Scroll, Akkordlexikon und barrierearmen Anzeigeeinstellungen.
+GitHub-Pages-kompatible Offline-PWA für Bandproben und Bühne.
 
-## Veröffentlichung
+## Neu in Version 9.0
 
-Alle Dateien und Ordner aus diesem Verzeichnis direkt in das Stammverzeichnis des GitHub-Pages-Repositories hochladen. Nach dem Commit startet GitHub Actions das Deployment automatisch.
+- Bluetooth-Fußschalter: Start/Pause, nächster Song und vorheriger Song
+- Frei lernbare Pedaltasten; kompatibel mit Fußschaltern, die Tastaturbefehle senden
+- Eigene mobile Tab-Ansicht mit horizontalem Scrollen
+- Einklappbare Tab-Blöcke für Intro, Solo und Outro
+- Eigener Notizen-Reiter pro Song
+- Chordie-Referenz, lokaler Import und Transponierung bleiben erhalten
 
-## Kontrolle nach dem Deployment
+## Fußschalter einrichten
 
-- Unter **Hinweise** steht „Version 8 – GitHub Pages“.
-- Im **Aa-Menü** steht „Version 8.0“.
-- Das Aa-Menü beginnt mit „🎸 Akkordfarbe ändern“.
-- Der Dark Mode verwendet neutrales Schwarz und Grau ohne Brauntöne.
+1. Fußschalter per Bluetooth mit Handy oder Tablet koppeln.
+2. Aa-Menü öffnen und **Fußschalter** wählen.
+3. Bei jeder Funktion **Taste lernen** drücken und anschließend das gewünschte Pedal betätigen.
+4. Player öffnen und testen.
 
-Bei einer installierten älteren PWA-Version die App vom Home-Bildschirm entfernen, alle offenen Tabs schließen und anschließend neu hinzufügen.
+Standard: Leertaste = Start/Pause, Pfeil rechts = nächster Song, Pfeil links = vorheriger Song.
 
+## Deployment
 
-## Chordie-Recherche (Version 8.2)
-
-Unter `research/chordie-links.html` stehen Suchlinks für alle Songs der Playlist Nadine und Martin. Aus rechtlichen Gründen enthält das Paket keine kopierten Liedtexte oder vollständigen Akkordblätter.
-
-
-## Neu in Version 8.2
-
-- Chordie-Suche direkt aus der App öffnen
-- Nutzer-gesteuerter Import von Lyrics und Akkorden über die Zwischenablage
-- Automatische Erkennung typischer Akkordzeilen und Umwandlung in die farbige Songblatt-Darstellung
-- Speicherung ausschließlich lokal im Browser
+Alle Dateien und Ordner direkt in das Stammverzeichnis des GitHub-Pages-Repositories hochladen und vorhandene Dateien ersetzen. GitHub Actions deployt nach dem Commit automatisch.

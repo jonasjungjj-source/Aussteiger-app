@@ -10,7 +10,8 @@ const STORAGE = {
   overrides: 'band-song-overrides',
   favorites: 'band-v4-favorites',
   libraries: 'band-v6-libraries',
-  importedSongs: 'band-v6-imported-songs'
+  importedSongs: 'band-v6-imported-songs',
+  footswitch: 'band-v9-footswitch'
 };
 
 const state = {
@@ -18,7 +19,8 @@ const state = {
   currentId: localStorage.getItem(STORAGE.current),
   scrollSpeed: Number(localStorage.getItem(STORAGE.speed) || 45),
   scrolling: false, lastTs: 0, overrides: {}, favorites: new Set(),
-  libraries: [], importedSongs: []
+  libraries: [], importedSongs: [],
+  footswitch: { play: 'Space', next: 'ArrowRight', prev: 'ArrowLeft' }, learningFootswitch: null
 };
 
 async function getJSON(path) {
@@ -54,6 +56,7 @@ function loadLocalState() {
   if (!state.setlists.some(list => list.id === state.activeSetlistId)) state.activeSetlistId = state.setlists[0]?.id || '';
   state.libraries = safeParse(localStorage.getItem(STORAGE.libraries), []);
   state.importedSongs = safeParse(localStorage.getItem(STORAGE.importedSongs), []);
+  state.footswitch = { ...state.footswitch, ...safeParse(localStorage.getItem(STORAGE.footswitch), {}) };
 }
 
 function mergeSongs() {
@@ -83,6 +86,38 @@ function uniqueSongId(baseId) {
 
 function isChordToken(token) {
   return /^[A-G](?:#|b)?(?:(?:m|min|maj|dim|aug|sus|add)?\d*)?(?:\/[A-G](?:#|b)?)?$/.test(token);
+}
+
+
+const NOTE_NAMES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTE_NAMES_FLAT = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const NOTE_INDEX = { C:0, 'C#':1, Db:1, D:2, 'D#':3, Eb:3, E:4, F:5, 'F#':6, Gb:6, G:7, 'G#':8, Ab:8, A:9, 'A#':10, Bb:10, B:11 };
+
+function transposeNote(note, semitones, preferFlats = false) {
+  const index = NOTE_INDEX[note];
+  if (index === undefined) return note;
+  const names = preferFlats ? NOTE_NAMES_FLAT : NOTE_NAMES_SHARP;
+  return names[(index + semitones + 120) % 12];
+}
+
+function transposeChord(chord, semitones) {
+  if (!semitones) return chord;
+  const match = String(chord).match(/^([A-G](?:#|b)?)(.*?)(?:\/([A-G](?:#|b)?))?$/);
+  if (!match) return chord;
+  const preferFlats = chord.includes('b') || semitones < 0;
+  const root = transposeNote(match[1], semitones, preferFlats);
+  const bass = match[3] ? `/${transposeNote(match[3], semitones, preferFlats)}` : '';
+  return `${root}${match[2] || ''}${bass}`;
+}
+
+function chordieSearchUrl(item) {
+  const query = [item?.title, item?.artist].filter(Boolean).join(' ');
+  return `https://www.chordie.com/results.php?q=${encodeURIComponent(query)}&np=0&ps=10`;
+}
+
+function songChordieUrl(item) {
+  const url = item?.source?.url || item?.chordieUrl || '';
+  return /^https:\/\/(?:www\.)?chordie\.com\//i.test(url) ? url : chordieSearchUrl(item);
 }
 
 function normalizePastedSongText(text) {
@@ -155,7 +190,7 @@ function saveClipboardSong() {
   const content = normalizePastedSongText(raw);
   const library = ensureClipboardLibrary();
   const id = uniqueSongId(slugify(`${title}-${artist || 'import'}`));
-  state.importedSongs.push({ id, library: library.id, title, artist, tags: ['Zwischenablage-Import'], source: { site: 'Chordie', importedByUser: true }, content });
+  state.importedSongs.push({ id, library: library.id, title, artist, tags: ['Zwischenablage-Import'], source: { site: 'Chordie', importedByUser: true, url: chordieSearchUrl({ title, artist }) }, content });
   library.count = state.importedSongs.filter(item => item.library === library.id).length;
   library.importedAt = new Date().toISOString();
   saveLibraries(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
@@ -301,7 +336,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=8.2', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.0', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -321,9 +356,10 @@ function bindUI() {
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
   $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
+  $('#lyricsTabBtn').onclick = () => setPlayerPanel('lyrics'); $('#tabsTabBtn').onclick = () => setPlayerPanel('tabs'); $('#notesTabBtn').onclick = () => setPlayerPanel('notes');
   $('#prevSongBtn').onclick = () => stepSong(-1); $('#nextSongBtn').onclick = () => stepSong(1);
   $('#favoriteCurrentBtn').onclick = () => toggleFavorite(state.currentId);
-  $('#editSongBtn').onclick = openEditor; $('#saveSongBtn').onclick = saveEditedSong; $('#deleteOverrideBtn').onclick = deleteOverride;
+  $('#editSongBtn').onclick = openEditor; $('#transposeDownBtn').onclick = () => changeTranspose(-1); $('#transposeResetBtn').onclick = resetTranspose; $('#transposeUpBtn').onclick = () => changeTranspose(1); $('#openSongChordieBtn').onclick = openCurrentSongOnChordie; $('#saveSongBtn').onclick = saveEditedSong; $('#deleteOverrideBtn').onclick = deleteOverride;
   $('#exportBtn').onclick = exportData; $('#importFile').onchange = importData;
   $('#importSongsFile').onchange = event => { importSongFiles(event.target.files); event.target.value = ''; };
   $('#openChordieImportBtn').onclick = openChordieImport;
@@ -332,8 +368,10 @@ function bindUI() {
   $('#saveClipboardSongBtn').onclick = saveClipboardSong;
   $('#speedRange').value = state.scrollSpeed; $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
   $('#speedRange').oninput = event => { state.scrollSpeed = Number(event.target.value); $('#speedValue').textContent = `${state.scrollSpeed} px/s`; localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); };
-  ['darkToggle','contrastToggle','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
+  ['darkToggle','contrastToggle','uiFontRange','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
   $('#resetDisplayBtn').onclick = resetDisplaySettings;
+  $('#footswitchSettingsBtn').onclick = openFootswitchSettings; $('#learnPlayKeyBtn').onclick = () => beginFootswitchLearning('play'); $('#learnNextKeyBtn').onclick = () => beginFootswitchLearning('next'); $('#learnPrevKeyBtn').onclick = () => beginFootswitchLearning('prev'); $('#resetFootswitchBtn').onclick = resetFootswitch;
+  document.addEventListener('keydown', handleFootswitchKey);
   $('#fullscreenBtn').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopScroll(); });
 }
@@ -414,18 +452,115 @@ function resetActiveSetlist() { const list = activeSetlist(); if (!list || !conf
 
 async function openSong(id, changeView = true) {
   const item = song(id); if (!item) return; stopScroll(); state.currentId = id; localStorage.setItem(STORAGE.current, id);
-  $('#songTitle').textContent = item.title; $('#songMeta').textContent = [item.artist, item.genre, meta(item)].filter(Boolean).join(' · ');
-  $('#songSheet').innerHTML = renderSong(item.content || item.lyrics || 'Noch kein Songblatt eingetragen. Tippe auf „Bearbeiten“.'); updateFavoriteButton(); scrollTo({ top: 0 }); if (changeView) switchView('player');
+  const semitones = Number(item.transpose || 0);
+  $('#songTitle').textContent = item.title;
+  $('#songMeta').textContent = [item.artist, item.genre, meta(item), semitones ? `Transponiert ${semitones > 0 ? '+' : ''}${semitones}` : ''].filter(Boolean).join(' · ');
+  $('#songSheet').innerHTML = renderSong(item.content || item.lyrics || 'Noch kein Songblatt eingetragen. Tippe auf „Bearbeiten“.', semitones);
+  renderTabs(item, semitones);
+  $('#notesSheet').innerHTML = item.notes?.trim() ? `<div class="notes-content">${esc(item.notes).replace(/\n/g, '<br>')}</div>` : '<p class="empty">Für diesen Song sind noch keine Notizen gespeichert.</p>';
+  setPlayerPanel('lyrics');
+  $('#transposeResetBtn').textContent = semitones ? `${semitones > 0 ? '+' : ''}${semitones}` : '0';
+  const directRef = /^https:\/\/(?:www\.)?chordie\.com\//i.test(item?.source?.url || item?.chordieUrl || '');
+  $('#songSourceStatus').textContent = directRef ? 'Chordie-Referenz gespeichert.' : 'Chordie öffnet eine Suche nach Titel und Interpret.';
+  updateFavoriteButton(); scrollTo({ top: 0 }); if (changeView) switchView('player');
 }
 
-function renderSong(text) { return String(text).split('\n').map(line => { const trimmed = line.trim(); if (!trimmed) return '<div class="blank"></div>'; if (/^\[.+\]$/.test(trimmed)) return `<h3 class="section-label">${esc(trimmed.slice(1, -1))}</h3>`; const rendered = esc(line).replace(/\[([A-G][#b]?(?:m|maj|min|sus|dim|aug|add)?\d*(?:\/[A-G][#b]?)?)\]/g, '<span class="chord">$1</span>'); return `<div class="lyric-line">${rendered}</div>`; }).join(''); }
+function renderSong(text, semitones = 0) { return String(text).split('\n').map(line => { const trimmed = line.trim(); if (!trimmed) return '<div class="blank"></div>'; if (/^\[.+\]$/.test(trimmed) && !/^\[[A-G][#b]?/.test(trimmed)) return `<h3 class="section-label">${esc(trimmed.slice(1, -1))}</h3>`; const rendered = esc(line).replace(/\[([A-G][#b]?(?:m|maj|min|sus|dim|aug|add)?\d*(?:\/[A-G][#b]?)?)\]/g, (_, chord) => `<span class="chord">${esc(transposeChord(chord, semitones))}</span>`); return `<div class="lyric-line">${rendered}</div>`; }).join(''); }
+
+
+function setPlayerPanel(name) {
+  const names = ['lyrics', 'tabs', 'notes'];
+  names.forEach(panel => {
+    const element = document.querySelector(`[data-panel="${panel}"]`);
+    const button = $(`#${panel === 'lyrics' ? 'lyricsTabBtn' : panel === 'tabs' ? 'tabsTabBtn' : 'notesTabBtn'}`);
+    const active = panel === name;
+    if (element) { element.hidden = !active; element.classList.toggle('active', active); }
+    if (button) { button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); }
+  });
+}
+
+function extractTabBlocks(text) {
+  const lines = String(text || '').split('\n');
+  const blocks = [];
+  let current = null;
+  const tabLine = /^\s*(?:e|B|G|D|A|E)\s*\|/i;
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const start = line.match(/^\s*\{start_of_tab(?::\s*([^}]+))?\}\s*$/i);
+    if (start) { current = { name: start[1]?.trim() || `Tab ${blocks.length + 1}`, lines: [] }; continue; }
+    if (/^\s*\{end_of_tab\}\s*$/i.test(line)) { if (current?.lines.length) blocks.push(current); current = null; continue; }
+    if (current) { current.lines.push(line); continue; }
+    if (tabLine.test(line)) {
+      const group = [];
+      let j = i;
+      while (j < lines.length && (tabLine.test(lines[j]) || /^\s*$/.test(lines[j]))) { group.push(lines[j]); j += 1; }
+      const clean = group.filter(Boolean);
+      if (clean.length >= 3) {
+        const previous = lines[i - 1]?.trim();
+        blocks.push({ name: previous && previous.length < 40 && !tabLine.test(previous) ? previous : `Tab ${blocks.length + 1}`, lines: group });
+        i = j - 1;
+      }
+    }
+  }
+  if (current?.lines.length) blocks.push(current);
+  return blocks;
+}
+
+function renderTabs(item, semitones = 0) {
+  const blocks = Array.isArray(item.tabs) && item.tabs.length
+    ? item.tabs.map((block, index) => ({ name: block.name || `Tab ${index + 1}`, lines: String(block.content || '').split('\n') }))
+    : extractTabBlocks(item.content || item.lyrics || '');
+  const host = $('#tabSheet');
+  if (!blocks.length) { host.innerHTML = '<p class="empty">Für diesen Song sind noch keine Tabs gespeichert. Im Editor können Tab-Blöcke mit <code>{start_of_tab: Intro}</code> und <code>{end_of_tab}</code> angelegt werden.</p>'; return; }
+  host.innerHTML = blocks.map((block, index) => `<details class="tab-block" ${index === 0 ? 'open' : ''}><summary>${esc(block.name)}</summary><div class="tab-scroll"><pre>${esc(block.lines.join('\n'))}</pre></div></details>`).join('');
+}
+
+function footswitchLabel(code) {
+  return ({ Space:'Leertaste', ArrowRight:'Pfeil rechts', ArrowLeft:'Pfeil links', ArrowDown:'Pfeil unten', ArrowUp:'Pfeil oben', PageDown:'Bild ab', PageUp:'Bild auf', Enter:'Enter' })[code] || code || 'Nicht belegt';
+}
+function saveFootswitch() { localStorage.setItem(STORAGE.footswitch, JSON.stringify(state.footswitch)); updateFootswitchUI(); }
+function updateFootswitchUI() { $('#footswitchPlayValue').textContent = footswitchLabel(state.footswitch.play); $('#footswitchNextValue').textContent = footswitchLabel(state.footswitch.next); $('#footswitchPrevValue').textContent = footswitchLabel(state.footswitch.prev); }
+function openFootswitchSettings() { state.learningFootswitch = null; updateFootswitchUI(); $('#footswitchStatus').textContent = 'Zum Testen Player öffnen und Pedal drücken.'; $('#footswitchDialog').showModal(); }
+function beginFootswitchLearning(action) { state.learningFootswitch = action; $('#footswitchStatus').textContent = `Jetzt die Pedaltaste für ${action === 'play' ? 'Start / Pause' : action === 'next' ? 'Nächster Song' : 'Vorheriger Song'} drücken …`; }
+function resetFootswitch() { state.footswitch = { play:'Space', next:'ArrowRight', prev:'ArrowLeft' }; saveFootswitch(); $('#footswitchStatus').textContent = 'Standardbelegung wiederhergestellt.'; }
+function handleFootswitchKey(event) {
+  if (state.learningFootswitch) {
+    event.preventDefault(); state.footswitch[state.learningFootswitch] = event.code; const learned = state.learningFootswitch; state.learningFootswitch = null; saveFootswitch(); $('#footswitchStatus').textContent = `${learned === 'play' ? 'Start / Pause' : learned === 'next' ? 'Nächster Song' : 'Vorheriger Song'} wurde auf „${footswitchLabel(event.code)}“ gelegt.`; return;
+  }
+  const target = event.target;
+  if (target?.matches?.('input, textarea, select, [contenteditable="true"]') || document.querySelector('dialog[open]')) return;
+  if (!$('#playerView')?.classList.contains('active')) return;
+  let handled = true;
+  if (event.code === state.footswitch.play) toggleScroll();
+  else if (event.code === state.footswitch.next) stepSong(1);
+  else if (event.code === state.footswitch.prev) stepSong(-1);
+  else handled = false;
+  if (handled) event.preventDefault();
+}
+
+function changeTranspose(delta) {
+  const item = song(state.currentId); if (!item) return;
+  const current = Number(item.transpose || 0);
+  state.overrides[item.id] = { ...(state.overrides[item.id] || {}), transpose: Math.max(-11, Math.min(11, current + delta)) };
+  saveOverrides(); renderAll(); openSong(item.id, false);
+}
+function resetTranspose() {
+  const item = song(state.currentId); if (!item) return;
+  state.overrides[item.id] = { ...(state.overrides[item.id] || {}), transpose: 0 };
+  saveOverrides(); renderAll(); openSong(item.id, false);
+}
+function openCurrentSongOnChordie() {
+  const item = song(state.currentId); if (!item) return;
+  window.open(songChordieUrl(item), '_blank', 'noopener,noreferrer');
+}
+
 function stepSong(delta) { const order = activeSetlist()?.songs.filter(id => song(id)) || []; const fallback = state.songs.map(item => item.id); const ids = order.includes(state.currentId) ? order : fallback; if (!ids.length) return; let index = ids.indexOf(state.currentId); if (index < 0) index = 0; openSong(ids[(index + delta + ids.length) % ids.length]); }
 
-function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editContent').value = item.content || item.lyrics || ''; $('#songEditor').showModal(); }
-function saveEditedSong() { const id = state.currentId; if (!id) return; state.overrides[id] = { title: $('#editTitle').value.trim(), artist: $('#editArtist').value.trim(), bpm: Number($('#editBpm').value) || undefined, capo: $('#editCapo').value === '' ? undefined : Number($('#editCapo').value), singer: $('#editSinger').value.trim(), content: $('#editContent').value }; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
+function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editChordieUrl').value = item.source?.url || item.chordieUrl || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editNotes').value = item.notes || ''; $('#editContent').value = item.content || item.lyrics || ''; $('#songEditor').showModal(); }
+function saveEditedSong() { const id = state.currentId; if (!id) return; const current = song(id); const chordieUrl = $('#editChordieUrl').value.trim(); state.overrides[id] = { ...(state.overrides[id] || {}), title: $('#editTitle').value.trim(), artist: $('#editArtist').value.trim(), bpm: Number($('#editBpm').value) || undefined, capo: $('#editCapo').value === '' ? undefined : Number($('#editCapo').value), singer: $('#editSinger').value.trim(), notes: $('#editNotes').value.trim(), content: $('#editContent').value, source: { ...(current?.source || {}), site: chordieUrl ? 'Chordie' : current?.source?.site, url: chordieUrl || undefined } }; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 function deleteOverride() { const id = state.currentId; if (!id || !state.overrides[id] || !confirm('Lokale Änderungen für diesen Song löschen?')) return; delete state.overrides[id]; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 
-function exportData() { const data = { version: 8.2, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v8-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: 9.0, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-0-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
@@ -437,17 +572,21 @@ function applySettings() {
   const settings = safeParse(localStorage.getItem(STORAGE.display), {});
   const font = Number(settings.font) || 26;
   const line = Number(settings.line) || 160;
+  const uiFont = Number(settings.uiFont) || 100;
   const chord = /^#[0-9a-f]{6}$/i.test(settings.chord || '') ? settings.chord : '#2563eb';
   document.documentElement.classList.toggle('dark', !!settings.dark);
   document.documentElement.classList.toggle('contrast', !!settings.contrast);
   document.documentElement.style.setProperty('--sheet-font', `${font}px`);
+  document.documentElement.style.setProperty('--ui-scale', String(uiFont / 100));
   document.documentElement.style.setProperty('--sheet-line', String(line / 100));
   document.documentElement.style.setProperty('--chord', settings.contrast ? '#ffeb00' : chord);
   $('#darkToggle').checked = !!settings.dark;
   $('#contrastToggle').checked = !!settings.contrast;
+  $('#uiFontRange').value = uiFont;
   $('#fontRange').value = font;
   $('#lineRange').value = line;
   $('#chordColor').value = chord;
+  $('#uiFontValue').textContent = `${uiFont} %`;
   $('#fontValue').textContent = `${font} px`;
   $('#lineValue').textContent = String(line / 100);
   $('#chordColorValue').textContent = chord.toUpperCase();
@@ -460,6 +599,7 @@ function saveSettings() {
   const settings = {
     dark: $('#darkToggle').checked,
     contrast: $('#contrastToggle').checked,
+    uiFont: Number($('#uiFontRange').value),
     font: Number($('#fontRange').value),
     line: Number($('#lineRange').value),
     chord: $('#chordColor').value
@@ -468,7 +608,7 @@ function saveSettings() {
   applySettings();
 }
 function resetDisplaySettings() {
-  localStorage.setItem(STORAGE.display, JSON.stringify({ dark: false, contrast: false, font: 26, line: 160, chord: '#2563eb' }));
+  localStorage.setItem(STORAGE.display, JSON.stringify({ dark: false, contrast: false, uiFont: 100, font: 26, line: 160, chord: '#2563eb' }));
   applySettings();
 }
 
