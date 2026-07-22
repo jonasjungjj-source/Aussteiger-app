@@ -1,15 +1,17 @@
-AUSSTEIGER APP VERSION 8.0
+AUSSTEIGER APP VERSION 8.0 FINAL
 
-Upload the CONTENTS of this folder to the repository root.
-The repository root must contain index.html, app.js, styles.css and service-worker.js.
+1. Den INHALT dieses Ordners in das Stammverzeichnis des GitHub-Repositories hochladen.
+2. Vorhandene Dateien mit denselben Namen ersetzen.
+3. Die Dateinamen müssen exakt index.html, app.js, styles.css, service-worker.js und manifest.json lauten.
+4. Nach dem Commit deployt GitHub Actions automatisch.
 
-Visible checks after deployment:
-- Hinweise page says "Version 8 – GitHub Pages"
-- Aa dialog says "Version 8.0"
-- Aa dialog begins with "🎸 Akkordfarbe ändern"
-- Dark Mode uses neutral black/grey, not brown
+Sichtprüfung nach dem Deployment:
+- Hinweise: "Version 8 – GitHub Pages"
+- Aa-Menü: "Version 8.0"
+- Erste Einstellung: "🎸 Akkordfarbe ändern"
+- Dark Mode: neutrales Schwarz/Grau ohne Braun
 
-For iPhone after deployment:
-1. Close every open tab of the app.
-2. Open the site again in Safari.
-3. If installed on the Home Screen, remove the old icon and add it again.
+Bei iPhone/PWA:
+- Alle offenen App-Tabs schließen.
+- Eine installierte alte Home-Screen-App entfernen.
+- Seite erneut in Safari öffnen und wieder zum Home-Bildschirm hinzufügen.
