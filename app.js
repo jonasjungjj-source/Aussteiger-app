@@ -246,7 +246,8 @@ function bindUI() {
   $('#importSongsFile').onchange = event => { importSongFiles(event.target.files); event.target.value = ''; };
   $('#speedRange').value = state.scrollSpeed; $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
   $('#speedRange').oninput = event => { state.scrollSpeed = Number(event.target.value); $('#speedValue').textContent = `${state.scrollSpeed} px/s`; localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); };
-  ['darkToggle','contrastToggle','fontRange','lineRange'].forEach(id => $(`#${id}`).oninput = saveSettings);
+  ['darkToggle','contrastToggle','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
+  $('#resetDisplayBtn').onclick = resetDisplaySettings;
   $('#fullscreenBtn').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopScroll(); });
 }
@@ -346,7 +347,43 @@ function startScroll() { state.scrolling = true; state.lastTs = performance.now(
 function stopScroll() { state.scrolling = false; $('#startStopBtn').textContent = '▶ Start'; }
 function scrollFrame(timestamp) { if (!state.scrolling) return; const delta = Math.min((timestamp - state.lastTs) / 1000, 0.1); state.lastTs = timestamp; scrollBy(0, state.scrollSpeed * delta); if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) { stopScroll(); return; } requestAnimationFrame(scrollFrame); }
 
-function applySettings() { const settings = safeParse(localStorage.getItem(STORAGE.display), {}); document.documentElement.classList.toggle('dark', !!settings.dark); document.documentElement.classList.toggle('contrast', !!settings.contrast); document.documentElement.style.setProperty('--sheet-font', `${settings.font || 26}px`); document.documentElement.style.setProperty('--sheet-line', String((settings.line || 160) / 100)); $('#darkToggle').checked = !!settings.dark; $('#contrastToggle').checked = !!settings.contrast; $('#fontRange').value = settings.font || 26; $('#lineRange').value = settings.line || 160; $('#fontValue').textContent = `${settings.font || 26} px`; $('#lineValue').textContent = String((settings.line || 160) / 100); $('#speedRange').value = state.scrollSpeed; $('#speedValue').textContent = `${state.scrollSpeed} px/s`; }
-function saveSettings() { const settings = { dark: $('#darkToggle').checked, contrast: $('#contrastToggle').checked, font: Number($('#fontRange').value), line: Number($('#lineRange').value) }; localStorage.setItem(STORAGE.display, JSON.stringify(settings)); applySettings(); }
+function applySettings() {
+  const settings = safeParse(localStorage.getItem(STORAGE.display), {});
+  const font = Number(settings.font) || 26;
+  const line = Number(settings.line) || 160;
+  const chord = /^#[0-9a-f]{6}$/i.test(settings.chord || '') ? settings.chord : '#b45309';
+  document.documentElement.classList.toggle('dark', !!settings.dark);
+  document.documentElement.classList.toggle('contrast', !!settings.contrast);
+  document.documentElement.style.setProperty('--sheet-font', `${font}px`);
+  document.documentElement.style.setProperty('--sheet-line', String(line / 100));
+  document.documentElement.style.setProperty('--chord', settings.contrast ? '#ffeb00' : chord);
+  $('#darkToggle').checked = !!settings.dark;
+  $('#contrastToggle').checked = !!settings.contrast;
+  $('#fontRange').value = font;
+  $('#lineRange').value = line;
+  $('#chordColor').value = chord;
+  $('#fontValue').textContent = `${font} px`;
+  $('#lineValue').textContent = String(line / 100);
+  $('#chordColorValue').textContent = chord.toUpperCase();
+  $('#speedRange').value = state.scrollSpeed;
+  $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
+  const themeColor = settings.contrast ? '#000000' : settings.dark ? '#121212' : '#cfbda9';
+  $('#themeColorMeta')?.setAttribute('content', themeColor);
+}
+function saveSettings() {
+  const settings = {
+    dark: $('#darkToggle').checked,
+    contrast: $('#contrastToggle').checked,
+    font: Number($('#fontRange').value),
+    line: Number($('#lineRange').value),
+    chord: $('#chordColor').value
+  };
+  localStorage.setItem(STORAGE.display, JSON.stringify(settings));
+  applySettings();
+}
+function resetDisplaySettings() {
+  localStorage.setItem(STORAGE.display, JSON.stringify({ dark: false, contrast: false, font: 26, line: 160, chord: '#b45309' }));
+  applySettings();
+}
 
 init();

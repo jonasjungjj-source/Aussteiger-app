@@ -1,4 +1,4 @@
-const CACHE = 'aussteiger-bandapp-v7-1';
+const CACHE = 'aussteiger-bandapp-v7-2';
 const APP_SHELL = ['./','./index.html','./chords.html','./app.js','./styles.css','./manifest.json','./songs.json','./setlists.json','./assets/images/logo.jpg','./assets/icons/icon.svg','./assets/icons/icon-180.png','./assets/icons/icon-192.png','./assets/icons/icon-512.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
