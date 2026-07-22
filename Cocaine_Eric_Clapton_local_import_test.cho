@@ -1,0 +1,43 @@
+{title: Cocaine}
+{artist: Eric Clapton / J. J. Cale}
+{composer: J. J. Cale}
+{key: E}
+{tempo: 105}
+{capo: 2}
+{source: User-provided Chordie text for local import test}
+
+{comment: Main riff}
+[E] [E] [D] [E]   [E] [D]
+Repeat twice over each verse line.
+
+{start_of_verse}
+If you wanna hang out you've got to take her out, [E]cocaine.
+If you wanna get down, down on the ground, [E]cocaine.
+{end_of_verse}
+
+{start_of_chorus}
+She don't [E]lie, she don't [D]lie, she don't [C]lie [B]
+[E]Cocaine!
+{end_of_chorus}
+
+{start_of_verse}
+If you got bad news, you wanna kick them blues, [E]cocaine.
+When your day is done and you wanna run, [E]cocaine.
+{end_of_verse}
+
+{chorus}
+
+{start_of_verse}
+If your thing is gone and you wanna ride on, [E]cocaine.
+Don't forget this fact, you can't get it back, [E]cocaine.
+{end_of_verse}
+
+{chorus}
+
+{comment: Long solo over the blues scale in E}
+
+{chorus}
+
+{comment: Import test notes}
+This file was created from the text supplied in chat.
+It is intentionally simplified for testing lyrics/chord import, transposition, capo handling, and Chordie reference storage.
