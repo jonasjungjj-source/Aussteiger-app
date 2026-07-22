@@ -1,0 +1,15 @@
+AUSSTEIGER APP VERSION 8.0
+
+Upload the CONTENTS of this folder to the repository root.
+The repository root must contain index.html, app.js, styles.css and service-worker.js.
+
+Visible checks after deployment:
+- Hinweise page says "Version 8 – GitHub Pages"
+- Aa dialog says "Version 8.0"
+- Aa dialog begins with "🎸 Akkordfarbe ändern"
+- Dark Mode uses neutral black/grey, not brown
+
+For iPhone after deployment:
+1. Close every open tab of the app.
+2. Open the site again in Safari.
+3. If installed on the Home Screen, remove the old icon and add it again.

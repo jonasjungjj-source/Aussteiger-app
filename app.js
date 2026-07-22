@@ -219,7 +219,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=7.3', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=8.0', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -339,7 +339,7 @@ function openEditor() { const item = song(state.currentId); if (!item) return; $
 function saveEditedSong() { const id = state.currentId; if (!id) return; state.overrides[id] = { title: $('#editTitle').value.trim(), artist: $('#editArtist').value.trim(), bpm: Number($('#editBpm').value) || undefined, capo: $('#editCapo').value === '' ? undefined : Number($('#editCapo').value), singer: $('#editSinger').value.trim(), content: $('#editContent').value }; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 function deleteOverride() { const id = state.currentId; if (!id || !state.overrides[id] || !confirm('Lokale Änderungen für diesen Song löschen?')) return; delete state.overrides[id]; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 
-function exportData() { const data = { version: 4, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v4-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: 8, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v8-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
@@ -351,7 +351,7 @@ function applySettings() {
   const settings = safeParse(localStorage.getItem(STORAGE.display), {});
   const font = Number(settings.font) || 26;
   const line = Number(settings.line) || 160;
-  const chord = /^#[0-9a-f]{6}$/i.test(settings.chord || '') ? settings.chord : '#b45309';
+  const chord = /^#[0-9a-f]{6}$/i.test(settings.chord || '') ? settings.chord : '#2563eb';
   document.documentElement.classList.toggle('dark', !!settings.dark);
   document.documentElement.classList.toggle('contrast', !!settings.contrast);
   document.documentElement.style.setProperty('--sheet-font', `${font}px`);
@@ -367,7 +367,7 @@ function applySettings() {
   $('#chordColorValue').textContent = chord.toUpperCase();
   $('#speedRange').value = state.scrollSpeed;
   $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
-  const themeColor = settings.contrast ? '#000000' : settings.dark ? '#121212' : '#cfbda9';
+  const themeColor = settings.contrast ? '#000000' : settings.dark ? '#121212' : '#f3f4f6';
   $('#themeColorMeta')?.setAttribute('content', themeColor);
 }
 function saveSettings() {
@@ -382,7 +382,7 @@ function saveSettings() {
   applySettings();
 }
 function resetDisplaySettings() {
-  localStorage.setItem(STORAGE.display, JSON.stringify({ dark: false, contrast: false, font: 26, line: 160, chord: '#b45309' }));
+  localStorage.setItem(STORAGE.display, JSON.stringify({ dark: false, contrast: false, font: 26, line: 160, chord: '#2563eb' }));
   applySettings();
 }
 

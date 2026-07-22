@@ -94,3 +94,66 @@ button:disabled{opacity:.55;cursor:not-allowed}
   .picker-item{align-items:stretch}.picker-item button{flex:0 0 auto}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Version 8: neutral theme, large mobile controls, prominent chord colour */
+:root{
+  --bg:#f3f4f6;
+  --panel:#ffffff;
+  --surface-2:#e5e7eb;
+  --text:#111827;
+  --muted:#4b5563;
+  --line:#cbd5e1;
+  --accent:#2563eb;
+  --focus:#2563eb;
+  --chord:#2563eb;
+  color-scheme:light;
+}
+.dark{
+  --bg:#0b0d10;
+  --panel:#171a1f;
+  --surface-2:#23272f;
+  --text:#f8fafc;
+  --muted:#cbd5e1;
+  --line:#3b424d;
+  --accent:#60a5fa;
+  --focus:#93c5fd;
+  color-scheme:dark;
+}
+body,.topbar,.transport,#splash{background-color:var(--bg)}
+button,.nav-link,input,select,textarea{font-size:1rem}
+button,.nav-link{min-height:52px;padding:.78rem 1rem;font-weight:650}
+.icon-btn{min-width:52px;min-height:52px;font-size:1.28rem}
+#settingsBtn{font-weight:900;border-width:2px}
+#displaySettings{width:min(94vw,720px);padding:22px}
+#displaySettings .dialog-head{gap:14px}
+#displaySettings .settings-form{gap:20px}
+#displaySettings .settings-group{gap:14px;padding:18px}
+#displaySettings .settings-group h3{font-size:1.15rem}
+#displaySettings .toggle-setting,
+#displaySettings .color-setting,
+#displaySettings .range-setting{min-height:76px;padding:16px;border:1px solid var(--line)}
+#displaySettings strong{font-size:1.08rem}
+#displaySettings small{font-size:.94rem}
+#displaySettings .toggle-setting input[type=checkbox]{width:68px;height:40px}
+#displaySettings .toggle-setting input[type=checkbox]::after{width:30px;height:30px;top:3px;left:3px}
+#displaySettings .toggle-setting input[type=checkbox]:checked::after{transform:translateX(28px)}
+.chord-color-setting{border:2px solid var(--accent)!important;background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important}
+.color-control{display:grid;grid-template-columns:78px auto;align-items:center;gap:12px}
+.color-control input[type=color]{width:78px;height:58px;padding:3px;border:2px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer}
+.color-control output{min-width:90px;font-weight:850;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center}
+.range-setting input[type=range]{min-height:44px}
+.settings-actions button{min-height:56px;font-size:1.03rem}
+@media(max-width:600px){
+  #displaySettings{padding:16px 12px calc(16px + env(safe-area-inset-bottom));max-height:96dvh}
+  #displaySettings .settings-group{padding:12px}
+  #displaySettings .toggle-setting,
+  #displaySettings .color-setting,
+  #displaySettings .range-setting{padding:14px 12px;min-height:82px}
+  #displaySettings .color-setting{grid-template-columns:1fr;align-items:start}
+  #displaySettings .color-control{width:100%;grid-template-columns:minmax(92px,1fr) minmax(100px,1fr)}
+  #displaySettings .color-control input[type=color]{width:100%;height:64px}
+  #displaySettings .settings-actions{grid-template-columns:1fr}
+  #displaySettings .settings-actions .primary{grid-column:auto}
+  .topbar{grid-template-columns:56px minmax(0,1fr) 56px}
+  button,.nav-link{min-height:54px}
+}
