@@ -1,7 +1,7 @@
-const CACHE = 'aussteiger-bandapp-v9-4-player-scroll';
+const CACHE = 'aussteiger-bandapp-v9-5scroll';
 const APP_SHELL = [
   './', './index.html', './chords.html',
-  './app.js?v=9.4', './styles.css?v=9.4', './manifest.json?v=9.4',
+  './app.js?v=9.5', './styles.css?v=9.5', './manifest.json?v=9.5',
   './songs.json', './setlists.json',
   './assets/images/logo.jpg', './assets/icons/icon.svg',
   './assets/icons/icon-180.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png'
