@@ -439,7 +439,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.2', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.4', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -459,7 +459,7 @@ function bindUI() {
   $('#resetSetlistBtn').onclick = resetActiveSetlist;
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
-  $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
+  $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = () => { const panel = activeScrollPanel(); if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' }); };
   $('#lyricsTabBtn').onclick = () => setPlayerPanel('lyrics'); $('#tabsTabBtn').onclick = () => setPlayerPanel('tabs'); $('#notesTabBtn').onclick = () => setPlayerPanel('notes'); $('#pdfTabBtn').onclick = () => setPlayerPanel('pdf');
   $('#prevSongBtn').onclick = () => stepSong(-1); $('#nextSongBtn').onclick = () => stepSong(1);
   $('#favoriteCurrentBtn').onclick = () => toggleFavorite(state.currentId);
@@ -478,6 +478,7 @@ function bindUI() {
   document.addEventListener('keydown', handleFootswitchKey);
   $('#fullscreenBtn').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopScroll(); });
+  $$('.player-panel').forEach(panel => panel.addEventListener('click', handlePlayerPanelTap));
 }
 
 function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); }
@@ -486,7 +487,10 @@ function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').set
 function switchView(name) {
   $$('.view').forEach(view => view.classList.remove('active')); $(`#${name}View`).classList.add('active');
   $$('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-  $('#viewTitle').textContent = { setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', player:'Player', about:'Hinweise' }[name]; closeDrawer();
+  $('#viewTitle').textContent = { setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', player:'Player', about:'Hinweise' }[name];
+  document.body.classList.toggle('player-mode', name === 'player');
+  if (name !== 'player') setPlaybackChromeHidden(false);
+  closeDrawer();
 }
 
 function renderSetlistSelect() {
@@ -500,16 +504,90 @@ function renderSetlist() {
   const validIds = list.songs.filter(id => song(id));
   $('#setlistSummary').textContent = `${list.name}: ${validIds.length} Songs${list.description ? ` · ${list.description}` : ''}`;
   validIds.forEach((id, index) => {
-    const item = song(id); const li = document.createElement('li'); li.className = 'song-row';
-    li.innerHTML = `<button class="song-main"><span class="number">${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.artist)}${meta(item) ? ` · ${esc(meta(item))}` : ''}</small></span></button><div class="row-actions"><button class="favorite" aria-label="Favorit">${state.favorites.has(id) ? '★' : '☆'}</button><button class="move-up" aria-label="Nach oben">↑</button><button class="move-down" aria-label="Nach unten">↓</button><button class="remove" aria-label="Entfernen">✕</button></div>`;
+    const item = song(id); const li = document.createElement('li'); li.className = 'song-row'; li.dataset.songId = id;
+    li.innerHTML = `<button class="drag-handle" type="button" aria-label="${esc(item.title)} verschieben. Gedrückt halten und ziehen." title="Zum Verschieben ziehen">⠿</button><button class="song-main"><span class="number">${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.artist)}${meta(item) ? ` · ${esc(meta(item))}` : ''}</small></span></button><div class="row-actions"><button class="favorite" aria-label="Favorit">${state.favorites.has(id) ? '★' : '☆'}</button><button class="move-up" aria-label="Nach oben">↑</button><button class="move-down" aria-label="Nach unten">↓</button><button class="remove" aria-label="Entfernen">✕</button></div>`;
     li.querySelector('.song-main').onclick = () => openSong(id); li.querySelector('.favorite').onclick = () => toggleFavorite(id);
     li.querySelector('.move-up').onclick = () => moveSong(index, -1); li.querySelector('.move-down').onclick = () => moveSong(index, 1);
-    li.querySelector('.remove').onclick = () => { list.songs.splice(index, 1); saveSetlists(); renderAll(); };
+    li.querySelector('.remove').onclick = () => { const pos = list.songs.indexOf(id); if (pos >= 0) list.songs.splice(pos, 1); saveSetlists(); renderAll(); };
+    bindSetlistDrag(li, li.querySelector('.drag-handle'));
     host.append(li);
   });
 }
 
 function moveSong(index, delta) { const list = activeSetlist(); const target = index + delta; if (!list || target < 0 || target >= list.songs.length) return; [list.songs[index], list.songs[target]] = [list.songs[target], list.songs[index]]; saveSetlists(); renderAll(); }
+
+function reorderSetlistSong(sourceId, targetId, placeAfter = false) {
+  const list = activeSetlist();
+  if (!list || !sourceId || !targetId || sourceId === targetId) return false;
+  const sourceIndex = list.songs.indexOf(sourceId);
+  const targetIndexBeforeRemoval = list.songs.indexOf(targetId);
+  if (sourceIndex < 0 || targetIndexBeforeRemoval < 0) return false;
+  list.songs.splice(sourceIndex, 1);
+  let targetIndex = list.songs.indexOf(targetId);
+  if (targetIndex < 0) targetIndex = list.songs.length;
+  list.songs.splice(targetIndex + (placeAfter ? 1 : 0), 0, sourceId);
+  saveSetlists();
+  return true;
+}
+
+function bindSetlistDrag(row, handle) {
+  if (!row || !handle || !window.PointerEvent) return;
+  let dragging = false;
+  let pointerId = null;
+  let targetRow = null;
+  let placeAfter = false;
+  let ghost = null;
+
+  const clearTarget = () => {
+    $$('.song-row.drag-target-before,.song-row.drag-target-after').forEach(el => el.classList.remove('drag-target-before','drag-target-after'));
+    targetRow = null;
+  };
+
+  const cleanup = () => {
+    clearTarget();
+    row.classList.remove('dragging');
+    ghost?.remove(); ghost = null;
+    dragging = false; pointerId = null;
+    document.body.classList.remove('setlist-dragging');
+  };
+
+  handle.addEventListener('pointerdown', event => {
+    if (event.button !== undefined && event.button !== 0) return;
+    pointerId = event.pointerId;
+    dragging = true;
+    handle.setPointerCapture?.(pointerId);
+    row.classList.add('dragging');
+    document.body.classList.add('setlist-dragging');
+    const rect = row.getBoundingClientRect();
+    ghost = row.cloneNode(true); ghost.className = 'song-row drag-ghost';
+    ghost.style.width = `${rect.width}px`; ghost.style.left = `${rect.left}px`; ghost.style.top = `${rect.top}px`;
+    document.body.append(ghost);
+    event.preventDefault();
+  });
+
+  handle.addEventListener('pointermove', event => {
+    if (!dragging || event.pointerId !== pointerId) return;
+    if (ghost) ghost.style.transform = `translateY(${event.clientY - row.getBoundingClientRect().top - row.getBoundingClientRect().height / 2}px)`;
+    clearTarget();
+    const hit = document.elementFromPoint(event.clientX, event.clientY)?.closest('.song-row');
+    if (!hit || hit === row || !hit.dataset.songId) return;
+    const rect = hit.getBoundingClientRect();
+    placeAfter = event.clientY > rect.top + rect.height / 2;
+    targetRow = hit;
+    hit.classList.add(placeAfter ? 'drag-target-after' : 'drag-target-before');
+  });
+
+  const finish = event => {
+    if (!dragging || (event.pointerId !== undefined && pointerId !== null && event.pointerId !== pointerId)) return;
+    const sourceId = row.dataset.songId;
+    const targetId = targetRow?.dataset.songId;
+    const after = placeAfter;
+    cleanup();
+    if (sourceId && targetId && reorderSetlistSong(sourceId, targetId, after)) renderAll();
+  };
+  handle.addEventListener('pointerup', finish);
+  handle.addEventListener('pointercancel', cleanup);
+}
 
 function songCard(item) {
   const card = document.createElement('article'); card.className = 'card'; const inList = activeSetlist()?.songs.includes(item.id);
@@ -700,6 +778,7 @@ function clearCurrentAnnotations() {
 
 function setPlayerPanel(name) {
   const names = ['lyrics', 'tabs', 'notes', 'pdf'];
+  if (state.scrolling && name !== 'lyrics') stopScroll();
   names.forEach(panel => {
     const element = document.querySelector(`[data-panel="${panel}"]`);
     const button = $(`#${panel === 'lyrics' ? 'lyricsTabBtn' : panel === 'tabs' ? 'tabsTabBtn' : panel === 'notes' ? 'notesTabBtn' : 'pdfTabBtn'}`);
@@ -707,6 +786,26 @@ function setPlayerPanel(name) {
     if (element) { element.hidden = !active; element.classList.toggle('active', active); }
     if (button) { button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); }
   });
+}
+
+function activeScrollPanel() {
+  const active = document.querySelector('#playerView .player-panel.active:not([hidden])');
+  if (!active || active.dataset.panel === 'pdf') return $('#songSheet');
+  return active;
+}
+
+function isCompactPlayback() {
+  return window.matchMedia?.('(max-width: 700px)').matches;
+}
+
+function setPlaybackChromeHidden(hidden) {
+  document.body.classList.toggle('playback-focus', !!hidden && isCompactPlayback() && state.scrolling);
+}
+
+function handlePlayerPanelTap(event) {
+  if (!state.scrolling || !isCompactPlayback() || state.annotationMode) return;
+  if (event.target.closest('button,a,input,summary,details')) return;
+  setPlaybackChromeHidden(!document.body.classList.contains('playback-focus'));
 }
 
 function extractTabBlocks(text) {
@@ -854,13 +953,35 @@ function importBackupData(data) {
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: 9.2, annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: 9.4, annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-4-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
-function startScroll() { state.scrolling = true; state.lastTs = performance.now(); $('#startStopBtn').textContent = '⏸ Pause'; requestAnimationFrame(scrollFrame); }
-function stopScroll() { state.scrolling = false; $('#startStopBtn').textContent = '▶ Start'; }
-function scrollFrame(timestamp) { if (!state.scrolling) return; const delta = Math.min((timestamp - state.lastTs) / 1000, 0.1); state.lastTs = timestamp; scrollBy(0, state.scrollSpeed * delta); if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) { stopScroll(); return; } requestAnimationFrame(scrollFrame); }
+function startScroll() {
+  const panel = activeScrollPanel();
+  if (!panel) return;
+  if (panel.dataset.panel !== 'lyrics') setPlayerPanel('lyrics');
+  state.scrolling = true;
+  state.lastTs = performance.now();
+  $('#startStopBtn').textContent = '⏸ Pause';
+  setPlaybackChromeHidden(true);
+  requestAnimationFrame(scrollFrame);
+}
+function stopScroll() {
+  state.scrolling = false;
+  $('#startStopBtn').textContent = '▶ Start';
+  setPlaybackChromeHidden(false);
+}
+function scrollFrame(timestamp) {
+  if (!state.scrolling) return;
+  const panel = activeScrollPanel();
+  if (!panel) { stopScroll(); return; }
+  const delta = Math.min((timestamp - state.lastTs) / 1000, 0.1);
+  state.lastTs = timestamp;
+  panel.scrollTop += state.scrollSpeed * delta;
+  if (panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 3) { stopScroll(); return; }
+  requestAnimationFrame(scrollFrame);
+}
 
 function applySettings() {
   const settings = safeParse(localStorage.getItem(STORAGE.display), {});
