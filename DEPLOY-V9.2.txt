@@ -1,0 +1,6 @@
+AUSSTEIGER APP VERSION 9.2
+
+Upload all files in this folder to the GitHub repository root.
+GitHub Pages deploys automatically after commit.
+
+Checks: Hinweise and Aa show Version 9.2.

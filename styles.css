@@ -211,3 +211,12 @@ body{font-size:calc(1rem * var(--ui-scale))}
 .pdf-frame{display:block;width:100%;height:72vh;border:0;border-radius:10px;background:#fff}
 .player-tabs button:disabled{opacity:.45}
 @media(max-width:600px){.chord-lyric-line{font-size:1em}.pdf-sheet{padding:5px;min-height:65vh}.pdf-frame{height:68vh}.pdf-actions{align-items:stretch}.pdf-open-link{width:100%;justify-content:center}}
+
+
+/* Version 9.2: precise chord positioning, vocal annotations, shareable setlists */
+
+.aligned-chord-pair{margin:.08em 0 .38em;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;line-height:1.18}
+.positioned-chord-line{color:var(--chord);font-weight:900;white-space:pre;min-width:max-content}
+.positioned-lyric-line{white-space:pre;min-width:max-content;color:var(--text)}
+.song-sheet{position:relative}.song-render-content{position:relative;z-index:1}.annotation-layer{position:absolute;z-index:4;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.annotation-layer.editing{pointer-events:auto;touch-action:none;cursor:crosshair;background:color-mix(in srgb,var(--focus) 3%,transparent)}.annotation-layer path{fill:none;stroke:var(--annotation,#38a3d1);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}.song-tools button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+@media(max-width:600px){.aligned-chord-pair{font-size:.96em}.annotation-layer path{stroke-width:3}.song-tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
