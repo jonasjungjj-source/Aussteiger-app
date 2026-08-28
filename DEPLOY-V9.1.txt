@@ -1,0 +1,4 @@
+AUSSTEIGER APP VERSION 9.1
+
+Neu: PDF-Import, Markdown-Import und Akkorde ueber Lyrics.
+Upload alle Dateien in das Repository-Root. GitHub Pages deployed danach automatisch.

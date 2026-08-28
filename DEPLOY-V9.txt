@@ -1,3 +1,3 @@
-Aussteiger Band-App Version 9.0
+Aussteiger Band-App Version 9.1
 Alle Dateien in das Repository-Stammverzeichnis hochladen und ersetzen.
 GitHub Pages deployt nach dem Commit automatisch.

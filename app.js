@@ -84,6 +84,93 @@ function uniqueSongId(baseId) {
   return candidate;
 }
 
+
+const PDF_DB = 'aussteiger-bandapp-files-v1';
+const PDF_STORE = 'pdfs';
+let activePdfObjectUrl = '';
+
+function openPdfDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(PDF_DB, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(PDF_STORE)) db.createObjectStore(PDF_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function savePdfBlob(songId, file) {
+  const db = await openPdfDb();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(PDF_STORE, 'readwrite');
+    tx.objectStore(PDF_STORE).put(file, songId);
+    tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+  });
+  db.close();
+}
+
+async function getPdfBlob(songId) {
+  const db = await openPdfDb();
+  const value = await new Promise((resolve, reject) => {
+    const tx = db.transaction(PDF_STORE, 'readonly');
+    const request = tx.objectStore(PDF_STORE).get(songId);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+  db.close(); return value;
+}
+
+async function deletePdfBlob(songId) {
+  const db = await openPdfDb();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(PDF_STORE, 'readwrite');
+    tx.objectStore(PDF_STORE).delete(songId);
+    tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+  });
+  db.close();
+}
+
+function parseMarkdownSong(text, filename) {
+  let source = String(text || '').replace(/\r\n?/g, '\n');
+  let title = '', artist = '', key = '', capo = '', bpm = '', singer = '';
+  if (source.startsWith('---\n')) {
+    const end = source.indexOf('\n---', 4);
+    if (end >= 0) {
+      const frontmatter = source.slice(4, end).split('\n');
+      for (const line of frontmatter) {
+        const match = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+        if (!match) continue;
+        const name = match[1].toLowerCase(), value = match[2].trim().replace(/^['\"]|['\"]$/g, '');
+        if (name === 'title') title = value;
+        else if (name === 'artist') artist = value;
+        else if (name === 'key') key = value;
+        else if (name === 'capo') capo = value;
+        else if (name === 'bpm' || name === 'tempo') bpm = value;
+        else if (name === 'singer') singer = value;
+      }
+      source = source.slice(end + 4).replace(/^\s+/, '');
+    }
+  }
+  const lines = source.split('\n');
+  const body = [];
+  for (const raw of lines) {
+    const line = raw.trim();
+    const heading = line.match(/^#{1,6}\s+(.+)$/);
+    if (heading) {
+      const value = heading[1].trim();
+      if (!title) { title = value; continue; }
+      if (!artist && body.length === 0) { artist = value; continue; }
+      body.push(`[${value}]`); continue;
+    }
+    body.push(raw);
+  }
+  const fallbackName = filename.replace(/\.[^.]+$/, '');
+  if (!title) title = fallbackName;
+  return { title, artist, key: key || undefined, capo: capo ? Number(capo) : undefined, bpm: bpm ? Number(bpm) : undefined, singer, content: normalizePastedSongText(body.join('\n')) };
+}
+
 function isChordToken(token) {
   return /^[A-G](?:#|b)?(?:(?:m|min|maj|dim|aug|sus|add)?\d*)?(?:\/[A-G](?:#|b)?)?$/.test(token);
 }
@@ -234,8 +321,15 @@ async function importSongFiles(fileList) {
   let failCount = 0;
   for (const file of files) {
     try {
-      const text = await file.text();
       const lower = file.name.toLowerCase();
+      if (lower.endsWith('.pdf') || file.type === 'application/pdf') {
+        const title = file.name.replace(/\.pdf$/i, '');
+        const id = uniqueSongId(slugify(`${title}-pdf`));
+        await savePdfBlob(id, file);
+        newSongs.push({ id, library: libraryId, title, artist: '', tags: ['PDF-Import'], pdfAttachment: true, pdfName: file.name, content: `[PDF]\nOriginal-Songblatt ist im Reiter „PDF“ gespeichert.` });
+        continue;
+      }
+      const text = await file.text();
       if (lower.endsWith('.json')) {
         const parsed = JSON.parse(text);
         const items = Array.isArray(parsed) ? parsed : Array.isArray(parsed.songs) ? parsed.songs : [parsed];
@@ -251,23 +345,29 @@ async function importSongFiles(fileList) {
             content: String(item.content || item.lyrics || '')
           });
         });
-      } else if (lower.endsWith('.cho') || lower.endsWith('.crd') || lower.endsWith('.pro') || lower.endsWith('.chopro') || lower.endsWith('.txt')) {
+      } else if (lower.endsWith('.md') || lower.endsWith('.markdown')) {
+        const song = parseMarkdownSong(text, file.name);
+        const id = uniqueSongId(slugify(`${song.title}-${song.artist || 'markdown'}`));
+        newSongs.push({ id, library: libraryId, ...song, tags: ['Markdown-Import'] });
+      } else if (lower.endsWith('.cho') || lower.endsWith('.crd') || lower.endsWith('.pro') || lower.endsWith('.chopro') || lower.endsWith('.chordpro') || lower.endsWith('.txt')) {
         const song = parseChordProText(text, file.name);
         const id = uniqueSongId(slugify(`${song.title}-${song.artist}`));
         newSongs.push({ id, library: libraryId, ...song, tags: [] });
       } else { failCount += 1; }
     } catch (error) { failCount += 1; console.error(error); }
   }
-  if (!newSongs.length) { alert('Keine passenden Songs gefunden. Unterstützt werden .json, .cho, .crd, .pro und .txt Dateien.'); return; }
+  if (!newSongs.length) { alert('Keine passenden Songs gefunden. Unterstützt werden JSON, Markdown, ChordPro/Text und PDF.'); return; }
   state.libraries.push({ id: libraryId, name: libraryName.trim(), importedAt: new Date().toISOString(), count: newSongs.length });
   state.importedSongs.push(...newSongs);
   saveLibraries(); renderAll(); renderLibraryFilterOptions();
   alert(`${newSongs.length} Song(s) in neue Bibliothek „${libraryName.trim()}“ importiert${failCount ? ` (${failCount} Datei(en) übersprungen)` : ''}.`);
 }
 
-function removeLibrary(libraryId) {
+async function removeLibrary(libraryId) {
   const lib = state.libraries.find(item => item.id === libraryId); if (!lib) return;
   if (!confirm(`Bibliothek „${lib.name}“ und ihre ${lib.count} Song(s) wirklich löschen?`)) return;
+  const removing = state.importedSongs.filter(item => item.library === libraryId);
+  for (const item of removing) if (item.pdfAttachment) { try { await deletePdfBlob(item.id); } catch (error) { console.warn(error); } }
   state.libraries = state.libraries.filter(item => item.id !== libraryId);
   state.importedSongs = state.importedSongs.filter(item => item.library !== libraryId);
   saveLibraries(); renderAll(); renderLibraryFilterOptions(); renderLibrariesManager();
@@ -336,7 +436,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.0', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.1', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -356,7 +456,7 @@ function bindUI() {
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
   $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
-  $('#lyricsTabBtn').onclick = () => setPlayerPanel('lyrics'); $('#tabsTabBtn').onclick = () => setPlayerPanel('tabs'); $('#notesTabBtn').onclick = () => setPlayerPanel('notes');
+  $('#lyricsTabBtn').onclick = () => setPlayerPanel('lyrics'); $('#tabsTabBtn').onclick = () => setPlayerPanel('tabs'); $('#notesTabBtn').onclick = () => setPlayerPanel('notes'); $('#pdfTabBtn').onclick = () => setPlayerPanel('pdf');
   $('#prevSongBtn').onclick = () => stepSong(-1); $('#nextSongBtn').onclick = () => stepSong(1);
   $('#favoriteCurrentBtn').onclick = () => toggleFavorite(state.currentId);
   $('#editSongBtn').onclick = openEditor; $('#transposeDownBtn').onclick = () => changeTranspose(-1); $('#transposeResetBtn').onclick = resetTranspose; $('#transposeUpBtn').onclick = () => changeTranspose(1); $('#openSongChordieBtn').onclick = openCurrentSongOnChordie; $('#saveSongBtn').onclick = saveEditedSong; $('#deleteOverrideBtn').onclick = deleteOverride;
@@ -457,6 +557,7 @@ async function openSong(id, changeView = true) {
   $('#songMeta').textContent = [item.artist, item.genre, meta(item), semitones ? `Transponiert ${semitones > 0 ? '+' : ''}${semitones}` : ''].filter(Boolean).join(' · ');
   $('#songSheet').innerHTML = renderSong(item.content || item.lyrics || 'Noch kein Songblatt eingetragen. Tippe auf „Bearbeiten“.', semitones);
   renderTabs(item, semitones);
+  await renderPdf(item);
   $('#notesSheet').innerHTML = item.notes?.trim() ? `<div class="notes-content">${esc(item.notes).replace(/\n/g, '<br>')}</div>` : '<p class="empty">Für diesen Song sind noch keine Notizen gespeichert.</p>';
   setPlayerPanel('lyrics');
   $('#transposeResetBtn').textContent = semitones ? `${semitones > 0 ? '+' : ''}${semitones}` : '0';
@@ -465,14 +566,63 @@ async function openSong(id, changeView = true) {
   updateFavoriteButton(); scrollTo({ top: 0 }); if (changeView) switchView('player');
 }
 
-function renderSong(text, semitones = 0) { return String(text).split('\n').map(line => { const trimmed = line.trim(); if (!trimmed) return '<div class="blank"></div>'; if (/^\[.+\]$/.test(trimmed) && !/^\[[A-G][#b]?/.test(trimmed)) return `<h3 class="section-label">${esc(trimmed.slice(1, -1))}</h3>`; const rendered = esc(line).replace(/\[([A-G][#b]?(?:m|maj|min|sus|dim|aug|add)?\d*(?:\/[A-G][#b]?)?)\]/g, (_, chord) => `<span class="chord">${esc(transposeChord(chord, semitones))}</span>`); return `<div class="lyric-line">${rendered}</div>`; }).join(''); }
+function renderSongLine(line, semitones = 0) {
+  const chordPattern = /\[([A-G][#b]?(?:m|maj|min|sus|dim|aug|add)?\d*(?:\/[A-G][#b]?)?)\]/g;
+  const matches = [...String(line).matchAll(chordPattern)];
+  if (!matches.length) return `<div class="lyric-line">${esc(line)}</div>`;
+  const withoutChords = String(line).replace(chordPattern, '').trim();
+  if (!withoutChords) {
+    const chords = matches.map(match => `<span class="chord">${esc(transposeChord(match[1], semitones))}</span>`).join(' ');
+    return `<div class="chord-only-line">${chords}</div>`;
+  }
+  const parts = [];
+  let cursor = 0, pendingChord = '';
+  for (const match of matches) {
+    const before = line.slice(cursor, match.index);
+    if (before) parts.push({ chord: pendingChord, text: before });
+    pendingChord = transposeChord(match[1], semitones);
+    cursor = match.index + match[0].length;
+  }
+  const rest = line.slice(cursor);
+  if (rest || pendingChord) parts.push({ chord: pendingChord, text: rest || ' ' });
+  return `<div class="chord-lyric-line">${parts.map(part => `<span class="chord-lyric-segment"><span class="chord-above">${part.chord ? esc(part.chord) : '&nbsp;'}</span><span class="lyric-below">${esc(part.text) || '&nbsp;'}</span></span>`).join('')}</div>`;
+}
+
+function renderSong(text, semitones = 0) {
+  return String(text).split('\n').map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '<div class="blank"></div>';
+    if (/^\[.+\]$/.test(trimmed) && !/^\[[A-G][#b]?/.test(trimmed)) return `<h3 class="section-label">${esc(trimmed.slice(1, -1))}</h3>`;
+    return renderSongLine(line, semitones);
+  }).join('');
+}
+
+async function renderPdf(item) {
+  const host = $('#pdfSheet');
+  const button = $('#pdfTabBtn');
+  if (activePdfObjectUrl) { URL.revokeObjectURL(activePdfObjectUrl); activePdfObjectUrl = ''; }
+  if (!item?.pdfAttachment) {
+    button.disabled = true; button.setAttribute('aria-disabled', 'true');
+    host.innerHTML = '<p class="empty">Für diesen Song ist kein PDF gespeichert.</p>'; return;
+  }
+  button.disabled = false; button.setAttribute('aria-disabled', 'false');
+  try {
+    const blob = await getPdfBlob(item.id);
+    if (!blob) throw new Error('PDF-Datei nicht mehr im lokalen Speicher gefunden');
+    activePdfObjectUrl = URL.createObjectURL(blob);
+    host.innerHTML = `<div class="pdf-actions"><a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">📄 PDF separat öffnen</a><small>${esc(item.pdfName || 'Song-PDF')}</small></div><iframe class="pdf-frame" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#view=FitH"></iframe>`;
+  } catch (error) {
+    host.innerHTML = `<p class="empty">PDF konnte nicht geladen werden: ${esc(error.message)}</p>`;
+  }
+}
+
 
 
 function setPlayerPanel(name) {
-  const names = ['lyrics', 'tabs', 'notes'];
+  const names = ['lyrics', 'tabs', 'notes', 'pdf'];
   names.forEach(panel => {
     const element = document.querySelector(`[data-panel="${panel}"]`);
-    const button = $(`#${panel === 'lyrics' ? 'lyricsTabBtn' : panel === 'tabs' ? 'tabsTabBtn' : 'notesTabBtn'}`);
+    const button = $(`#${panel === 'lyrics' ? 'lyricsTabBtn' : panel === 'tabs' ? 'tabsTabBtn' : panel === 'notes' ? 'notesTabBtn' : 'pdfTabBtn'}`);
     const active = panel === name;
     if (element) { element.hidden = !active; element.classList.toggle('active', active); }
     if (button) { button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); }
@@ -560,7 +710,7 @@ function openEditor() { const item = song(state.currentId); if (!item) return; $
 function saveEditedSong() { const id = state.currentId; if (!id) return; const current = song(id); const chordieUrl = $('#editChordieUrl').value.trim(); state.overrides[id] = { ...(state.overrides[id] || {}), title: $('#editTitle').value.trim(), artist: $('#editArtist').value.trim(), bpm: Number($('#editBpm').value) || undefined, capo: $('#editCapo').value === '' ? undefined : Number($('#editCapo').value), singer: $('#editSinger').value.trim(), notes: $('#editNotes').value.trim(), content: $('#editContent').value, source: { ...(current?.source || {}), site: chordieUrl ? 'Chordie' : current?.source?.site, url: chordieUrl || undefined } }; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 function deleteOverride() { const id = state.currentId; if (!id || !state.overrides[id] || !confirm('Lokale Änderungen für diesen Song löschen?')) return; delete state.overrides[id]; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 
-function exportData() { const data = { version: 9.0, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-0-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: 9.1, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-1-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
