@@ -439,7 +439,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.1', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -1055,13 +1055,24 @@ function showTutorialStep(){
   $('#tutorialIcon').textContent=step.icon; $('#tutorialTitle').textContent=step.title; $('#tutorialText').textContent=step.text;
   $('#tutorialStepLabel').textContent=`${tutorialIndex+1} / ${TUTORIAL_STEPS.length}`;
   $('#tutorialBackBtn').disabled=tutorialIndex===0; $('#tutorialNextBtn').textContent=tutorialIndex===TUTORIAL_STEPS.length-1?'Fertig':'Weiter';
-  requestAnimationFrame(()=>{ const el=tutorialTarget(step), spot=$('#tutorialSpotlight');
+  requestAnimationFrame(()=>{
+    const el=tutorialTarget(step), spot=$('#tutorialSpotlight'), overlay=$('#tutorialOverlay'), card=$('#tutorialCard');
+    overlay.classList.toggle('has-target', !!el);
+    card.classList.remove('tutorial-card-top');
     if(!el){ spot.style.cssText='opacity:0;left:50%;top:20%;width:0;height:0'; return; }
     el.classList.add('tutorial-highlight'); el.scrollIntoView({block:'center',behavior:'smooth'});
-    setTimeout(()=>{ const r=el.getBoundingClientRect(), pad=7; spot.style.opacity='1'; spot.style.left=`${Math.max(5,r.left-pad)}px`; spot.style.top=`${Math.max(5,r.top-pad)}px`; spot.style.width=`${Math.min(innerWidth-10,r.width+pad*2)}px`; spot.style.height=`${r.height+pad*2}px`; },180);
+    setTimeout(()=>{
+      const r=el.getBoundingClientRect(), pad=8;
+      const left=Math.max(6,r.left-pad), top=Math.max(6,r.top-pad);
+      const right=Math.min(innerWidth-6,r.right+pad), bottom=Math.min(innerHeight-6,r.bottom+pad);
+      spot.style.opacity='1';
+      spot.style.left=`${left}px`; spot.style.top=`${top}px`;
+      spot.style.width=`${Math.max(0,right-left)}px`; spot.style.height=`${Math.max(0,bottom-top)}px`;
+      card.classList.toggle('tutorial-card-top', r.top > innerHeight * .54);
+    },180);
   });
 }
-function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); $('#tutorialOverlay').hidden=true; $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('setlists'); }
+function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); const overlay=$('#tutorialOverlay'); overlay.hidden=true; overlay.classList.remove('has-target'); $('#tutorialCard')?.classList.remove('tutorial-card-top'); $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('setlists'); }
 window.addEventListener('resize',()=>{ if(!$('#tutorialOverlay')?.hidden) showTutorialStep(); });
 document.addEventListener('click',e=>{ if(e.target?.id==='tutorialNextBtn'){ tutorialIndex++; showTutorialStep(); } if(e.target?.id==='tutorialBackBtn'){ tutorialIndex=Math.max(0,tutorialIndex-1); showTutorialStep(); } if(e.target?.id==='tutorialSkipBtn') finishTutorial(); });
 setTimeout(()=>startTutorial(false),2600);

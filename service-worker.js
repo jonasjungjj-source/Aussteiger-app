@@ -1,7 +1,7 @@
-const CACHE = 'aussteiger-bandapp-v9-6-tutorial';
+const CACHE = 'aussteiger-bandapp-v9-6-1-tutorial-contrast';
 const APP_SHELL = [
   './', './index.html', './chords.html',
-  './app.js?v=9.6', './styles.css?v=9.6', './manifest.json?v=9.6',
+  './app.js?v=9.6.1', './styles.css?v=9.6.1', './manifest.json?v=9.6.1',
   './songs.json', './setlists.json',
   './assets/images/logo.jpg', './assets/icons/icon.svg',
   './assets/icons/icon-180.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png'
