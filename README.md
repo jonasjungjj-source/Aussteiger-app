@@ -1,8 +1,8 @@
-# Aussteiger Band-App – Version 9.5
+# Aussteiger Band-App – Version 9.6
 
 GitHub-Pages-kompatible Offline-PWA für Bandproben und Bühne.
 
-## Neu in Version 9.5
+## Neu in Version 9.6
 
 - Auto-Scroll bewegt nur noch das aktive Songblatt, nicht die Funktionsleisten.
 - Auf Smartphones werden beim Start von Play Kopf- und Bedienleisten ausgeblendet.
@@ -31,15 +31,19 @@ Standard: Leertaste = Start/Pause, Pfeil rechts = nächster Song, Pfeil links = 
 Alle Dateien und Ordner direkt in das Stammverzeichnis des GitHub-Pages-Repositories hochladen und vorhandene Dateien ersetzen. GitHub Actions deployt nach dem Commit automatisch.
 
 
-## Version 9.5
+## Version 9.6
 - PDF-Songblätter lokal importieren und im Player anzeigen.
 - Markdown-Dateien (.md/.markdown) importieren.
 - ChordPro-Akkorde in eckigen Klammern werden über dem zugehörigen Songtext dargestellt.
 - PDF-Dateien liegen lokal in IndexedDB und sind nicht Teil des JSON-Backups.
 
 
-## Version 9.5
+## Version 9.6
 - Akkorde bleiben an ihrer tatsächlichen Textposition (Inline-Chords oder zweizeilige Akkordblätter).
 - Freihand-Gesangsmarkierungen im Player (geschwungene Linien/Phrasierungszeichen), lokal pro Song gespeichert.
 - Aktive Setliste teilen/exportieren; geteilte Setlisten enthalten die Songdaten.
 - Universeller Import erkennt automatisch Song, Setliste oder Gesamt-Backup.
+
+
+## Interaktives Tutorial (v9.6)
+Beim ersten Start erscheint ein geführtes Overlay-Tutorial. Es kann jederzeit über „? App-Tutorial“ im Menü erneut gestartet werden.

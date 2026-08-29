@@ -439,7 +439,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.4', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -452,6 +452,7 @@ function bindUI() {
   $('#menuBtn').onclick = openDrawer; $('#backdrop').onclick = closeDrawer;
   $$('.nav-item').forEach(button => button.onclick = () => switchView(button.dataset.view));
   $('#settingsBtn').onclick = () => $('#displaySettings').showModal();
+  $('#tutorialBtn').onclick = () => { closeDrawer(); startTutorial(true); };
   $('#setlistSelect').onchange = event => { state.activeSetlistId = event.target.value; saveSetlists(); renderAll(); };
   $('#newSetlistBtn').onclick = createSetlist; $('#renameSetlistBtn').onclick = renameSetlist; $('#deleteSetlistBtn').onclick = deleteSetlist;
   $('#exportSetlistBtn').onclick = exportActiveSetlist;
@@ -1026,5 +1027,43 @@ function resetDisplaySettings() {
   localStorage.setItem(STORAGE.display, JSON.stringify({ dark: false, contrast: false, uiFont: 100, font: 26, line: 160, chord: '#2563eb' }));
   applySettings();
 }
+
+
+const TUTORIAL_KEY = 'band-v96-tutorial-seen';
+const TUTORIAL_STEPS = [
+  { icon:'👋', title:'Willkommen', text:'Das ist dein digitales Songbook für Probe und Bühne. In wenigen Schritten zeigen wir dir die wichtigsten Funktionen.' },
+  { target:'#menuBtn', icon:'☰', title:'Navigation', text:'Über das Menü erreichst du Setlisten, alle Songs, Favoriten, den Player, das Akkordlexikon und diese Hilfe.' },
+  { target:'#setlistSelect', icon:'📋', title:'Setlisten', text:'Wähle hier deine aktive Setliste. Songs lassen sich in der Liste am Griff ⠿ per Drag & Drop in die richtige Reihenfolge bringen.' },
+  { target:'#addSongBtn', icon:'＋', title:'Songs hinzufügen', text:'Füge Songs aus deiner Bibliothek zur aktiven Setliste hinzu. Weitere Dateien und PDFs kannst du unter Hinweise importieren.' },
+  { target:'#settingsBtn', icon:'Aa', title:'Anzeige anpassen', text:'Hier stellst du Lyrics-Größe, App-Schrift, Zeilenabstand, Akkordfarbe, Dark Mode und den Bluetooth-Fußschalter ein.' },
+  { target:'.player-tabs', view:'player', icon:'🎤', title:'Song, Tabs, Notizen & PDF', text:'Im Player wechselst du zwischen Songtext, Gitarren-Tabs, persönlichen Notizen und einem hinterlegten PDF.' },
+  { target:'.song-tools', view:'player', icon:'♯', title:'Transponieren & markieren', text:'Akkorde kannst du live höher oder tiefer setzen. Mit ✍ Markieren zeichnest du Gesangsphrasierungen direkt auf das Songblatt.' },
+  { target:'#startStopBtn', view:'player', icon:'▶️', title:'Bühnenmodus & Autoscroll', text:'Start bewegt nur das Songblatt. Auf dem Handy verschwinden die Bedienelemente; ein Tipp auf den Song blendet sie wieder ein.' },
+  { target:'#prevSongBtn', view:'player', icon:'🦶', title:'Fußschalter', text:'Ein Bluetooth-Pedal kann Start/Pause sowie nächsten und vorherigen Song steuern. Die Pedaltasten lernst du im Aa-Menü an.' },
+  { target:'#exportSetlistBtn', view:'setlists', icon:'↗', title:'Setliste teilen', text:'Teile die aktive Setliste als Datei mit anderen Bandmitgliedern. Beim Import erkennt die App Song, Setliste oder Backup automatisch.' }
+];
+let tutorialIndex = 0;
+function startTutorial(force=false){
+  if(!force && localStorage.getItem(TUTORIAL_KEY)) return;
+  tutorialIndex=0; $('#tutorialOverlay').hidden=false; document.body.classList.remove('playback-focus'); showTutorialStep();
+}
+function tutorialTarget(step){ return step.target ? document.querySelector(step.target) : null; }
+function showTutorialStep(){
+  const step=TUTORIAL_STEPS[tutorialIndex]; if(!step) return finishTutorial();
+  if(step.view) switchView(step.view);
+  $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight'));
+  $('#tutorialIcon').textContent=step.icon; $('#tutorialTitle').textContent=step.title; $('#tutorialText').textContent=step.text;
+  $('#tutorialStepLabel').textContent=`${tutorialIndex+1} / ${TUTORIAL_STEPS.length}`;
+  $('#tutorialBackBtn').disabled=tutorialIndex===0; $('#tutorialNextBtn').textContent=tutorialIndex===TUTORIAL_STEPS.length-1?'Fertig':'Weiter';
+  requestAnimationFrame(()=>{ const el=tutorialTarget(step), spot=$('#tutorialSpotlight');
+    if(!el){ spot.style.cssText='opacity:0;left:50%;top:20%;width:0;height:0'; return; }
+    el.classList.add('tutorial-highlight'); el.scrollIntoView({block:'center',behavior:'smooth'});
+    setTimeout(()=>{ const r=el.getBoundingClientRect(), pad=7; spot.style.opacity='1'; spot.style.left=`${Math.max(5,r.left-pad)}px`; spot.style.top=`${Math.max(5,r.top-pad)}px`; spot.style.width=`${Math.min(innerWidth-10,r.width+pad*2)}px`; spot.style.height=`${r.height+pad*2}px`; },180);
+  });
+}
+function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); $('#tutorialOverlay').hidden=true; $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('setlists'); }
+window.addEventListener('resize',()=>{ if(!$('#tutorialOverlay')?.hidden) showTutorialStep(); });
+document.addEventListener('click',e=>{ if(e.target?.id==='tutorialNextBtn'){ tutorialIndex++; showTutorialStep(); } if(e.target?.id==='tutorialBackBtn'){ tutorialIndex=Math.max(0,tutorialIndex-1); showTutorialStep(); } if(e.target?.id==='tutorialSkipBtn') finishTutorial(); });
+setTimeout(()=>startTutorial(false),2600);
 
 init();
