@@ -1,8 +1,8 @@
-# Aussteiger Band-App – Version 9.6.1
+# Aussteiger Band-App – Version 9.6.2
 
 GitHub-Pages-kompatible Offline-PWA für Bandproben und Bühne.
 
-## Neu in Version 9.6.1
+## Neu in Version 9.6.2
 
 - Tutorial-Overlay mit deutlich höherem Kontrast in der hellen Ansicht.
 - Tutorial-Karte nutzt unabhängig vom App-Theme einen dunklen Hintergrund mit weißer Schrift.

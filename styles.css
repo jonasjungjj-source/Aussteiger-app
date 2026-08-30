@@ -357,3 +357,31 @@ body.player-mode .transport{position:fixed;bottom:0}
   .tutorial-spotlight{border-radius:13px}
   .tutorial-actions button{min-width:0;flex:1}
 }
+
+
+/* Version 9.6.2: collapsible player controls + compact mobile mini bar */
+.transport-collapse-row{display:flex;justify-content:center;max-width:960px;margin:0 auto 7px}
+.transport-toggle{min-height:36px;padding:.35rem .8rem;border-radius:999px;font-size:.9em;font-weight:800}
+.transport-mini{max-width:960px;margin:auto;display:grid;grid-template-columns:repeat(5,minmax(44px,1fr));gap:7px}
+.transport-mini[hidden],.transport-full[hidden]{display:none!important}
+.transport-mini button{min-height:48px;padding:.45rem .35rem;font-size:1.05em}
+body.transport-collapsed main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+@media(max-width:700px){
+  .transport{padding:7px 8px calc(7px + env(safe-area-inset-bottom))}
+  .transport-collapse-row{margin-bottom:5px}
+  .transport-toggle{min-height:34px;padding:.25rem .7rem;font-size:.82em}
+  .transport-mini{grid-template-columns:52px minmax(64px,1.4fr) 52px 48px 48px;gap:5px}
+  .transport-mini button{min-height:46px;font-size:1em}
+  body.playback-focus .topbar,
+  body.playback-focus #playerView .player-head,
+  body.playback-focus #playerView .player-tabs{display:none!important}
+  body.playback-focus #playerView .transport{display:block!important}
+  body.playback-focus #playerView .transport-full{display:none!important}
+  body.playback-focus #playerView .transport-mini{display:grid!important}
+  body.playback-focus #playerView .transport-collapse-row{display:none!important}
+  body.playback-focus #playerView .player-panel.active{
+    max-height:calc(100dvh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height:calc(100dvh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding-bottom:5rem;
+  }
+}

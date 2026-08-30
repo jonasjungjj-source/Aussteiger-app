@@ -12,7 +12,8 @@ const STORAGE = {
   libraries: 'band-v6-libraries',
   importedSongs: 'band-v6-imported-songs',
   footswitch: 'band-v9-footswitch',
-  annotations: 'band-v9-annotations'
+  annotations: 'band-v9-annotations',
+  transportCollapsed: 'band-v9-transport-collapsed'
 };
 
 const state = {
@@ -436,10 +437,10 @@ async function init() {
   try {
     state.baseSongs = await getJSON('./songs.json');
     state.defaultSetlists = normalizeSetlists(await getJSON('./setlists.json'));
-    loadLocalState(); mergeSongs(); bindUI(); applySettings(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
+    loadLocalState(); mergeSongs(); bindUI(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.1', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.2', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -461,6 +462,8 @@ function bindUI() {
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
   $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = () => { const panel = activeScrollPanel(); if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' }); };
+  $('#transportToggleBtn').onclick = () => setTransportCollapsed(!document.body.classList.contains('transport-collapsed'), true);
+  $('#miniStartStopBtn').onclick = toggleScroll; $('#miniPrevBtn').onclick = () => stepSong(-1); $('#miniNextBtn').onclick = () => stepSong(1); $('#miniTransposeDownBtn').onclick = () => changeTranspose(-1); $('#miniTransposeUpBtn').onclick = () => changeTranspose(1);
   $('#lyricsTabBtn').onclick = () => setPlayerPanel('lyrics'); $('#tabsTabBtn').onclick = () => setPlayerPanel('tabs'); $('#notesTabBtn').onclick = () => setPlayerPanel('notes'); $('#pdfTabBtn').onclick = () => setPlayerPanel('pdf');
   $('#prevSongBtn').onclick = () => stepSong(-1); $('#nextSongBtn').onclick = () => stepSong(1);
   $('#favoriteCurrentBtn').onclick = () => toggleFavorite(state.currentId);
@@ -799,14 +802,33 @@ function isCompactPlayback() {
   return window.matchMedia?.('(max-width: 700px)').matches;
 }
 
+function setTransportCollapsed(collapsed, persist = false) {
+  const isCollapsed = !!collapsed;
+  document.body.classList.toggle('transport-collapsed', isCollapsed);
+  const full = $('#transportFull'); const mini = $('#transportMini'); const toggle = $('#transportToggleBtn');
+  if (full) full.hidden = isCollapsed;
+  if (mini) mini.hidden = !isCollapsed;
+  if (toggle) { toggle.setAttribute('aria-expanded', String(!isCollapsed)); toggle.textContent = isCollapsed ? '▴ Bedienung einblenden' : '▾ Bedienung ausblenden'; }
+  if (persist) localStorage.setItem(STORAGE.transportCollapsed, isCollapsed ? '1' : '0');
+}
+
+function syncMiniPlayerButtons() {
+  const mini = $('#miniStartStopBtn');
+  if (mini) mini.textContent = state.scrolling ? '⏸' : '▶';
+}
+
 function setPlaybackChromeHidden(hidden) {
-  document.body.classList.toggle('playback-focus', !!hidden && isCompactPlayback() && state.scrolling);
+  const focus = !!hidden && isCompactPlayback() && state.scrolling;
+  document.body.classList.toggle('playback-focus', focus);
+  if (focus) setTransportCollapsed(true, false);
+  else if (state.scrolling && isCompactPlayback()) setTransportCollapsed(false, false);
 }
 
 function handlePlayerPanelTap(event) {
   if (!state.scrolling || !isCompactPlayback() || state.annotationMode) return;
   if (event.target.closest('button,a,input,summary,details')) return;
-  setPlaybackChromeHidden(!document.body.classList.contains('playback-focus'));
+  const enteringFocus = !document.body.classList.contains('playback-focus');
+  setPlaybackChromeHidden(enteringFocus);
 }
 
 function extractTabBlocks(text) {
@@ -954,7 +976,7 @@ function importBackupData(data) {
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: 9.4, annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-4-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: "9.6.2", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
@@ -965,13 +987,16 @@ function startScroll() {
   state.scrolling = true;
   state.lastTs = performance.now();
   $('#startStopBtn').textContent = '⏸ Pause';
+  syncMiniPlayerButtons();
   setPlaybackChromeHidden(true);
   requestAnimationFrame(scrollFrame);
 }
 function stopScroll() {
   state.scrolling = false;
   $('#startStopBtn').textContent = '▶ Start';
+  syncMiniPlayerButtons();
   setPlaybackChromeHidden(false);
+  setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false);
 }
 function scrollFrame(timestamp) {
   if (!state.scrolling) return;
