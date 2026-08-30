@@ -1,4 +1,11 @@
-# Aussteiger Band-App – Version 9.6.2
+# Aussteiger Band-App – Version 9.6.3
+
+## Neu in Version 9.6.3
+
+- PDFs können jetzt nachträglich an bereits bestehende Songs angehängt werden.
+- Im Song-Editor: PDF hinzufügen, ersetzen oder entfernen.
+- Im PDF-Reiter erscheint bei fehlendem PDF direkt „+ PDF hinzufügen“.
+- PDF-Dateien bleiben lokal in IndexedDB gespeichert; Lyrics, Akkorde, Tabs und Notizen bleiben unverändert.
 
 GitHub-Pages-kompatible Offline-PWA für Bandproben und Bühne.
 

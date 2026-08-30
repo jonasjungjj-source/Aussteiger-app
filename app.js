@@ -440,7 +440,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.2', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.3', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -468,6 +468,7 @@ function bindUI() {
   $('#prevSongBtn').onclick = () => stepSong(-1); $('#nextSongBtn').onclick = () => stepSong(1);
   $('#favoriteCurrentBtn').onclick = () => toggleFavorite(state.currentId);
   $('#editSongBtn').onclick = openEditor; $('#annotationBtn').onclick = toggleAnnotationMode; $('#clearAnnotationsBtn').onclick = clearCurrentAnnotations; $('#transposeDownBtn').onclick = () => changeTranspose(-1); $('#transposeResetBtn').onclick = resetTranspose; $('#transposeUpBtn').onclick = () => changeTranspose(1); $('#openSongChordieBtn').onclick = openCurrentSongOnChordie; $('#saveSongBtn').onclick = saveEditedSong; $('#deleteOverrideBtn').onclick = deleteOverride;
+  $('#attachPdfBtn').onclick = promptPdfForCurrentSong; $('#removePdfBtn').onclick = removePdfFromCurrentSong; $('#attachPdfInput').onchange = handlePdfAttachmentSelection;
   $('#exportBtn').onclick = exportData; $('#importFile').onchange = importUniversalFile;
   $('#importSongsFile').onchange = event => { importSongFiles(event.target.files); event.target.value = ''; };
   $('#openChordieImportBtn').onclick = openChordieImport;
@@ -726,11 +727,12 @@ async function renderPdf(item) {
   const host = $('#pdfSheet');
   const button = $('#pdfTabBtn');
   if (activePdfObjectUrl) { URL.revokeObjectURL(activePdfObjectUrl); activePdfObjectUrl = ''; }
-  if (!item?.pdfAttachment) {
-    button.disabled = true; button.setAttribute('aria-disabled', 'true');
-    host.innerHTML = '<p class="empty">Für diesen Song ist kein PDF gespeichert.</p>'; return;
-  }
   button.disabled = false; button.setAttribute('aria-disabled', 'false');
+  if (!item?.pdfAttachment) {
+    host.innerHTML = '<div class="empty pdf-empty-state"><p>Für diesen Song ist kein PDF gespeichert.</p><button id="addPdfFromPlayerBtn" type="button" class="primary">+ PDF hinzufügen</button></div>';
+    $('#addPdfFromPlayerBtn').onclick = promptPdfForCurrentSong;
+    return;
+  }
   try {
     const blob = await getPdfBlob(item.id);
     if (!blob) throw new Error('PDF-Datei nicht mehr im lokalen Speicher gefunden');
@@ -908,7 +910,63 @@ function openCurrentSongOnChordie() {
 
 function stepSong(delta) { const order = activeSetlist()?.songs.filter(id => song(id)) || []; const fallback = state.songs.map(item => item.id); const ids = order.includes(state.currentId) ? order : fallback; if (!ids.length) return; let index = ids.indexOf(state.currentId); if (index < 0) index = 0; openSong(ids[(index + delta + ids.length) % ids.length]); }
 
-function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editChordieUrl').value = item.source?.url || item.chordieUrl || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editNotes').value = item.notes || ''; $('#editContent').value = item.content || item.lyrics || ''; $('#songEditor').showModal(); }
+function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editChordieUrl').value = item.source?.url || item.chordieUrl || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editNotes').value = item.notes || ''; $('#editContent').value = item.content || item.lyrics || ''; updateEditorPdfStatus(item); $('#songEditor').showModal(); }
+
+function updateEditorPdfStatus(item = song(state.currentId)) {
+  const status = $('#editPdfStatus'), remove = $('#removePdfBtn'), attach = $('#attachPdfBtn');
+  if (!status || !remove || !attach) return;
+  const hasPdf = !!item?.pdfAttachment;
+  status.textContent = hasPdf ? `Gespeichert: ${item.pdfName || 'Song-PDF'}` : 'Kein PDF hinterlegt.';
+  remove.disabled = !hasPdf;
+  attach.textContent = hasPdf ? 'PDF ersetzen' : '+ PDF hinzufügen';
+}
+
+function promptPdfForCurrentSong() {
+  if (!state.currentId || !song(state.currentId)) { alert('Bitte zuerst einen Song öffnen.'); return; }
+  const input = $('#attachPdfInput');
+  if (!input) return;
+  input.value = '';
+  input.click();
+}
+
+async function handlePdfAttachmentSelection(event) {
+  const file = event.target.files?.[0];
+  const id = state.currentId;
+  if (!file || !id) return;
+  if (!(file.type === 'application/pdf' || /\.pdf$/i.test(file.name))) { alert('Bitte eine PDF-Datei auswählen.'); event.target.value = ''; return; }
+  try {
+    await savePdfBlob(id, file);
+    state.overrides[id] = { ...(state.overrides[id] || {}), pdfAttachment: true, pdfName: file.name };
+    saveOverrides();
+    const updated = song(id);
+    updateEditorPdfStatus(updated);
+    await renderPdf(updated);
+    $('#pdfTabBtn').disabled = false;
+    if (!$('#songEditor').open) setPlayerPanel('pdf');
+  } catch (error) {
+    alert(`PDF konnte nicht gespeichert werden: ${error.message}`);
+  } finally {
+    event.target.value = '';
+  }
+}
+
+async function removePdfFromCurrentSong() {
+  const id = state.currentId, item = song(id);
+  if (!id || !item?.pdfAttachment) return;
+  if (!confirm(`PDF „${item.pdfName || 'Song-PDF'}“ von diesem Song entfernen?`)) return;
+  try {
+    await deletePdfBlob(id);
+    state.overrides[id] = { ...(state.overrides[id] || {}), pdfAttachment: false, pdfName: undefined };
+    saveOverrides();
+    const updated = song(id);
+    updateEditorPdfStatus(updated);
+    await renderPdf(updated);
+    setPlayerPanel('lyrics');
+  } catch (error) {
+    alert(`PDF konnte nicht entfernt werden: ${error.message}`);
+  }
+}
+
 function saveEditedSong() { const id = state.currentId; if (!id) return; const current = song(id); const chordieUrl = $('#editChordieUrl').value.trim(); state.overrides[id] = { ...(state.overrides[id] || {}), title: $('#editTitle').value.trim(), artist: $('#editArtist').value.trim(), bpm: Number($('#editBpm').value) || undefined, capo: $('#editCapo').value === '' ? undefined : Number($('#editCapo').value), singer: $('#editSinger').value.trim(), notes: $('#editNotes').value.trim(), content: $('#editContent').value, source: { ...(current?.source || {}), site: chordieUrl ? 'Chordie' : current?.source?.site, url: chordieUrl || undefined } }; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 function deleteOverride() { const id = state.currentId; if (!id || !state.overrides[id] || !confirm('Lokale Änderungen für diesen Song löschen?')) return; delete state.overrides[id]; saveOverrides(); $('#songEditor').close(); renderAll(); openSong(id, false); }
 
@@ -976,7 +1034,7 @@ function importBackupData(data) {
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.2", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: "9.6.3", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
