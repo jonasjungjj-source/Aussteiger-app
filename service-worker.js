@@ -1,7 +1,7 @@
-const CACHE = 'aussteiger-bandapp-v9-6-3-pdf-attachments';
+const CACHE = 'aussteiger-bandapp-v9-6-4-song-speeds';
 const APP_SHELL = [
   './', './index.html', './chords.html',
-  './app.js?v=9.6.3', './styles.css?v=9.6.3', './manifest.json?v=9.6.3',
+  './app.js?v=9.6.4', './styles.css?v=9.6.4', './manifest.json?v=9.6.4',
   './songs.json', './setlists.json',
   './assets/images/logo.jpg', './assets/icons/icon.svg',
   './assets/icons/icon-180.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png'

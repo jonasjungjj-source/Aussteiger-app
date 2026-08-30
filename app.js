@@ -6,6 +6,7 @@ const STORAGE = {
   activeSetlist: 'band-v4-active-setlist',
   current: 'band-current',
   speed: 'band-speed',
+  songSpeeds: 'band-v964-song-speeds',
   display: 'band-display',
   overrides: 'band-song-overrides',
   favorites: 'band-v4-favorites',
@@ -19,7 +20,8 @@ const STORAGE = {
 const state = {
   songs: [], baseSongs: [], defaultSetlists: [], setlists: [], activeSetlistId: '',
   currentId: localStorage.getItem(STORAGE.current),
-  scrollSpeed: Number(localStorage.getItem(STORAGE.speed) || 45),
+  scrollSpeed: 45,
+  songSpeeds: {},
   scrolling: false, lastTs: 0, overrides: {}, favorites: new Set(),
   libraries: [], importedSongs: [],
   footswitch: { play: 'Space', next: 'ArrowRight', prev: 'ArrowLeft' }, learningFootswitch: null,
@@ -61,6 +63,7 @@ function loadLocalState() {
   state.importedSongs = safeParse(localStorage.getItem(STORAGE.importedSongs), []);
   state.footswitch = { ...state.footswitch, ...safeParse(localStorage.getItem(STORAGE.footswitch), {}) };
   state.annotations = safeParse(localStorage.getItem(STORAGE.annotations), {});
+  state.songSpeeds = safeParse(localStorage.getItem(STORAGE.songSpeeds), {});
 }
 
 function mergeSongs() {
@@ -401,6 +404,36 @@ function renderLibrariesManager() {
   });
 }
 
+function saveSongSpeeds() {
+  localStorage.setItem(STORAGE.songSpeeds, JSON.stringify(state.songSpeeds));
+}
+
+function recommendedScrollSpeed(item) {
+  const settings = safeParse(localStorage.getItem(STORAGE.display), {});
+  const lineSpacing = (Number(settings.line) || 160) / 100;
+  const bpm = Math.max(30, Math.min(240, Number(item?.bpm) || 100));
+  // Heuristik: bei 120 BPM und 1.6 Zeilenabstand etwa 45 px/s.
+  return Math.max(5, Math.min(180, Math.round((bpm * lineSpacing) / 4.25)));
+}
+
+function applySpeedForSong(item = song(state.currentId)) {
+  if (!item) return;
+  const saved = Number(state.songSpeeds[item.id]);
+  const isCustom = Number.isFinite(saved) && saved >= 5;
+  state.scrollSpeed = isCustom ? saved : recommendedScrollSpeed(item);
+  const range = $('#speedRange');
+  const output = $('#speedValue');
+  if (range) range.value = state.scrollSpeed;
+  if (output) output.textContent = `${state.scrollSpeed} px/s${isCustom ? '' : ' · Auto'}`;
+}
+
+function resetCurrentSongSpeedToAuto() {
+  if (!state.currentId) return;
+  delete state.songSpeeds[state.currentId];
+  saveSongSpeeds();
+  applySpeedForSong();
+}
+
 function saveSetlists() {
   localStorage.setItem(STORAGE.setlists, JSON.stringify(state.setlists));
   localStorage.setItem(STORAGE.activeSetlist, state.activeSetlistId);
@@ -440,7 +473,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.3', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.4', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -475,8 +508,13 @@ function bindUI() {
   $('#searchChordieBtn').onclick = searchChordie;
   $('#readClipboardBtn').onclick = readClipboardIntoImporter;
   $('#saveClipboardSongBtn').onclick = saveClipboardSong;
-  $('#speedRange').value = state.scrollSpeed; $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
-  $('#speedRange').oninput = event => { state.scrollSpeed = Number(event.target.value); $('#speedValue').textContent = `${state.scrollSpeed} px/s`; localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); };
+  applySpeedForSong();
+  $('#speedRange').oninput = event => {
+    state.scrollSpeed = Number(event.target.value);
+    $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
+    if (state.currentId) { state.songSpeeds[state.currentId] = state.scrollSpeed; saveSongSpeeds(); }
+  };
+  $('#speedAutoBtn').onclick = resetCurrentSongSpeedToAuto;
   ['darkToggle','contrastToggle','uiFontRange','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
   $('#resetDisplayBtn').onclick = resetDisplaySettings;
   $('#footswitchSettingsBtn').onclick = openFootswitchSettings; $('#learnPlayKeyBtn').onclick = () => beginFootswitchLearning('play'); $('#learnNextKeyBtn').onclick = () => beginFootswitchLearning('next'); $('#learnPrevKeyBtn').onclick = () => beginFootswitchLearning('prev'); $('#resetFootswitchBtn').onclick = resetFootswitch;
@@ -639,6 +677,7 @@ function resetActiveSetlist() { const list = activeSetlist(); if (!list || !conf
 
 async function openSong(id, changeView = true) {
   const item = song(id); if (!item) return; stopScroll(); state.currentId = id; localStorage.setItem(STORAGE.current, id);
+  applySpeedForSong(item);
   const semitones = Number(item.transpose || 0);
   $('#songTitle').textContent = item.title;
   $('#songMeta').textContent = [item.artist, item.genre, meta(item), semitones ? `Transponiert ${semitones > 0 ? '+' : ''}${semitones}` : ''].filter(Boolean).join(' · ');
@@ -1030,12 +1069,13 @@ function importBackupData(data) {
   if (Array.isArray(data.setlists)) state.setlists=normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs=data.setlist;
   if (Array.isArray(data.favorites)) state.favorites=new Set(data.favorites);
   if (data.activeSetlistId && state.setlists.some(list=>list.id===data.activeSetlistId)) state.activeSetlistId=data.activeSetlistId;
-  if (data.display) localStorage.setItem(STORAGE.display,JSON.stringify(data.display)); if (data.speed) {state.scrollSpeed=Number(data.speed);localStorage.setItem(STORAGE.speed,String(state.scrollSpeed));}
+  if (data.display) localStorage.setItem(STORAGE.display,JSON.stringify(data.display));
+  if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); }
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.3", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-2-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
-async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.speed) { state.scrollSpeed = Number(data.speed); localStorage.setItem(STORAGE.speed, String(state.scrollSpeed)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
+function exportData() { const data = { version: "9.6.4", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-4-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
 function startScroll() {
@@ -1089,8 +1129,7 @@ function applySettings() {
   $('#fontValue').textContent = `${font} px`;
   $('#lineValue').textContent = String(line / 100);
   $('#chordColorValue').textContent = chord.toUpperCase();
-  $('#speedRange').value = state.scrollSpeed;
-  $('#speedValue').textContent = `${state.scrollSpeed} px/s`;
+  applySpeedForSong();
   const themeColor = settings.contrast ? '#000000' : settings.dark ? '#121212' : '#f3f4f6';
   $('#themeColorMeta')?.setAttribute('content', themeColor);
 }

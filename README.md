@@ -1,6 +1,14 @@
-# Aussteiger Band-App – Version 9.6.3
+# Aussteiger Band-App – Version 9.6.4
 
-## Neu in Version 9.6.3
+## Neu in Version 9.6.4
+- Die Auto-Scroll-Geschwindigkeit wird jetzt pro Song gespeichert.
+- Beim ersten Öffnen wird ein Startwert automatisch aus BPM und dem eingestellten Zeilenabstand berechnet.
+- Eine manuelle Änderung am Geschwindigkeitsregler gilt nur für den aktuellen Song.
+- Mit „Auto“ kann die individuelle Geschwindigkeit jederzeit wieder aus BPM + Zeilenabstand berechnet werden.
+- Song-Geschwindigkeiten werden im Backup mitgesichert.
+
+
+## Neu in Version 9.6.4
 
 - PDFs können jetzt nachträglich an bereits bestehende Songs angehängt werden.
 - Im Song-Editor: PDF hinzufügen, ersetzen oder entfernen.
