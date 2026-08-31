@@ -30,7 +30,9 @@ const state = {
   annotations: {}, annotationMode: false, activeStroke: null,
   metronomeSettings: {}, metronomeRunning: false, metronomeTimer: null, metronomeBeat: 0, metronomeAudio: null, tapTimes: [],
   pdfScroll: { page: 1, pages: 0, fallbackProgress: 0 },
-  live: { gigMode:false, countInTimer:null, countInBeat:0, sectionIndex:0 }
+  live: { gigMode:false, countInTimer:null, countInBeat:0, sectionIndex:0 },
+  pendingSetlistSongId: null,
+  tuner: { stream:null, ctx:null, analyser:null, raf:null, buffer:null }
 };
 
 async function getJSON(path) {
@@ -481,7 +483,7 @@ async function init() {
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
     switchView('dashboard');
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.8', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.9', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -497,7 +499,7 @@ function bindUI() {
   $('#dashboardLibraryBtn').onclick = () => switchView('library');
   $('#dashboardFavoritesBtn').onclick = () => switchView('favorites');
   $('#dashboardContinueBtn').onclick = () => switchView('player');
-  $('#dashboardGigBtn').onclick = () => { switchView('player'); if(!state.live.gigMode) toggleGigMode(); };
+  $('#dashboardGigBtn').onclick = openGigStartDialog;
   $('#insertSotBtn').onclick = () => insertEditorText('{sot: Intro}\n');
   $('#insertEotBtn').onclick = () => insertEditorText('\n{eot}');
   $('#insertTabBlockBtn').onclick = () => insertEditorText('{sot: Intro}\ne|----------------|\nB|----------------|\nG|----------------|\nD|----------------|\nA|----------------|\nE|----------------|\n{eot}\n');
@@ -508,7 +510,12 @@ function bindUI() {
   $('#setlistSelect').onchange = event => { state.activeSetlistId = event.target.value; saveSetlists(); renderAll(); };
   $('#newSetlistBtn').onclick = createSetlist; $('#renameSetlistBtn').onclick = renameSetlist; $('#deleteSetlistBtn').onclick = deleteSetlist;
   $('#exportSetlistBtn').onclick = exportActiveSetlist;
-  $('#addSongBtn').onclick = () => { renderPicker(); $('#songPicker').showModal(); };
+  $('#addSongBtn').onclick = () => { fillSetlistSelect($('#pickerSetlistSelect')); renderPicker(); $('#songPicker').showModal(); };
+  $('#pickerSetlistSelect').onchange = renderPicker;
+  $('#confirmSongToSetlistBtn').onclick = confirmSongToSetlist;
+  $('#gigSetlistSelect').onchange = updateGigSetlistInfo;
+  $('#confirmGigStartBtn').onclick = confirmGigStart;
+  $('#endGigBtn').onclick = endGig;
   $('#resetSetlistBtn').onclick = resetActiveSetlist;
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
@@ -541,6 +548,13 @@ function bindUI() {
   };
 
   $('#metronomeBpm').onchange = saveCurrentMetronomeSettings; $('#metronomeMeter').onchange = saveCurrentMetronomeSettings; $('#metronomeSound').onchange = saveCurrentMetronomeSettings;
+  $('#toolMetronomeStartBtn').onclick=toggleMetronome;
+  $('#toolMetronomeTapBtn').onclick=tapTempoTool;
+  $('#toolMetronomeBpm').oninput=updateMetronomeFromTool;
+  $('#toolMetronomeMeter').onchange=updateMetronomeFromTool;
+  $('#toolMetronomeSound').onchange=updateMetronomeFromTool;
+  $('#tunerStartBtn').onclick=startTuner;
+  $('#tunerStopBtn').onclick=stopTuner;
   $('#gigModeBtn').onclick = toggleGigMode; $('#countInBtn').onclick = startCountIn;
   ['Play','Next','Prev'].forEach(k => { const el=$(`#footAction${k}`); if(el) el.onchange=saveFootswitchActions; });
 
@@ -553,15 +567,16 @@ function bindUI() {
   $$('.player-panel').forEach(panel => panel.addEventListener('click', handlePlayerPanelTap));
 }
 
-function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); renderDashboard(); requestAnimationFrame(updatePlayerLayout); }
+function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); renderDashboard(); updateSetlistTargetControls(); syncMetronomeTool(); requestAnimationFrame(updatePlayerLayout); }
 function openDrawer() { $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#backdrop').hidden = false; }
 function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); $('#backdrop').hidden = true; }
 function switchView(name) {
   $$('.view').forEach(view => view.classList.remove('active')); $(`#${name}View`).classList.add('active');
   $$('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-  $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', player:'Player', about:'Hinweise' }[name];
+  $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', metronome:'Metronom', tuner:'Stimmgerät', player:'Player', about:'Hinweise' }[name];
   document.body.classList.toggle('player-mode', name === 'player');
   if (name !== 'player') setPlaybackChromeHidden(false);
+  if(name !== 'tuner' && state.tuner?.stream) stopTuner();
   requestAnimationFrame(updatePlayerLayout);
   closeDrawer();
 }
@@ -583,6 +598,22 @@ function renderDashboard() {
     host.innerHTML=next.length?next.map((id,i)=>{const s=song(id);return `<li><button type="button" data-song="${esc(id)}"><span>${currentIndex+i+1}</span><strong>${esc(s.title)}</strong><small>${esc(s.artist||'')}</small></button></li>`}).join(''):'<li class="empty">Noch keine Songs in der aktiven Setliste.</li>';
     host.querySelectorAll('button[data-song]').forEach(b=>b.onclick=()=>openSong(b.dataset.song));
   }
+}
+
+
+function fillSetlistSelect(select, selectedId = state.activeSetlistId) {
+  if (!select) return;
+  select.innerHTML = '';
+  state.setlists.forEach(list => {
+    const option=document.createElement('option');
+    option.value=list.id; option.textContent=`${list.name} (${list.songs.filter(id=>song(id)).length})`;
+    option.selected=list.id===selectedId; select.append(option);
+  });
+}
+function updateSetlistTargetControls(){
+  fillSetlistSelect($('#pickerSetlistSelect'));
+  fillSetlistSelect($('#gigSetlistSelect'));
+  fillSetlistSelect($('#songTargetSetlistSelect'));
 }
 
 function renderSetlistSelect() {
@@ -685,7 +716,7 @@ function songCard(item) {
   const card = document.createElement('article'); card.className = 'card'; const inList = activeSetlist()?.songs.includes(item.id);
   card.innerHTML = `<div class="card-title"><div><h3>${esc(item.title)}</h3><p>${esc(item.artist)}</p></div><button class="star" aria-label="Favorit">${state.favorites.has(item.id) ? '★' : '☆'}</button></div><small>${esc([item.genre, meta(item)].filter(Boolean).join(' · '))}</small><div class="card-actions"><button class="primary open">Öffnen</button><button class="add">${inList ? '✓ In Setliste' : '+ Setliste'}</button></div>`;
   card.querySelector('.open').onclick = () => openSong(item.id); card.querySelector('.star').onclick = () => toggleFavorite(item.id);
-  card.querySelector('.add').onclick = () => addToSetlist(item.id); return card;
+  card.querySelector('.add').onclick = () => openSongToSetlist(item.id); return card;
 }
 
 function filteredSongs(query, filter) {
@@ -712,10 +743,41 @@ function renderFavorites() {
 
 function renderPicker() {
   const q = ($('#pickerSearch').value || '').toLowerCase(); const host = $('#pickerList'); host.innerHTML = '';
-  filteredSongs(q, 'all').forEach(item => { const row = document.createElement('div'); row.className = 'picker-item'; const exists = activeSetlist()?.songs.includes(item.id); row.innerHTML = `<div><strong>${esc(item.title)}</strong><small>${esc(item.artist)}</small></div><button type="button">${exists ? '✓' : 'Hinzufügen'}</button>`; row.querySelector('button').disabled = exists; row.querySelector('button').onclick = () => { addToSetlist(item.id); renderPicker(); }; host.append(row); });
+  const targetId = $('#pickerSetlistSelect')?.value || state.activeSetlistId;
+  const target = state.setlists.find(list=>list.id===targetId) || activeSetlist();
+  filteredSongs(q, 'all').forEach(item => {
+    const row = document.createElement('div'); row.className = 'picker-item';
+    const exists = target?.songs.includes(item.id);
+    row.innerHTML = `<div><strong>${esc(item.title)}</strong><small>${esc(item.artist)}</small></div><button type="button">${exists ? '✓ Enthalten' : 'Hinzufügen'}</button>`;
+    row.querySelector('button').disabled = exists;
+    row.querySelector('button').onclick = () => { addToSetlist(item.id, target?.id); renderPicker(); };
+    host.append(row);
+  });
 }
 
-function addToSetlist(id) { const list = activeSetlist(); if (!list) return; if (!list.songs.includes(id)) { list.songs.push(id); saveSetlists(); renderAll(); } }
+function addToSetlist(id, setlistId = state.activeSetlistId) {
+  const list = state.setlists.find(item=>item.id===setlistId) || activeSetlist();
+  if (!list) return false;
+  if (!list.songs.includes(id)) { list.songs.push(id); saveSetlists(); renderAll(); return true; }
+  return false;
+}
+function openSongToSetlist(id){
+  const item=song(id); if(!item) return;
+  state.pendingSetlistSongId=id;
+  $('#songToSetlistName').textContent=`${item.title}${item.artist ? ` · ${item.artist}` : ''}`;
+  fillSetlistSelect($('#songTargetSetlistSelect'));
+  $('#songToSetlistDialog').showModal();
+}
+function confirmSongToSetlist(){
+  const id=state.pendingSetlistSongId, target=$('#songTargetSetlistSelect').value;
+  if(!id||!target) return;
+  const list=state.setlists.find(x=>x.id===target);
+  const added=addToSetlist(id,target);
+  $('#songToSetlistDialog').close();
+  state.pendingSetlistSongId=null;
+  if(added) alert(`Song zu „${list?.name || 'Setliste'}“ hinzugefügt.`);
+  else alert('Der Song ist bereits in dieser Setliste.');
+}
 function toggleFavorite(id) { if (!id || !song(id)) return; state.favorites.has(id) ? state.favorites.delete(id) : state.favorites.add(id); saveFavorites(); renderAll(); }
 function updateFavoriteButton() { const active = state.currentId && state.favorites.has(state.currentId); $('#favoriteCurrentBtn').textContent = active ? '★ Favorit' : '☆ Favorit'; }
 
@@ -835,18 +897,19 @@ async function renderPdf(item) {
   button.disabled = false; button.setAttribute('aria-disabled', 'false');
   if (!item?.pdfAttachment) {
     host.innerHTML = '<div class="empty pdf-empty-state"><p>Für diesen Song ist kein PDF gespeichert.</p><button id="addPdfFromPlayerBtn" type="button" class="primary">+ PDF hinzufügen</button></div>';
-    $('#addPdfFromPlayerBtn').onclick = promptPdfForCurrentSong;
-    return;
+    $('#addPdfFromPlayerBtn').onclick = promptPdfForCurrentSong; return;
   }
   try {
     const blob = await getPdfBlob(item.id);
     if (!blob) throw new Error('PDF-Datei nicht mehr im lokalen Speicher gefunden');
     activePdfObjectUrl = URL.createObjectURL(blob);
     state.pdfScroll.pages = await estimatePdfPageCount(blob); state.pdfScroll.page = 1; state.pdfScroll.fallbackProgress = 0;
-    host.innerHTML = `<div class="pdf-actions"><a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">📄 PDF separat öffnen</a><small>${esc(item.pdfName || 'Song-PDF')}</small></div><div class="pdf-scroll-status"><span>▶ Auto-Scroll funktioniert auch in der PDF-Ansicht.</span><strong id="pdfPageStatus">Seite 1${state.pdfScroll.pages ? ` / ${state.pdfScroll.pages}` : ''}</strong></div><div class="pdf-scroll-viewer" id="pdfScrollViewer"><iframe id="pdfFrame" class="pdf-frame" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#page=1&view=FitH"></iframe></div>`;
-  } catch (error) {
-    host.innerHTML = `<p class="empty">PDF konnte nicht geladen werden: ${esc(error.message)}</p>`;
-  }
+    const pages=state.pdfScroll.pages;
+    const pageHtml=pages>0
+      ? Array.from({length:pages},(_,i)=>`<section class="pdf-page-card" data-pdf-page="${i+1}"><div class="pdf-page-label">Seite ${i+1} / ${pages}</div><iframe class="pdf-page-frame" title="${esc(item.title)} – Seite ${i+1}" src="${activePdfObjectUrl}#page=${i+1}&view=FitH&toolbar=0&navpanes=0"></iframe></section>`).join('')
+      : `<section class="pdf-page-card"><iframe id="pdfFrame" class="pdf-page-frame pdf-full-document" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#view=FitH"></iframe></section>`;
+    host.innerHTML=`<div class="pdf-actions"><a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">📄 PDF separat öffnen</a><small>${esc(item.pdfName||'Song-PDF')}</small></div><div class="pdf-scroll-status"><span>Alle ${pages||''} Seiten werden untereinander angezeigt.</span><strong id="pdfPageStatus">${pages?`${pages} Seiten`:'PDF'}</strong></div><div class="pdf-scroll-viewer pdf-pages-stack" id="pdfScrollViewer">${pageHtml}</div>`;
+  } catch(error){ host.innerHTML=`<p class="empty">PDF konnte nicht geladen werden: ${esc(error.message)}</p>`; }
 }
 
 
@@ -1187,7 +1250,7 @@ function importBackupData(data) {
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.8", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-8-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: "9.6.9", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-9-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 async function estimatePdfPageCount(blob) {
@@ -1205,41 +1268,69 @@ function updatePdfPageStatus() {
 }
 
 function setPdfPage(page) {
-  const frame = $('#pdfFrame'); if (!frame || !activePdfObjectUrl) return;
-  const max = state.pdfScroll.pages || 100;
-  state.pdfScroll.page = Math.max(1, Math.min(max, page));
-  frame.src = `${activePdfObjectUrl}#page=${state.pdfScroll.page}&view=FitH`;
+  const max=state.pdfScroll.pages||1;
+  state.pdfScroll.page=Math.max(1,Math.min(max,page));
+  const viewer=$('#pdfScrollViewer'), el=viewer?.querySelector(`[data-pdf-page="${state.pdfScroll.page}"]`);
+  if(el) viewer.scrollTo({top:el.offsetTop-viewer.offsetTop,behavior:'smooth'});
   updatePdfPageStatus();
 }
 
 function scrollPdfBy(distance) {
-  const frame = $('#pdfFrame');
-  if (!frame) return true;
-  // On Safari and some Android viewers the PDF frame can be scrolled directly.
-  try {
-    const win = frame.contentWindow;
-    const doc = win?.document;
-    const root = doc?.scrollingElement || doc?.documentElement;
-    if (win && root && root.scrollHeight > root.clientHeight + 2) {
-      win.scrollBy(0, distance);
-      return root.scrollTop + root.clientHeight >= root.scrollHeight - 3;
-    }
-  } catch (_) { /* Browser PDF viewer is isolated; use page-advance fallback below. */ }
-  // Chrome often isolates its built-in PDF viewer. In that case advance pages
-  // after roughly one visible-page worth of auto-scroll distance.
-  state.pdfScroll.fallbackProgress += distance;
-  const pageDistance = Math.max(520, ($('#pdfScrollViewer')?.clientHeight || 700) * 0.92);
-  if (state.pdfScroll.fallbackProgress >= pageDistance) {
-    state.pdfScroll.fallbackProgress = 0;
-    if (state.pdfScroll.pages && state.pdfScroll.page >= state.pdfScroll.pages) return true;
-    setPdfPage(state.pdfScroll.page + 1);
+  const viewer=$('#pdfScrollViewer'); if(!viewer) return true;
+  const before=viewer.scrollTop; viewer.scrollTop+=distance;
+  const cards=[...viewer.querySelectorAll('[data-pdf-page]')];
+  if(cards.length){
+    const center=viewer.scrollTop+viewer.clientHeight*.35;
+    const current=cards.reduce((best,el)=>Math.abs(el.offsetTop-center)<Math.abs(best.offsetTop-center)?el:best,cards[0]);
+    state.pdfScroll.page=Number(current.dataset.pdfPage)||1;
   }
-  return false;
+  return viewer.scrollTop+viewer.clientHeight>=viewer.scrollHeight-3 || (viewer.scrollTop===before && distance>0);
 }
 
 function scrollActiveToTop() {
-  if (activePanelName() === 'pdf') { state.pdfScroll.fallbackProgress = 0; setPdfPage(1); try { $('#pdfFrame')?.contentWindow?.scrollTo(0, 0); } catch (_) {} return; }
+  if (activePanelName() === 'pdf') { state.pdfScroll.fallbackProgress = 0; state.pdfScroll.page=1; $('#pdfScrollViewer')?.scrollTo({top:0,behavior:'smooth'}); return; }
   const panel = activeScrollPanel(); if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+function syncMetronomeTool(){
+  const m=currentMetronomeSettings();
+  if($('#toolMetronomeBpm')) $('#toolMetronomeBpm').value=m.bpm;
+  if($('#toolMetronomeBpmValue')) $('#toolMetronomeBpmValue').textContent=m.bpm;
+  if($('#toolMetronomeMeter')) $('#toolMetronomeMeter').value=String(m.meter);
+  if($('#toolMetronomeSound')) $('#toolMetronomeSound').checked=m.sound;
+  if($('#toolMetronomeSong')) {
+    const item=song(state.currentId);
+    $('#toolMetronomeSong').textContent=item ? `Aktueller Song: ${item.title}${item.artist?` · ${item.artist}`:''}` : 'Kein Song geöffnet.';
+  }
+  renderToolMetronomeBeats(m.meter,state.metronomeBeat);
+  if($('#toolMetronomeStartBtn')) $('#toolMetronomeStartBtn').textContent=state.metronomeRunning?'⏸ Stop':'▶ Start';
+}
+function renderToolMetronomeBeats(meter,active=0){
+  const host=$('#toolMetronomeBeatDisplay'); if(!host) return;
+  host.innerHTML=Array.from({length:meter},(_,i)=>`<i class="${i===active?'active':''}"></i>`).join('');
+}
+function updateMetronomeFromTool(){
+  const item=song(state.currentId);
+  const bpm=Math.max(30,Math.min(260,Number($('#toolMetronomeBpm').value)||100));
+  const meter=[3,4,6].includes(Number($('#toolMetronomeMeter').value))?Number($('#toolMetronomeMeter').value):4;
+  const sound=$('#toolMetronomeSound').checked;
+  if(item){ state.metronomeSettings[item.id]={bpm,meter,sound}; saveMetronomeState(); }
+  if($('#metronomeBpm')) $('#metronomeBpm').value=bpm;
+  if($('#metronomeMeter')) $('#metronomeMeter').value=String(meter);
+  if($('#metronomeSound')) $('#metronomeSound').checked=sound;
+  $('#toolMetronomeBpmValue').textContent=bpm;
+  if(state.metronomeRunning){ stopMetronome(); startMetronome(); }
+  syncMetronomeTool();
+}
+function tapTempoTool(){
+  const now=performance.now(); state.tapTimes=[...state.tapTimes.filter(t=>now-t<2500),now].slice(-5);
+  if(state.tapTimes.length>=2){
+    const intervals=state.tapTimes.slice(1).map((t,i)=>t-state.tapTimes[i]);
+    const avg=intervals.reduce((a,b)=>a+b,0)/intervals.length;
+    $('#toolMetronomeBpm').value=Math.max(30,Math.min(260,Math.round(60000/avg)));
+    updateMetronomeFromTool();
+  }
 }
 
 function currentMetronomeSettings(item = song(state.currentId)) {
@@ -1279,17 +1370,17 @@ function metronomeClick(accent = false) {
 }
 function metronomeTick() {
   if (!state.metronomeRunning) return; const m = currentMetronomeSettings();
-  renderMetronomeBeats(m.meter, state.metronomeBeat); metronomeClick(state.metronomeBeat === 0);
+  renderMetronomeBeats(m.meter, state.metronomeBeat); renderToolMetronomeBeats(m.meter,state.metronomeBeat); metronomeClick(state.metronomeBeat === 0);
   state.metronomeBeat = (state.metronomeBeat + 1) % m.meter;
   state.metronomeTimer = setTimeout(metronomeTick, 60000 / m.bpm);
 }
 function startMetronome() {
   if (state.metronomeRunning) return; ensureMetronomeAudio(); state.metronomeRunning = true; state.metronomeBeat = 0; metronomeTick();
-  $('#metronomeStartBtn').textContent = '⏸ Metronom'; $('#miniMetronomeBtn').textContent = '⏸'; $('#miniMetronomeBtn').classList.add('primary');
+  $('#metronomeStartBtn').textContent = '⏸ Metronom'; $('#miniMetronomeBtn').textContent = '⏸'; $('#miniMetronomeBtn').classList.add('primary'); syncMetronomeTool();
 }
 function stopMetronome() {
   state.metronomeRunning = false; clearTimeout(state.metronomeTimer); state.metronomeTimer = null;
-  $('#metronomeStartBtn').textContent = '▶ Metronom'; $('#miniMetronomeBtn').textContent = '♩'; $('#miniMetronomeBtn').classList.remove('primary'); renderMetronomeBeats(currentMetronomeSettings().meter, 0);
+  $('#metronomeStartBtn').textContent = '▶ Metronom'; $('#miniMetronomeBtn').textContent = '♩'; $('#miniMetronomeBtn').classList.remove('primary'); renderMetronomeBeats(currentMetronomeSettings().meter, 0); syncMetronomeTool();
 }
 function toggleMetronome() { state.metronomeRunning ? stopMetronome() : startMetronome(); }
 function tapTempo() {
@@ -1317,11 +1408,43 @@ function runFootAction(action){
   else if(action==='pdfNext') pdfPageStep(1);
   else if(action==='pdfPrev') pdfPageStep(-1);
 }
+function openGigStartDialog(){
+  fillSetlistSelect($('#gigSetlistSelect'));
+  updateGigSetlistInfo();
+  $('#gigStartDialog').showModal();
+}
+function updateGigSetlistInfo(){
+  const list=state.setlists.find(x=>x.id===$('#gigSetlistSelect')?.value);
+  if($('#gigSetlistInfo')) $('#gigSetlistInfo').textContent=list ? `${list.songs.filter(id=>song(id)).length} Songs · ${list.description || 'keine Beschreibung'}` : '';
+}
+async function confirmGigStart(){
+  const id=$('#gigSetlistSelect').value;
+  const list=state.setlists.find(x=>x.id===id);
+  if(!list) return;
+  state.activeSetlistId=id; saveSetlists(); renderAll();
+  const first=list.songs.find(song);
+  if(first) await openSong(first,false);
+  $('#gigStartDialog').close();
+  state.live.gigMode=true;
+  document.body.classList.add('gig-mode');
+  $('#gigModeBtn').textContent='⏹ Gig beenden';
+  $('#gigExitBar').hidden=false;
+  switchView('player');
+  setTransportCollapsed(true,false);
+  updatePlayerLayout();
+}
+function endGig(){
+  state.live.gigMode=false;
+  document.body.classList.remove('gig-mode','playback-focus');
+  $('#gigModeBtn').textContent='Gig-Modus';
+  $('#gigExitBar').hidden=true;
+  stopScroll();
+  setTransportCollapsed(false,false);
+  switchView('dashboard');
+}
 function toggleGigMode(){
-  state.live.gigMode=!state.live.gigMode;
-  document.body.classList.toggle('gig-mode', state.live.gigMode);
-  $('#gigModeBtn').textContent=state.live.gigMode?'Gig-Modus beenden':'Gig-Modus';
-  if(state.live.gigMode) switchView('player');
+  if(state.live.gigMode) endGig();
+  else openGigStartDialog();
 }
 function songSections(){
   const item=song(state.currentId); if(!item) return [];
@@ -1346,8 +1469,7 @@ function jumpToSection(index){
 function jumpRelativeSection(delta){ const s=songSections(); if(s.length) jumpToSection((state.live.sectionIndex+delta+s.length)%s.length); }
 function pdfPageStep(delta){
   if(activePanelName()!=='pdf') setPlayerPanel('pdf');
-  state.pdfScroll.page=Math.max(1,Math.min(state.pdfScroll.pages||999,state.pdfScroll.page+delta));
-  const frame=$('#pdfFrame'); if(frame?.src){ const base=frame.src.split('#')[0]; frame.src=`${base}#page=${state.pdfScroll.page}&view=FitH`; }
+  setPdfPage((state.pdfScroll.page||1)+delta);
 }
 function cancelCountIn(){
   clearTimeout(state.live.countInTimer); state.live.countInTimer=null; state.live.countInBeat=0;
@@ -1456,24 +1578,75 @@ document.addEventListener('keydown', event => {
   }
 });
 
-const TUTORIAL_KEY = 'band-v966-tutorial-seen';
+
+const TUNER_NOTES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+function autoCorrelate(buffer,sampleRate){
+  let rms=0; for(let i=0;i<buffer.length;i++) rms+=buffer[i]*buffer[i];
+  rms=Math.sqrt(rms/buffer.length); if(rms<0.012) return -1;
+  let r1=0,r2=buffer.length-1,threshold=.2;
+  for(let i=0;i<buffer.length/2;i++){ if(Math.abs(buffer[i])<threshold){r1=i;break;} }
+  for(let i=1;i<buffer.length/2;i++){ if(Math.abs(buffer[buffer.length-i])<threshold){r2=buffer.length-i;break;} }
+  const buf=buffer.slice(r1,r2), c=new Array(buf.length).fill(0);
+  for(let lag=0;lag<buf.length;lag++) for(let i=0;i<buf.length-lag;i++) c[lag]+=buf[i]*buf[i+lag];
+  let d=0; while(d+1<c.length && c[d]>c[d+1]) d++;
+  let max=-1,maxpos=-1; for(let i=d;i<c.length;i++){if(c[i]>max){max=c[i];maxpos=i;}}
+  if(maxpos<=0) return -1;
+  return sampleRate/maxpos;
+}
+function updateTunerDisplay(freq){
+  if(!(freq>20&&freq<2000)){ $('#tunerStatus').textContent='Saite anschlagen …'; return; }
+  const midi=69+12*Math.log2(freq/440), rounded=Math.round(midi), cents=Math.round((midi-rounded)*100);
+  const note=TUNER_NOTES[(rounded%12+12)%12], octave=Math.floor(rounded/12)-1;
+  $('#tunerNote').textContent=`${note}${octave}`;
+  $('#tunerFrequency').textContent=freq.toFixed(1);
+  $('#tunerCents').textContent=`${cents>0?'+':''}${cents} Cent`;
+  $('#tunerNeedle').style.transform=`translateX(${Math.max(-50,Math.min(50,cents))}%)`;
+  $('#tunerStatus').textContent=Math.abs(cents)<=5?'✓ Sauber gestimmt':cents<0?'Zu tief – höher stimmen':'Zu hoch – tiefer stimmen';
+  $('.tuner-card')?.classList.toggle('in-tune',Math.abs(cents)<=5);
+}
+async function startTuner(){
+  if(state.tuner.stream) return;
+  if(!navigator.mediaDevices?.getUserMedia){ $('#tunerStatus').textContent='Mikrofonzugriff wird von diesem Browser nicht unterstützt.'; return; }
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const Ctx=window.AudioContext||window.webkitAudioContext, ctx=new Ctx(), analyser=ctx.createAnalyser();
+    analyser.fftSize=2048; ctx.createMediaStreamSource(stream).connect(analyser);
+    state.tuner={stream,ctx,analyser,raf:null,buffer:new Float32Array(analyser.fftSize)};
+    $('#tunerStartBtn').disabled=true; $('#tunerStopBtn').disabled=false; $('#tunerStatus').textContent='Mikrofon aktiv – Saite anschlagen.';
+    const loop=()=>{ if(!state.tuner.analyser)return; state.tuner.analyser.getFloatTimeDomainData(state.tuner.buffer); updateTunerDisplay(autoCorrelate(state.tuner.buffer,ctx.sampleRate)); state.tuner.raf=requestAnimationFrame(loop); };
+    loop();
+  }catch(error){ $('#tunerStatus').textContent=`Mikrofon nicht verfügbar: ${error.message}`; }
+}
+function stopTuner(){
+  if(state.tuner.raf) cancelAnimationFrame(state.tuner.raf);
+  state.tuner.stream?.getTracks().forEach(t=>t.stop()); state.tuner.ctx?.close?.();
+  state.tuner={stream:null,ctx:null,analyser:null,raf:null,buffer:null};
+  $('#tunerStartBtn').disabled=false; $('#tunerStopBtn').disabled=true; $('#tunerStatus').textContent='Mikrofon ist noch nicht aktiv.';
+  $('#tunerNote').textContent='–'; $('#tunerFrequency').textContent='–'; $('#tunerCents').textContent='0 Cent'; $('#tunerNeedle').style.transform='translateX(0)';
+}
+
+const TUTORIAL_KEY = 'band-v969-tutorial-seen';
 const TUTORIAL_STEPS = [
-  { view:'dashboard', target:'#dashboardView', icon:'🏠', title:'Übersicht', text:'Die App startet jetzt auf dem Dashboard. Hier siehst du aktive Setliste, letzten Song, Bibliothek, Favoriten und die nächsten Songs.' },
-  { view:'dashboard', target:'#dashboardGigBtn', icon:'🎤', title:'Gig direkt starten', text:'Mit Gig starten wechselst du unmittelbar in den reduzierten Live-Player.' },
-  { view:'setlists', target:'#setlistSelect', icon:'📋', title:'Setlisten', text:'Wähle deine aktive Setliste und verschiebe Songs am Griff ⠿ per Drag & Drop.' },
-  { view:'setlists', target:'#exportSetlistBtn', icon:'↗', title:'Setliste teilen', text:'Teile eine Setliste als Datei. Beim Import erkennt die App automatisch Song, Setliste oder Backup.' },
-  { view:'library', target:'#searchInput', icon:'🔎', title:'Bibliothek', text:'Hier suchst du nach Titel, Interpret, Genre oder Tags und öffnest einen Song.' },
-  { view:'player', target:'.player-tabs', icon:'🎤', title:'Player-Ansichten', text:'Song, Tabs, Notizen und PDF haben getrennte Seiten. Das verhindert, dass breite Tabs den Liedtext auf dem Handy zerstören.' },
-  { view:'player', panel:'tabs', target:'#tabSheet', icon:'🎸', title:'Optimierte Tabs', text:'Tabs werden in einer eigenen Monospace-Ansicht dargestellt. Du kannst horizontal wischen und die Tab-Schrift mit A−/A+ anpassen.' },
-  { view:'player', panel:'lyrics', target:'#editSongBtn', icon:'✎', title:'Song bearbeiten', text:'Im Editor kannst du Lyrics, Akkorde, Tabs, Notizen und PDF eines bestehenden Songs bearbeiten.' },
-  { view:'player', panel:'lyrics', target:'.song-tools', icon:'♯', title:'Akkorde & Markierungen', text:'Transponiere Akkorde oder zeichne Gesangsphrasierungen direkt auf das Songblatt.' },
-  { view:'player', target:'#liveTools', icon:'🎤', title:'Live Performance', text:'Gig-Modus, Count-in und Sprungmarken bündeln die wichtigsten Bühnenfunktionen.' },
-  { view:'player', target:'#countInControls', icon:'⏱', title:'Count-in', text:'Einzählen mit 1, 2 oder 4 Takten und optional danach automatisch Autoscroll starten.' },
-  { view:'player', target:'#sectionJumpBar', icon:'📍', title:'Sprungmarken', text:'Intro, Refrain, Solo und Outro können als schnelle Sprungziele erscheinen.' },
-  { view:'player', target:'.metronome', icon:'♩', title:'Metronom', text:'Metronom, Tap Tempo, Taktart und BPM funktionieren unabhängig vom Autoscroll.' },
-  { view:'player', target:'#startStopBtn', icon:'▶️', title:'Autoscroll', text:'Die Scrollgeschwindigkeit wird pro Song gespeichert und aus BPM plus Zeilenabstand vorbelegt.' },
-  { view:'player', panel:'pdf', target:'#pdfSheet', icon:'📄', title:'PDF', text:'PDFs können an bestehende Songs gehängt und ebenfalls automatisch gescrollt werden.' },
-  { view:'player', target:'#footswitchSettingsBtn', action:'footswitch', icon:'🦶', title:'Fußschalter', text:'Pedaltasten können Aktionen wie Play, Songwechsel, Metronom, Count-in, Abschnitt oder PDF-Seite auslösen.' }
+  { view:'dashboard', target:'#dashboardView', icon:'🏠', title:'Übersicht', text:'Die App startet auf dem Dashboard. Hier findest du Setliste, letzten Song, Bibliothek, Favoriten und den Gig-Start.' },
+  { view:'dashboard', target:'#dashboardGigBtn', icon:'🎤', title:'Gig starten', text:'Beim Gig-Start wählst du zuerst die Setliste. Danach öffnet die App deren ersten Song im reduzierten Live-Modus.' },
+  { view:'setlists', target:'#setlistSelect', icon:'📋', title:'Setlisten', text:'Wähle eine aktive Setliste und ändere die Reihenfolge per Drag & Drop.' },
+  { view:'library', target:'#library', icon:'➕', title:'Song zu einer Setliste', text:'Bei + Setliste wählst du jetzt immer die gewünschte Ziel-Setliste – unabhängig davon, welche gerade aktiv ist.' },
+  { view:'setlists', target:'#exportSetlistBtn', icon:'↗', title:'Setliste teilen', text:'Setlisten können als Datei weitergegeben und auf anderen Geräten wieder importiert werden.' },
+  { view:'player', target:'.player-tabs', icon:'🎤', title:'Player', text:'Song, Tabs, Notizen und PDF sind getrennte Ansichten für eine mobile, übersichtliche Darstellung.' },
+  { view:'player', panel:'tabs', target:'#tabSheet', icon:'🎸', title:'Tabs', text:'Tabs bleiben in Monospace-Schrift, lassen sich seitlich wischen und werden nicht mehr in den Lyrics umgebrochen.' },
+  { view:'player', panel:'pdf', target:'#pdfSheet', icon:'📄', title:'Mehrseitige PDFs', text:'Bei mehrseitigen PDFs werden alle Seiten untereinander angezeigt. Dadurch kann die PDF-Ansicht wie ein langes Liedblatt gescrollt werden.' },
+  { view:'player', panel:'lyrics', target:'#liveTools', icon:'🎤', title:'Live Performance', text:'Gig-Modus, Count-in und Sprungmarken bündeln die Bühnensteuerung.' },
+  { view:'player', target:'#gigModeBtn', icon:'⏹', title:'Gig beenden', text:'Im Gig-Modus gibt es zusätzlich einen deutlich sichtbaren „Gig beenden“-Button in der reduzierten Player-Steuerung.' },
+  { view:'player', target:'#countInControls', icon:'⏱', title:'Count-in', text:'Einzählen mit 1, 2 oder 4 Takten; optional startet danach automatisch der Autoscroll.' },
+  { view:'player', target:'#sectionJumpBar', icon:'📍', title:'Sprungmarken', text:'Springe schnell zu Intro, Refrain, Solo, Bridge oder Outro.' },
+  { view:'player', target:'#startStopBtn', icon:'▶️', title:'Autoscroll', text:'Die Scrollgeschwindigkeit wird für jeden Song individuell gespeichert.' },
+  { view:'metronome', target:'#metronomeView', icon:'♩', title:'Metronom als Tool', text:'Das Metronom ist jetzt direkt im Hauptmenü erreichbar. BPM, Tap Tempo, Taktart und Ton können hier unabhängig vom Player bedient werden.' },
+  { view:'tuner', target:'#tunerView', icon:'🎸', title:'Stimmgerät', text:'Das chromatische Stimmgerät nutzt nach deiner Freigabe das Mikrofon und zeigt Note, Frequenz und Cent-Abweichung.' },
+  { view:'player', panel:'lyrics', target:'.song-tools', icon:'♯', title:'Akkorde', text:'Akkorde lassen sich live transponieren und farblich anpassen.' },
+  { view:'player', target:'#editSongBtn', icon:'✎', title:'Song bearbeiten', text:'Lyrics, Akkorde, SOT/EOT-Tabs, Notizen, BPM, Capo und PDF können direkt am Song bearbeitet werden.' },
+  { view:'player', target:'#footswitchSettingsBtn', action:'footswitch', icon:'🦶', title:'Fußschalter', text:'Pedaltasten können Play, Songwechsel, Metronom, Count-in, Abschnitte und PDF-Seiten steuern.' },
+  { view:'about', target:'#importSongsFile', icon:'📥', title:'Import', text:'Songs können als Markdown, ChordPro/Text, JSON oder PDF importiert werden.' },
+  { view:'dashboard', target:'#dashboardView', icon:'✅', title:'Bereit', text:'Damit sind die wichtigsten Probe- und Bühnenfunktionen eingerichtet. Das Tutorial kannst du jederzeit im Menü erneut starten.' }
 ];
 let tutorialIndex = 0;
 function startTutorial(force=false){
@@ -1508,7 +1681,7 @@ function showTutorialStep(){
     },180);
   });
 }
-function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); const overlay=$('#tutorialOverlay'); overlay.hidden=true; overlay.classList.remove('has-target'); $('#tutorialCard')?.classList.remove('tutorial-card-top'); $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('setlists'); }
+function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); const overlay=$('#tutorialOverlay'); overlay.hidden=true; overlay.classList.remove('has-target'); $('#tutorialCard')?.classList.remove('tutorial-card-top'); $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('dashboard'); }
 window.addEventListener('resize',()=>{ updatePlayerLayout(); if(!$('#tutorialOverlay')?.hidden) showTutorialStep(); });
 window.addEventListener('orientationchange',()=>setTimeout(updatePlayerLayout,120));
 document.addEventListener('click',e=>{ if(e.target?.id==='tutorialNextBtn'){ tutorialIndex++; showTutorialStep(); } if(e.target?.id==='tutorialBackBtn'){ tutorialIndex=Math.max(0,tutorialIndex-1); showTutorialStep(); } if(e.target?.id==='tutorialSkipBtn') finishTutorial(); });

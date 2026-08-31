@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="AusSteiger">
-  <link rel="manifest" href="./manifest.json?v=9.6.8">
+  <link rel="manifest" href="./manifest.json?v=9.6.9">
   <link rel="apple-touch-icon" href="./assets/icons/icon-180.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=9.6.8">
+  <link rel="stylesheet" href="./styles.css?v=9.6.9">
   <title>AusSteiger & Friends</title>
 </head>
 <body>
@@ -32,6 +32,8 @@
     <button data-view="setlists" class="nav-item">Setlisten</button>
     <button data-view="library" class="nav-item">Alle Songs</button>
     <button data-view="favorites" class="nav-item">Favoriten</button>
+    <button data-view="metronome" class="nav-item">♩ Metronom</button>
+    <button data-view="tuner" class="nav-item">🎸 Stimmgerät</button>
     <a href="./chords.html" class="nav-item nav-link">Akkordlexikon</a>
     <button data-view="player" class="nav-item">Player</button>
     <button data-view="about" class="nav-item">Hinweise</button>
@@ -108,6 +110,45 @@
     <div id="favorites" class="library-grid"></div>
   </section>
 
+
+  <section id="metronomeView" class="view tool-view">
+    <div class="tool-hero"><span class="tool-icon">♩</span><div><h1>Metronom</h1><p class="subtle">Eigenständiges Tool – übernimmt die BPM des aktuell geöffneten Songs.</p></div></div>
+    <div class="tool-card metronome-tool-card">
+      <div class="metronome-tool-value"><strong id="toolMetronomeBpmValue">100</strong><span>BPM</span></div>
+      <div id="toolMetronomeBeatDisplay" class="metronome-beats tool-beats"><i class="active"></i><i></i><i></i><i></i></div>
+      <div class="tool-controls">
+        <button id="toolMetronomeStartBtn" type="button" class="primary big">▶ Start</button>
+        <button id="toolMetronomeTapBtn" type="button">Tap Tempo</button>
+      </div>
+      <label class="tool-range">BPM
+        <input id="toolMetronomeBpm" type="range" min="30" max="260" value="100">
+      </label>
+      <div class="tool-controls">
+        <label>Takt <select id="toolMetronomeMeter"><option value="4">4/4</option><option value="3">3/4</option><option value="6">6/8</option></select></label>
+        <label><input id="toolMetronomeSound" type="checkbox" checked> Ton</label>
+      </div>
+      <p id="toolMetronomeSong" class="hint">Kein Song geöffnet.</p>
+    </div>
+  </section>
+
+  <section id="tunerView" class="view tool-view">
+    <div class="tool-hero"><span class="tool-icon">🎸</span><div><h1>Chromatisches Stimmgerät</h1><p class="subtle">Verwendet das Mikrofon des Geräts. Funktioniert auf HTTPS/PWA nach Mikrofonfreigabe.</p></div></div>
+    <div class="tool-card tuner-card">
+      <div id="tunerStatus" class="hint">Mikrofon ist noch nicht aktiv.</div>
+      <div class="tuner-note" id="tunerNote">–</div>
+      <div class="tuner-frequency"><span id="tunerFrequency">–</span> Hz</div>
+      <div class="tuner-meter" aria-label="Stimmabweichung">
+        <div class="tuner-center"></div><div id="tunerNeedle" class="tuner-needle"></div>
+      </div>
+      <div id="tunerCents" class="tuner-cents">0 Cent</div>
+      <div class="tool-controls">
+        <button id="tunerStartBtn" type="button" class="primary big">🎙 Mikrofon starten</button>
+        <button id="tunerStopBtn" type="button" disabled>Stop</button>
+      </div>
+      <p class="hint">Tipp: einzelne Saite anschlagen und andere Saiten abdämpfen. Standard-Gitarre: E2 · A2 · D3 · G3 · B3 · E4.</p>
+    </div>
+  </section>
+
   <section id="playerView" class="view player-view">
     <div class="player-head">
       <div><h1 id="songTitle">Kein Song gewählt</h1><p id="songMeta" class="subtle"></p></div>
@@ -124,6 +165,7 @@
     <article id="notesSheet" class="notes-sheet player-panel" data-panel="notes" hidden><p>Für diesen Song sind noch keine Notizen gespeichert.</p></article>
     <article id="pdfSheet" class="pdf-sheet player-panel" data-panel="pdf" hidden><p>Für diesen Song ist kein PDF gespeichert.</p></article>
     <div class="transport" id="playerTransport">
+      <div id="gigExitBar" class="gig-exit-bar" hidden><button id="endGigBtn" type="button">⏹ Gig beenden</button></div>
       <div class="transport-collapse-row">
         <button id="transportToggleBtn" type="button" class="transport-toggle" aria-expanded="true" aria-controls="transportFull">▾ Bedienung</button>
       </div>
@@ -178,7 +220,7 @@
   </section>
 
   <section id="aboutView" class="view prose">
-    <h2>Version 9.6.8 – GitHub Pages</h2>
+    <h2>Version 9.6.9 – GitHub Pages</h2>
     <p>Alle Songs aus <code>songs.json</code> werden in der Bibliothek angezeigt. Im Menü findest du zusätzlich ein offline verfügbares Akkordlexikon mit Griffbildern und Übungshilfen. Du kannst mehrere lokale Setlisten anlegen, Favoriten markieren und Songs durchsuchen.</p>
     <p>Bearbeitungen, Setlisten und Favoriten werden lokal im Browser gespeichert. Aktive Setlisten kannst du als eigene Datei teilen; beim Import erkennt die App automatisch Song, Setliste oder Backup.</p>
     <div class="toolbar wrap"><button id="exportBtn">Gesamt-Backup exportieren</button><label class="file-btn">Datei automatisch importieren<input id="importFile" type="file" accept=".json,.md,.markdown,.cho,.chordpro,.crd,.pro,.chopro,.txt,.pdf,application/json,application/pdf,text/plain,text/markdown"></label></div><p class="hint">JSON wird automatisch als Song, geteilte Setliste oder Gesamt-Backup erkannt. Andere unterstützte Formate werden als Song importiert.</p>
@@ -193,8 +235,27 @@
   </section>
 </main>
 
-<dialog id="songPicker"><form method="dialog"><div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div><input id="pickerSearch" type="search" placeholder="Suchen"><div id="pickerList" class="picker-list"></div></form></dialog>
-<dialog id="displaySettings" aria-labelledby="displaySettingsTitle"><form method="dialog" class="settings-form"><div class="dialog-head"><div><h2 id="displaySettingsTitle">Anzeige &amp; Barrierefreiheit</h2><p class="dialog-intro">Darstellung für Bühne, Smartphone und persönliche Bedürfnisse anpassen. <strong>Version 9.6.8</strong></p></div><button value="cancel" class="close-dialog" aria-label="Einstellungen schließen">✕</button></div><div class="settings-grid"><section class="settings-group" aria-labelledby="themeSettingsTitle"><h3 id="themeSettingsTitle">Farben &amp; Kontrast</h3><label class="color-setting chord-color-setting" for="chordColor"><span><strong>🎸 Akkordfarbe ändern</strong><small>Tippe auf das große Farbfeld. Die Änderung wird sofort im Songblatt sichtbar.</small></span><span class="color-control"><input id="chordColor" type="color" value="#2563eb" aria-label="Akkordfarbe auswählen"><output id="chordColorValue">#2563EB</output></span></label><label class="toggle-setting"><span><strong>Dark Mode</strong><small>Modernes neutrales Schwarz und Grau – ohne Brauntöne</small></span><input id="darkToggle" type="checkbox" role="switch"></label><label class="toggle-setting"><span><strong>Hoher Kontrast</strong><small>Schwarz, Weiß und Gelb für maximale Erkennbarkeit</small></span><input id="contrastToggle" type="checkbox" role="switch"></label></section><section class="settings-group" aria-labelledby="readingSettingsTitle"><h3 id="readingSettingsTitle">Lesbarkeit</h3><label class="range-setting" for="uiFontRange"><span><strong>App-Schriftgröße</strong><output id="uiFontValue">100 %</output></span><input id="uiFontRange" type="range" min="85" max="130" step="5" value="100"></label><label class="range-setting" for="fontRange"><span><strong>Lyrics-Schriftgröße</strong><output id="fontValue">26 px</output></span><input id="fontRange" type="range" min="16" max="42" step="1" value="26"></label><label class="range-setting" for="lineRange"><span><strong>Zeilenabstand</strong><output id="lineValue">1.6</output></span><input id="lineRange" type="range" min="120" max="220" step="5" value="160"></label></section></div><div class="settings-actions"><button id="resetDisplayBtn" type="button">Standard wiederherstellen</button><button id="footswitchSettingsBtn" type="button">🦶 Fußschalter</button><button id="fullscreenBtn" type="button">Vollbild umschalten</button><button value="cancel" class="primary">Fertig</button></div></form></dialog>
+<dialog id="songPicker"><form method="dialog"><div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div><label class="picker-target">Zu Setliste hinzufügen <select id="pickerSetlistSelect"></select></label>
+<input id="pickerSearch" type="search" placeholder="Suchen"><div id="pickerList" class="picker-list"></div></form></dialog>
+
+<dialog id="gigStartDialog" aria-labelledby="gigStartTitle">
+  <form method="dialog">
+    <div class="dialog-head"><div><h2 id="gigStartTitle">🎤 Gig starten</h2><p class="dialog-intro">Wähle zuerst die Setliste für den Auftritt.</p></div><button value="cancel">✕</button></div>
+    <label>Setliste<select id="gigSetlistSelect"></select></label>
+    <p id="gigSetlistInfo" class="hint"></p>
+    <div class="dialog-actions"><button value="cancel">Abbrechen</button><button id="confirmGigStartBtn" type="button" class="primary">Gig starten</button></div>
+  </form>
+</dialog>
+
+<dialog id="songToSetlistDialog" aria-labelledby="songToSetlistTitle">
+  <form method="dialog">
+    <div class="dialog-head"><div><h2 id="songToSetlistTitle">📋 Song zu Setliste</h2><p id="songToSetlistName" class="dialog-intro"></p></div><button value="cancel">✕</button></div>
+    <label>Ziel-Setliste<select id="songTargetSetlistSelect"></select></label>
+    <div class="dialog-actions"><button value="cancel">Abbrechen</button><button id="confirmSongToSetlistBtn" type="button" class="primary">Hinzufügen</button></div>
+  </form>
+</dialog>
+
+<dialog id="displaySettings" aria-labelledby="displaySettingsTitle"><form method="dialog" class="settings-form"><div class="dialog-head"><div><h2 id="displaySettingsTitle">Anzeige &amp; Barrierefreiheit</h2><p class="dialog-intro">Darstellung für Bühne, Smartphone und persönliche Bedürfnisse anpassen. <strong>Version 9.6.9</strong></p></div><button value="cancel" class="close-dialog" aria-label="Einstellungen schließen">✕</button></div><div class="settings-grid"><section class="settings-group" aria-labelledby="themeSettingsTitle"><h3 id="themeSettingsTitle">Farben &amp; Kontrast</h3><label class="color-setting chord-color-setting" for="chordColor"><span><strong>🎸 Akkordfarbe ändern</strong><small>Tippe auf das große Farbfeld. Die Änderung wird sofort im Songblatt sichtbar.</small></span><span class="color-control"><input id="chordColor" type="color" value="#2563eb" aria-label="Akkordfarbe auswählen"><output id="chordColorValue">#2563EB</output></span></label><label class="toggle-setting"><span><strong>Dark Mode</strong><small>Modernes neutrales Schwarz und Grau – ohne Brauntöne</small></span><input id="darkToggle" type="checkbox" role="switch"></label><label class="toggle-setting"><span><strong>Hoher Kontrast</strong><small>Schwarz, Weiß und Gelb für maximale Erkennbarkeit</small></span><input id="contrastToggle" type="checkbox" role="switch"></label></section><section class="settings-group" aria-labelledby="readingSettingsTitle"><h3 id="readingSettingsTitle">Lesbarkeit</h3><label class="range-setting" for="uiFontRange"><span><strong>App-Schriftgröße</strong><output id="uiFontValue">100 %</output></span><input id="uiFontRange" type="range" min="85" max="130" step="5" value="100"></label><label class="range-setting" for="fontRange"><span><strong>Lyrics-Schriftgröße</strong><output id="fontValue">26 px</output></span><input id="fontRange" type="range" min="16" max="42" step="1" value="26"></label><label class="range-setting" for="lineRange"><span><strong>Zeilenabstand</strong><output id="lineValue">1.6</output></span><input id="lineRange" type="range" min="120" max="220" step="5" value="160"></label></section></div><div class="settings-actions"><button id="resetDisplayBtn" type="button">Standard wiederherstellen</button><button id="footswitchSettingsBtn" type="button">🦶 Fußschalter</button><button id="fullscreenBtn" type="button">Vollbild umschalten</button><button value="cancel" class="primary">Fertig</button></div></form></dialog>
 
 <dialog id="chordieImportDialog" aria-labelledby="chordieImportTitle"><form method="dialog" class="chordie-import-form"><div class="dialog-head"><div><h2 id="chordieImportTitle">Chordie-Suche &amp; Import</h2><p class="dialog-intro">1. Song suchen · 2. Lyrics und Akkorde kopieren · 3. Hier einfügen und lokal speichern</p></div><button value="cancel" aria-label="Dialog schließen">✕</button></div><div class="chordie-search-row"><label>Songtitel<input id="chordieSongTitle" type="text" placeholder="z. B. Ring of Fire"></label><label>Interpret<input id="chordieArtist" type="text" placeholder="z. B. Johnny Cash"></label></div><button id="searchChordieBtn" type="button">🔎 Auf Chordie suchen</button><div class="clipboard-actions"><button id="readClipboardBtn" type="button">📋 Aus Zwischenablage einfügen</button><span class="hint">Falls der Browser den Zugriff blockiert, unten lange drücken und „Einfügen“ wählen.</span></div><label>Lyrics &amp; Akkorde<textarea id="chordiePasteText" rows="18" spellcheck="false" placeholder="Kopierten Inhalt hier einfügen …"></textarea></label><p id="chordieImportStatus" class="hint" aria-live="polite"></p><div class="dialog-actions"><button value="cancel">Abbrechen</button><button id="saveClipboardSongBtn" type="button" class="primary">Song lokal importieren</button></div></form></dialog>
 <dialog id="songEditor"><form method="dialog" id="songEditorForm"><div class="dialog-head"><h2>Song bearbeiten</h2><button value="cancel">✕</button></div><label>Titel<input id="editTitle" type="text"></label><label>Interpret<input id="editArtist" type="text"></label><label>Chordie-Referenz oder Suchlink<input id="editChordieUrl" type="url" inputmode="url" placeholder="https://www.chordie.com/..."></label><div class="editor-grid"><label>BPM<input id="editBpm" type="number" min="1" max="300"></label><label>Capo<input id="editCapo" type="number" min="0" max="12"></label><label>Sänger<input id="editSinger" type="text"></label></div><section class="editor-pdf-section" aria-labelledby="editorPdfTitle"><div><strong id="editorPdfTitle">📄 PDF-Liedblatt</strong><small id="editPdfStatus">Kein PDF hinterlegt.</small></div><div class="editor-pdf-actions"><button id="attachPdfBtn" type="button">+ PDF hinzufügen</button><button id="removePdfBtn" type="button">PDF entfernen</button></div></section><label>Notizen<textarea id="editNotes" rows="5" placeholder="Eigene Bühnen- oder Spielhinweise …"></textarea></label><label>Songblatt
@@ -215,7 +276,7 @@
 <div id="tutorialOverlay" class="tutorial-overlay" hidden aria-live="polite">
   <div id="tutorialSpotlight" class="tutorial-spotlight"></div>
   <section id="tutorialCard" class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
-    <div class="tutorial-progress"><span id="tutorialStepLabel">1 / 16</span><button id="tutorialSkipBtn" type="button">Überspringen</button></div>
+    <div class="tutorial-progress"><span id="tutorialStepLabel">1 / 20</span><button id="tutorialSkipBtn" type="button">Überspringen</button></div>
     <div class="tutorial-icon" id="tutorialIcon">👋</div>
     <h2 id="tutorialTitle">Willkommen</h2>
     <p id="tutorialText"></p>
@@ -223,6 +284,6 @@
   </section>
 </div>
 <div id="errorBanner" class="error-banner" hidden></div>
-<script src="./app.js?v=9.6.8" type="module"></script>
+<script src="./app.js?v=9.6.9" type="module"></script>
 </body>
 </html>

@@ -1,0 +1,12 @@
+Aussteiger Band-App v9.6.9
+
+Neu:
+- Gig starten: Setliste vorher auswählen
+- Songbibliothek: Ziel-Setliste beim Hinzufügen auswählen
+- Songpicker: Ziel-Setliste auswählbar
+- Mehrseitige PDFs werden als Seitenstapel untereinander angezeigt
+- PDF-Autoscroll scrollt den Seitenstapel
+- Prominenter roter „Gig beenden“-Button in reduzierter Live-Ansicht
+- Metronom als eigenes Tool im Hauptmenü
+- Chromatisches Stimmgerät über Mikrofon
+- Tutorial auf 20 Schritte erweitert und neue Seiten/Tools integriert
