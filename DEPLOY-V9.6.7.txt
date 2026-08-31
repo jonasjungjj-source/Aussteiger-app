@@ -1,0 +1,12 @@
+Aussteiger Band-App v9.6.7
+
+Neu:
+- Dashboard als Startseite
+- Schnellzugriff auf aktive Setliste, Player, Bibliothek, Favoriten und Gig-Modus
+- SOT/EOT-Schaltflächen im Song-Editor
+- Unterstützt {sot: Intro} ... {eot} als Tab-Block-Alias
+- Tab-Blöcke werden aus der Lyrics-Ansicht entfernt
+- Tabs erhalten eine eigene mobile, horizontal scrollbar optimierte Ansicht
+- A-/A+ für Tab-Schriftgröße
+- Tutorial aktualisiert und um Dashboard/Tab-Workflow erweitert
+- Tutorial öffnet jeweils die referenzierte App-Seite bzw. Player-Ansicht

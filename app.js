@@ -15,7 +15,8 @@ const STORAGE = {
   footswitch: 'band-v9-footswitch',
   annotations: 'band-v9-annotations',
   transportCollapsed: 'band-v9-transport-collapsed',
-  metronome: 'band-v965-metronome'
+  metronome: 'band-v965-metronome',
+  live: 'band-v966-live'
 };
 
 const state = {
@@ -28,7 +29,8 @@ const state = {
   footswitch: { play: 'Space', next: 'ArrowRight', prev: 'ArrowLeft' }, learningFootswitch: null,
   annotations: {}, annotationMode: false, activeStroke: null,
   metronomeSettings: {}, metronomeRunning: false, metronomeTimer: null, metronomeBeat: 0, metronomeAudio: null, tapTimes: [],
-  pdfScroll: { page: 1, pages: 0, fallbackProgress: 0 }
+  pdfScroll: { page: 1, pages: 0, fallbackProgress: 0 },
+  live: { gigMode:false, countInTimer:null, countInBeat:0, sectionIndex:0 }
 };
 
 async function getJSON(path) {
@@ -68,6 +70,7 @@ function loadLocalState() {
   state.annotations = safeParse(localStorage.getItem(STORAGE.annotations), {});
   state.songSpeeds = safeParse(localStorage.getItem(STORAGE.songSpeeds), {});
   state.metronomeSettings = safeParse(localStorage.getItem(STORAGE.metronome), {});
+  state.footswitch.actions = { scroll:'scroll', next:'next', prev:'prev', ...(state.footswitch.actions || {}) };
 }
 
 function mergeSongs() {
@@ -477,7 +480,8 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.5', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    switchView('dashboard');
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.7', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -488,6 +492,16 @@ async function init() {
 
 function bindUI() {
   $('#menuBtn').onclick = openDrawer; $('#backdrop').onclick = closeDrawer;
+  $('#dashboardSetlistBtn').onclick = () => switchView('setlists');
+  $('#dashboardOpenSetlistBtn').onclick = () => switchView('setlists');
+  $('#dashboardLibraryBtn').onclick = () => switchView('library');
+  $('#dashboardFavoritesBtn').onclick = () => switchView('favorites');
+  $('#dashboardContinueBtn').onclick = () => switchView('player');
+  $('#dashboardGigBtn').onclick = () => { switchView('player'); if(!state.live.gigMode) toggleGigMode(); };
+  $('#insertSotBtn').onclick = () => insertEditorText('{sot: Intro}\n');
+  $('#insertEotBtn').onclick = () => insertEditorText('\n{eot}');
+  $('#insertTabBlockBtn').onclick = () => insertEditorText('{sot: Intro}\ne|----------------|\nB|----------------|\nG|----------------|\nD|----------------|\nA|----------------|\nE|----------------|\n{eot}\n');
+
   $$('.nav-item').forEach(button => button.onclick = () => switchView(button.dataset.view));
   $('#settingsBtn').onclick = () => $('#displaySettings').showModal();
   $('#tutorialBtn').onclick = () => { closeDrawer(); startTutorial(true); };
@@ -521,6 +535,9 @@ function bindUI() {
   $('#speedAutoBtn').onclick = resetCurrentSongSpeedToAuto;
   $('#metronomeStartBtn').onclick = toggleMetronome; $('#miniMetronomeBtn').onclick = toggleMetronome; $('#metronomeTapBtn').onclick = tapTempo;
   $('#metronomeBpm').onchange = saveCurrentMetronomeSettings; $('#metronomeMeter').onchange = saveCurrentMetronomeSettings; $('#metronomeSound').onchange = saveCurrentMetronomeSettings;
+  $('#gigModeBtn').onclick = toggleGigMode; $('#countInBtn').onclick = startCountIn;
+  ['Play','Next','Prev'].forEach(k => { const el=$(`#footAction${k}`); if(el) el.onchange=saveFootswitchActions; });
+
   ['darkToggle','contrastToggle','uiFontRange','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
   $('#resetDisplayBtn').onclick = resetDisplaySettings;
   $('#footswitchSettingsBtn').onclick = openFootswitchSettings; $('#learnPlayKeyBtn').onclick = () => beginFootswitchLearning('play'); $('#learnNextKeyBtn').onclick = () => beginFootswitchLearning('next'); $('#learnPrevKeyBtn').onclick = () => beginFootswitchLearning('prev'); $('#resetFootswitchBtn').onclick = resetFootswitch;
@@ -530,16 +547,35 @@ function bindUI() {
   $$('.player-panel').forEach(panel => panel.addEventListener('click', handlePlayerPanelTap));
 }
 
-function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); }
+function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); renderDashboard(); }
 function openDrawer() { $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#backdrop').hidden = false; }
 function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); $('#backdrop').hidden = true; }
 function switchView(name) {
   $$('.view').forEach(view => view.classList.remove('active')); $(`#${name}View`).classList.add('active');
   $$('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-  $('#viewTitle').textContent = { setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', player:'Player', about:'Hinweise' }[name];
+  $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', player:'Player', about:'Hinweise' }[name];
   document.body.classList.toggle('player-mode', name === 'player');
   if (name !== 'player') setPlaybackChromeHidden(false);
   closeDrawer();
+}
+
+
+function renderDashboard() {
+  const list = activeSetlist();
+  const current = song(state.currentId);
+  if ($('#dashboardSetlistName')) $('#dashboardSetlistName').textContent = list?.name || 'Keine Setliste';
+  if ($('#dashboardSetlistCount')) $('#dashboardSetlistCount').textContent = `${(list?.songs || []).filter(id=>song(id)).length} Songs`;
+  if ($('#dashboardSongName')) $('#dashboardSongName').textContent = current?.title || 'Kein Song gewählt';
+  if ($('#dashboardSongMeta')) $('#dashboardSongMeta').textContent = current ? ([current.artist, meta(current)].filter(Boolean).join(' · ') || 'Im Player öffnen') : 'Song öffnen';
+  if ($('#dashboardLibraryCount')) $('#dashboardLibraryCount').textContent = `${state.songs.length} Songs`;
+  if ($('#dashboardFavoriteCount')) $('#dashboardFavoriteCount').textContent = String(state.favorites.size);
+  const host=$('#dashboardNextSongs'); if(host){
+    const ids=(list?.songs||[]).filter(id=>song(id));
+    const currentIndex=Math.max(0,ids.indexOf(state.currentId));
+    const next=ids.slice(currentIndex, currentIndex+5);
+    host.innerHTML=next.length?next.map((id,i)=>{const s=song(id);return `<li><button type="button" data-song="${esc(id)}"><span>${currentIndex+i+1}</span><strong>${esc(s.title)}</strong><small>${esc(s.artist||'')}</small></button></li>`}).join(''):'<li class="empty">Noch keine Songs in der aktiven Setliste.</li>';
+    host.querySelectorAll('button[data-song]').forEach(b=>b.onclick=()=>openSong(b.dataset.song));
+  }
 }
 
 function renderSetlistSelect() {
@@ -690,7 +726,7 @@ async function openSong(id, changeView = true) {
   $('#songMeta').textContent = [item.artist, item.genre, meta(item), semitones ? `Transponiert ${semitones > 0 ? '+' : ''}${semitones}` : ''].filter(Boolean).join(' · ');
   $('#songSheet').innerHTML = `<div class="song-render-content">${renderSong(item.content || item.lyrics || 'Noch kein Songblatt eingetragen. Tippe auf „Bearbeiten“.', semitones)}</div><svg id="annotationLayer" class="annotation-layer" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-label="Gesangsmarkierungen"></svg>`;
   renderAnnotations(item.id); setupAnnotationLayer();
-  renderTabs(item, semitones);
+  renderTabs(item, semitones); renderSectionJumps();
   await renderPdf(item);
   $('#notesSheet').innerHTML = item.notes?.trim() ? `<div class="notes-content">${esc(item.notes).replace(/\n/g, '<br>')}</div>` : '<p class="empty">Für diesen Song sind noch keine Notizen gespeichert.</p>';
   setPlayerPanel('lyrics');
@@ -753,8 +789,24 @@ function renderSongLine(line, semitones = 0) {
   return `<div class="chord-lyric-line">${segments.map(part => `<span class="chord-lyric-segment"><span class="chord-above">${part.chord ? esc(part.chord) : '&nbsp;'}</span><span class="lyric-below">${esc(part.text) || '&nbsp;'}</span></span>`).join('')}</div>`;
 }
 
+
+function stripTabBlocksFromSongText(text) {
+  const lines=String(text||'').split('\n'), out=[]; let inTab=false; let autoTabRun=[];
+  const isTabLine=line=>/^\s*(?:e|B|G|D|A|E)\s*\|/.test(line);
+  const flushAuto=()=>{ if(autoTabRun.length){ if(autoTabRun.filter(isTabLine).length<3) out.push(...autoTabRun); autoTabRun=[]; } };
+  for(const line of lines){
+    if(/^\s*\{(?:sot|start_of_tab)(?::\s*[^}]*)?\}\s*$/i.test(line)){ flushAuto(); inTab=true; continue; }
+    if(/^\s*\{(?:eot|end_of_tab)\}\s*$/i.test(line)){ inTab=false; continue; }
+    if(inTab) continue;
+    if(isTabLine(line) || (autoTabRun.length && /^\s*$/.test(line))){ autoTabRun.push(line); continue; }
+    flushAuto(); out.push(line);
+  }
+  flushAuto();
+  return out.join('\n');
+}
+
 function renderSong(text, semitones = 0) {
-  const lines = String(text).split('\n');
+  const lines = stripTabBlocksFromSongText(text).split('\n');
   const output = [];
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
@@ -892,9 +944,9 @@ function extractTabBlocks(text) {
   const tabLine = /^\s*(?:e|B|G|D|A|E)\s*\|/i;
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
-    const start = line.match(/^\s*\{start_of_tab(?::\s*([^}]+))?\}\s*$/i);
+    const start = line.match(/^\s*\{(?:sot|start_of_tab)(?::\s*([^}]+))?\}\s*$/i);
     if (start) { current = { name: start[1]?.trim() || `Tab ${blocks.length + 1}`, lines: [] }; continue; }
-    if (/^\s*\{end_of_tab\}\s*$/i.test(line)) { if (current?.lines.length) blocks.push(current); current = null; continue; }
+    if (/^\s*\{(?:eot|end_of_tab)\}\s*$/i.test(line)) { if (current?.lines.length) blocks.push(current); current = null; continue; }
     if (current) { current.lines.push(line); continue; }
     if (tabLine.test(line)) {
       const group = [];
@@ -917,31 +969,35 @@ function renderTabs(item, semitones = 0) {
     ? item.tabs.map((block, index) => ({ name: block.name || `Tab ${index + 1}`, lines: String(block.content || '').split('\n') }))
     : extractTabBlocks(item.content || item.lyrics || '');
   const host = $('#tabSheet');
-  if (!blocks.length) { host.innerHTML = '<p class="empty">Für diesen Song sind noch keine Tabs gespeichert. Im Editor können Tab-Blöcke mit <code>{start_of_tab: Intro}</code> und <code>{end_of_tab}</code> angelegt werden.</p>'; return; }
-  host.innerHTML = blocks.map((block, index) => `<details class="tab-block" ${index === 0 ? 'open' : ''}><summary>${esc(block.name)}</summary><div class="tab-scroll"><pre>${esc(block.lines.join('\n'))}</pre></div></details>`).join('');
+  if (!blocks.length) {
+    host.innerHTML = '<div class="empty"><p>Für diesen Song sind noch keine Tabs gespeichert.</p><p>Im Editor kannst du <code>{sot: Intro}</code> … <code>{eot}</code> verwenden.</p></div>';
+    return;
+  }
+  host.innerHTML = `<div class="tab-view-toolbar"><strong>🎸 Tabs</strong><span>Seitlich wischen zum Lesen</span><div><button type="button" id="tabFontDown" aria-label="Tab-Schrift kleiner">A−</button><button type="button" id="tabFontUp" aria-label="Tab-Schrift größer">A+</button></div></div>` +
+    blocks.map((block, index) => `<details class="tab-block" ${index === 0 ? 'open' : ''}><summary>${esc(block.name)}</summary><div class="tab-scroll" tabindex="0" aria-label="${esc(block.name)} Tabulatur – horizontal scrollbar"><pre>${esc(block.lines.join('\n'))}</pre></div></details>`).join('');
+  const change = delta => {
+    const current = Number(getComputedStyle(host).getPropertyValue('--tab-font').replace('px','')) || 14;
+    host.style.setProperty('--tab-font', `${Math.max(10,Math.min(22,current+delta))}px`);
+  };
+  $('#tabFontDown').onclick=()=>change(-1); $('#tabFontUp').onclick=()=>change(1);
 }
 
 function footswitchLabel(code) {
   return ({ Space:'Leertaste', ArrowRight:'Pfeil rechts', ArrowLeft:'Pfeil links', ArrowDown:'Pfeil unten', ArrowUp:'Pfeil oben', PageDown:'Bild ab', PageUp:'Bild auf', Enter:'Enter' })[code] || code || 'Nicht belegt';
 }
 function saveFootswitch() { localStorage.setItem(STORAGE.footswitch, JSON.stringify(state.footswitch)); updateFootswitchUI(); }
-function updateFootswitchUI() { $('#footswitchPlayValue').textContent = footswitchLabel(state.footswitch.play); $('#footswitchNextValue').textContent = footswitchLabel(state.footswitch.next); $('#footswitchPrevValue').textContent = footswitchLabel(state.footswitch.prev); }
+function updateFootswitchUI() { $('#footswitchPlayValue').textContent = footswitchLabel(state.footswitch.play); $('#footswitchNextValue').textContent = footswitchLabel(state.footswitch.next); $('#footswitchPrevValue').textContent = footswitchLabel(state.footswitch.prev); if($('#footActionPlay')) $('#footActionPlay').value=state.footswitch.actions?.scroll||'scroll'; if($('#footActionNext')) $('#footActionNext').value=state.footswitch.actions?.next||'next'; if($('#footActionPrev')) $('#footActionPrev').value=state.footswitch.actions?.prev||'prev'; }
 function openFootswitchSettings() { state.learningFootswitch = null; updateFootswitchUI(); $('#footswitchStatus').textContent = 'Zum Testen Player öffnen und Pedal drücken.'; $('#footswitchDialog').showModal(); }
 function beginFootswitchLearning(action) { state.learningFootswitch = action; $('#footswitchStatus').textContent = `Jetzt die Pedaltaste für ${action === 'play' ? 'Start / Pause' : action === 'next' ? 'Nächster Song' : 'Vorheriger Song'} drücken …`; }
 function resetFootswitch() { state.footswitch = { play:'Space', next:'ArrowRight', prev:'ArrowLeft' }; saveFootswitch(); $('#footswitchStatus').textContent = 'Standardbelegung wiederhergestellt.'; }
 function handleFootswitchKey(event) {
-  if (state.learningFootswitch) {
-    event.preventDefault(); state.footswitch[state.learningFootswitch] = event.code; const learned = state.learningFootswitch; state.learningFootswitch = null; saveFootswitch(); $('#footswitchStatus').textContent = `${learned === 'play' ? 'Start / Pause' : learned === 'next' ? 'Nächster Song' : 'Vorheriger Song'} wurde auf „${footswitchLabel(event.code)}“ gelegt.`; return;
-  }
-  const target = event.target;
-  if (target?.matches?.('input, textarea, select, [contenteditable="true"]') || document.querySelector('dialog[open]')) return;
-  if (!$('#playerView')?.classList.contains('active')) return;
-  let handled = true;
-  if (event.code === state.footswitch.play) toggleScroll();
-  else if (event.code === state.footswitch.next) stepSong(1);
-  else if (event.code === state.footswitch.prev) stepSong(-1);
-  else handled = false;
-  if (handled) event.preventDefault();
+  if (state.learningFootswitch) return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
+  const map = [['play','scroll'],['next','next'],['prev','prev']];
+  const found = map.find(([slot]) => state.footswitch[slot] === event.code);
+  if (!found) return;
+  event.preventDefault();
+  runFootAction(state.footswitch.actions?.[found[0]] || found[1]);
 }
 
 function changeTranspose(delta) {
@@ -961,6 +1017,13 @@ function openCurrentSongOnChordie() {
 }
 
 function stepSong(delta) { const order = activeSetlist()?.songs.filter(id => song(id)) || []; const fallback = state.songs.map(item => item.id); const ids = order.includes(state.currentId) ? order : fallback; if (!ids.length) return; let index = ids.indexOf(state.currentId); if (index < 0) index = 0; openSong(ids[(index + delta + ids.length) % ids.length]); }
+
+
+function insertEditorText(text) {
+  const field=$('#editContent'); if(!field) return;
+  const start=field.selectionStart ?? field.value.length, end=field.selectionEnd ?? start;
+  field.setRangeText(text,start,end,'end'); field.focus();
+}
 
 function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editChordieUrl').value = item.source?.url || item.chordieUrl || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editNotes').value = item.notes || ''; $('#editContent').value = item.content || item.lyrics || ''; updateEditorPdfStatus(item); $('#songEditor').showModal(); }
 
@@ -1087,7 +1150,7 @@ function importBackupData(data) {
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.5", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-5-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: "9.6.7", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-7-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 async function estimatePdfPageCount(blob) {
@@ -1197,6 +1260,74 @@ function tapTempo() {
   if (state.tapTimes.length >= 2) { const intervals = state.tapTimes.slice(1).map((t,i)=>t-state.tapTimes[i]); const avg = intervals.reduce((a,b)=>a+b,0)/intervals.length; const bpm = Math.max(30, Math.min(260, Math.round(60000/avg))); $('#metronomeBpm').value=bpm; saveCurrentMetronomeSettings(); }
 }
 
+
+function saveFootswitchActions(){
+  state.footswitch.actions = {
+    scroll: $('#footActionPlay')?.value || 'scroll',
+    next: $('#footActionNext')?.value || 'next',
+    prev: $('#footActionPrev')?.value || 'prev'
+  };
+  saveFootswitch();
+}
+function runFootAction(action){
+  if(action==='scroll') toggleScroll();
+  else if(action==='next') nextSong(1);
+  else if(action==='prev') nextSong(-1);
+  else if(action==='metronome') toggleMetronome();
+  else if(action==='countin') startCountIn();
+  else if(action==='sectionNext') jumpRelativeSection(1);
+  else if(action==='sectionPrev') jumpRelativeSection(-1);
+  else if(action==='pdfNext') pdfPageStep(1);
+  else if(action==='pdfPrev') pdfPageStep(-1);
+}
+function toggleGigMode(){
+  state.live.gigMode=!state.live.gigMode;
+  document.body.classList.toggle('gig-mode', state.live.gigMode);
+  $('#gigModeBtn').textContent=state.live.gigMode?'Gig-Modus beenden':'Gig-Modus';
+  if(state.live.gigMode) switchView('player');
+}
+function songSections(){
+  const item=song(state.currentId); if(!item) return [];
+  const text=String(item.content||item.lyrics||'');
+  const re=/^\s*(?:\[([^\]]+)\]|\{(?:start_of_)?(?:section|chorus|verse|bridge|solo|intro|outro)(?::\s*([^}]+))?\})\s*$/gim;
+  const out=[]; let m;
+  while((m=re.exec(text))) { const name=(m[1]||m[2]||'Abschnitt').trim(); if(!out.some(x=>x.name===name)) out.push({name}); }
+  return out;
+}
+function renderSectionJumps(){
+  const host=$('#sectionJumpBar'); if(!host) return; const sections=songSections();
+  host.innerHTML=sections.length?sections.map((s,i)=>`<button type="button" data-section-index="${i}">${esc(s.name)}</button>`).join(''):'<span class="hint">Sprungmarken entstehen automatisch aus Abschnittsüberschriften wie [Intro], [Refrain], [Solo] oder [Outro].</span>';
+  host.querySelectorAll('button').forEach(b=>b.onclick=()=>jumpToSection(Number(b.dataset.sectionIndex)));
+}
+function jumpToSection(index){
+  const sections=songSections(); if(!sections.length) return; index=Math.max(0,Math.min(sections.length-1,index)); state.live.sectionIndex=index;
+  const labels=[...$('#songSheet').querySelectorAll('.section-label,h2,h3,strong')]; const name=sections[index].name.toLowerCase();
+  const el=labels.find(x=>x.textContent.trim().toLowerCase().includes(name));
+  if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); else $('#songSheet').scrollTop=($('#songSheet').scrollHeight/sections.length)*index;
+  renderSectionJumps();
+}
+function jumpRelativeSection(delta){ const s=songSections(); if(s.length) jumpToSection((state.live.sectionIndex+delta+s.length)%s.length); }
+function pdfPageStep(delta){
+  if(activePanelName()!=='pdf') setPlayerPanel('pdf');
+  state.pdfScroll.page=Math.max(1,Math.min(state.pdfScroll.pages||999,state.pdfScroll.page+delta));
+  const frame=$('#pdfFrame'); if(frame?.src){ const base=frame.src.split('#')[0]; frame.src=`${base}#page=${state.pdfScroll.page}&view=FitH`; }
+}
+function cancelCountIn(){
+  clearTimeout(state.live.countInTimer); state.live.countInTimer=null; state.live.countInBeat=0;
+  const o=$('#countInStatus'); if(o) o.textContent='';
+}
+function startCountIn(){
+  cancelCountIn(); ensureMetronomeAudio();
+  const m=currentMetronomeSettings(), bars=Number($('#countInBars')?.value||2), total=bars*m.meter;
+  let beat=0; const status=$('#countInStatus');
+  const tick=()=>{
+    const inBar=beat%m.meter; if(status) status.textContent=`${Math.floor(beat/m.meter)+1}/${bars} · ${inBar+1}`;
+    metronomeClick(inBar===0); renderMetronomeBeats(m.meter,inBar); beat++;
+    if(beat<total) state.live.countInTimer=setTimeout(tick,60000/m.bpm);
+    else state.live.countInTimer=setTimeout(()=>{ cancelCountIn(); if($('#countInAutoScroll')?.checked&&!state.scrolling) startScroll(); },60000/m.bpm);
+  }; tick();
+}
+
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
 function startScroll() {
   const name = activePanelName();
@@ -1277,18 +1408,24 @@ function resetDisplaySettings() {
 }
 
 
-const TUTORIAL_KEY = 'band-v96-tutorial-seen';
+const TUTORIAL_KEY = 'band-v966-tutorial-seen';
 const TUTORIAL_STEPS = [
-  { icon:'👋', title:'Willkommen', text:'Das ist dein digitales Songbook für Probe und Bühne. In wenigen Schritten zeigen wir dir die wichtigsten Funktionen.' },
-  { target:'#menuBtn', icon:'☰', title:'Navigation', text:'Über das Menü erreichst du Setlisten, alle Songs, Favoriten, den Player, das Akkordlexikon und diese Hilfe.' },
-  { target:'#setlistSelect', icon:'📋', title:'Setlisten', text:'Wähle hier deine aktive Setliste. Songs lassen sich in der Liste am Griff ⠿ per Drag & Drop in die richtige Reihenfolge bringen.' },
-  { target:'#addSongBtn', icon:'＋', title:'Songs hinzufügen', text:'Füge Songs aus deiner Bibliothek zur aktiven Setliste hinzu. Weitere Dateien und PDFs kannst du unter Hinweise importieren.' },
-  { target:'#settingsBtn', icon:'Aa', title:'Anzeige anpassen', text:'Hier stellst du Lyrics-Größe, App-Schrift, Zeilenabstand, Akkordfarbe, Dark Mode und den Bluetooth-Fußschalter ein.' },
-  { target:'.player-tabs', view:'player', icon:'🎤', title:'Song, Tabs, Notizen & PDF', text:'Im Player wechselst du zwischen Songtext, Gitarren-Tabs, persönlichen Notizen und einem hinterlegten PDF.' },
-  { target:'.song-tools', view:'player', icon:'♯', title:'Transponieren & markieren', text:'Akkorde kannst du live höher oder tiefer setzen. Mit ✍ Markieren zeichnest du Gesangsphrasierungen direkt auf das Songblatt.' },
-  { target:'#startStopBtn', view:'player', icon:'▶️', title:'Bühnenmodus & Autoscroll', text:'Start bewegt nur das Songblatt. Auf dem Handy verschwinden die Bedienelemente; ein Tipp auf den Song blendet sie wieder ein.' },
-  { target:'#prevSongBtn', view:'player', icon:'🦶', title:'Fußschalter', text:'Ein Bluetooth-Pedal kann Start/Pause sowie nächsten und vorherigen Song steuern. Die Pedaltasten lernst du im Aa-Menü an.' },
-  { target:'#exportSetlistBtn', view:'setlists', icon:'↗', title:'Setliste teilen', text:'Teile die aktive Setliste als Datei mit anderen Bandmitgliedern. Beim Import erkennt die App Song, Setliste oder Backup automatisch.' }
+  { view:'dashboard', target:'#dashboardView', icon:'🏠', title:'Übersicht', text:'Die App startet jetzt auf dem Dashboard. Hier siehst du aktive Setliste, letzten Song, Bibliothek, Favoriten und die nächsten Songs.' },
+  { view:'dashboard', target:'#dashboardGigBtn', icon:'🎤', title:'Gig direkt starten', text:'Mit Gig starten wechselst du unmittelbar in den reduzierten Live-Player.' },
+  { view:'setlists', target:'#setlistSelect', icon:'📋', title:'Setlisten', text:'Wähle deine aktive Setliste und verschiebe Songs am Griff ⠿ per Drag & Drop.' },
+  { view:'setlists', target:'#exportSetlistBtn', icon:'↗', title:'Setliste teilen', text:'Teile eine Setliste als Datei. Beim Import erkennt die App automatisch Song, Setliste oder Backup.' },
+  { view:'library', target:'#searchInput', icon:'🔎', title:'Bibliothek', text:'Hier suchst du nach Titel, Interpret, Genre oder Tags und öffnest einen Song.' },
+  { view:'player', target:'.player-tabs', icon:'🎤', title:'Player-Ansichten', text:'Song, Tabs, Notizen und PDF haben getrennte Seiten. Das verhindert, dass breite Tabs den Liedtext auf dem Handy zerstören.' },
+  { view:'player', panel:'tabs', target:'#tabSheet', icon:'🎸', title:'Optimierte Tabs', text:'Tabs werden in einer eigenen Monospace-Ansicht dargestellt. Du kannst horizontal wischen und die Tab-Schrift mit A−/A+ anpassen.' },
+  { view:'player', panel:'lyrics', target:'#editSongBtn', icon:'✎', title:'Song bearbeiten', text:'Im Editor kannst du Lyrics, Akkorde, Tabs, Notizen und PDF eines bestehenden Songs bearbeiten.' },
+  { view:'player', panel:'lyrics', target:'.song-tools', icon:'♯', title:'Akkorde & Markierungen', text:'Transponiere Akkorde oder zeichne Gesangsphrasierungen direkt auf das Songblatt.' },
+  { view:'player', target:'#liveTools', icon:'🎤', title:'Live Performance', text:'Gig-Modus, Count-in und Sprungmarken bündeln die wichtigsten Bühnenfunktionen.' },
+  { view:'player', target:'#countInControls', icon:'⏱', title:'Count-in', text:'Einzählen mit 1, 2 oder 4 Takten und optional danach automatisch Autoscroll starten.' },
+  { view:'player', target:'#sectionJumpBar', icon:'📍', title:'Sprungmarken', text:'Intro, Refrain, Solo und Outro können als schnelle Sprungziele erscheinen.' },
+  { view:'player', target:'.metronome', icon:'♩', title:'Metronom', text:'Metronom, Tap Tempo, Taktart und BPM funktionieren unabhängig vom Autoscroll.' },
+  { view:'player', target:'#startStopBtn', icon:'▶️', title:'Autoscroll', text:'Die Scrollgeschwindigkeit wird pro Song gespeichert und aus BPM plus Zeilenabstand vorbelegt.' },
+  { view:'player', panel:'pdf', target:'#pdfSheet', icon:'📄', title:'PDF', text:'PDFs können an bestehende Songs gehängt und ebenfalls automatisch gescrollt werden.' },
+  { view:'player', target:'#footswitchSettingsBtn', action:'footswitch', icon:'🦶', title:'Fußschalter', text:'Pedaltasten können Aktionen wie Play, Songwechsel, Metronom, Count-in, Abschnitt oder PDF-Seite auslösen.' }
 ];
 let tutorialIndex = 0;
 function startTutorial(force=false){
@@ -1298,7 +1435,10 @@ function startTutorial(force=false){
 function tutorialTarget(step){ return step.target ? document.querySelector(step.target) : null; }
 function showTutorialStep(){
   const step=TUTORIAL_STEPS[tutorialIndex]; if(!step) return finishTutorial();
+  document.querySelectorAll('dialog[open]').forEach(d=>d.close());
   if(step.view) switchView(step.view);
+  if(step.panel) setPlayerPanel(step.panel);
+  if(step.action==='footswitch') { openFootswitchSettings(); }
   $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight'));
   $('#tutorialIcon').textContent=step.icon; $('#tutorialTitle').textContent=step.title; $('#tutorialText').textContent=step.text;
   $('#tutorialStepLabel').textContent=`${tutorialIndex+1} / ${TUTORIAL_STEPS.length}`;

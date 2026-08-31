@@ -1,0 +1,13 @@
+Aussteiger Band-App v9.6.7 – Live Performance
+
+Neu:
+- Gig-Modus
+- Count-in 1/2/4 Takte mit BPM/Taktart des Songs
+- optional Autoscroll nach Count-in
+- Sprungmarken aus Songabschnitten
+- erweitertes Fußschalter-Mapping
+- Tutorial auf 16 Schritte erweitert
+- Tutorial öffnet jeweils die referenzierte Seite/Player-Ansicht
+- Metronom und PDF-Autoscroll aus v9.6.5 enthalten
+
+GitHub Pages: ZIP-Inhalt ins Repository übernehmen und deployen.
