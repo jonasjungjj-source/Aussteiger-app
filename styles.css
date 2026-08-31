@@ -362,7 +362,7 @@ body.player-mode .transport{position:fixed;bottom:0}
 /* Version 9.6.2: collapsible player controls + compact mobile mini bar */
 .transport-collapse-row{display:flex;justify-content:center;max-width:960px;margin:0 auto 7px}
 .transport-toggle{min-height:36px;padding:.35rem .8rem;border-radius:999px;font-size:.9em;font-weight:800}
-.transport-mini{max-width:960px;margin:auto;display:grid;grid-template-columns:repeat(5,minmax(44px,1fr));gap:7px}
+.transport-mini{max-width:960px;margin:auto;display:grid;grid-template-columns:repeat(6,minmax(44px,1fr));gap:7px}
 .transport-mini[hidden],.transport-full[hidden]{display:none!important}
 .transport-mini button{min-height:48px;padding:.45rem .35rem;font-size:1.05em}
 body.transport-collapsed main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
@@ -370,7 +370,7 @@ body.transport-collapsed main{padding-bottom:calc(110px + env(safe-area-inset-bo
   .transport{padding:7px 8px calc(7px + env(safe-area-inset-bottom))}
   .transport-collapse-row{margin-bottom:5px}
   .transport-toggle{min-height:34px;padding:.25rem .7rem;font-size:.82em}
-  .transport-mini{grid-template-columns:52px minmax(64px,1.4fr) 52px 48px 48px;gap:5px}
+  .transport-mini{grid-template-columns:48px minmax(58px,1.35fr) 48px 44px 44px 44px;gap:5px}
   .transport-mini button{min-height:46px;font-size:1em}
   body.playback-focus .topbar,
   body.playback-focus #playerView .player-head,
@@ -396,3 +396,9 @@ body.transport-collapsed main{padding-bottom:calc(110px + env(safe-area-inset-bo
 .speed-label span small{display:block;font-size:.78em;font-weight:500;margin-top:2px}
 .speed-auto-btn{min-height:40px;padding:.45rem .7rem}
 @media(max-width:600px){.speed-label{grid-template-columns:minmax(0,1fr) auto auto}.speed-label span{grid-column:1/-1}.speed-auto-btn{min-height:44px}}
+
+/* Version 9.6.5: metronome + PDF autoscroll */
+.metronome{max-width:960px;margin:10px auto 0;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--surface-2) 62%,transparent)}
+.metronome-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.metronome-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.metronome-controls label{display:flex;align-items:center;gap:6px;font-size:.9em}.metronome-controls input[type=number]{width:76px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);padding:0 8px}.metronome-controls select{min-height:44px}.metronome-sound{min-height:44px;padding:0 8px}.metronome-beats{display:flex;align-items:center;gap:6px;min-height:20px}.metronome-beats i{display:block;width:10px;height:10px;border-radius:50%;background:var(--line);transition:transform .07s ease,background .07s ease}.metronome-beats i.active{background:var(--accent);transform:scale(1.45)}
+.pdf-scroll-viewer{height:68vh;overflow:hidden;position:relative;border-radius:10px;background:#fff;overscroll-behavior:contain}.pdf-scroll-viewer .pdf-frame{height:100%;border-radius:0}.pdf-scroll-status{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:.45rem 0;color:var(--muted);font-size:.84em}.pdf-scroll-status strong{color:var(--text)}
+@media(max-width:600px){.metronome{padding:9px}.metronome-head{margin-bottom:6px}.metronome-controls{display:grid;grid-template-columns:1fr 1fr}.metronome-controls label{justify-content:space-between}.metronome-controls label.metronome-sound{justify-content:flex-start}.metronome-controls #metronomeStartBtn,.metronome-controls #metronomeTapBtn{width:100%}.pdf-scroll-viewer{height:70vh}}

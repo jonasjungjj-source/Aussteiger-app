@@ -14,7 +14,8 @@ const STORAGE = {
   importedSongs: 'band-v6-imported-songs',
   footswitch: 'band-v9-footswitch',
   annotations: 'band-v9-annotations',
-  transportCollapsed: 'band-v9-transport-collapsed'
+  transportCollapsed: 'band-v9-transport-collapsed',
+  metronome: 'band-v965-metronome'
 };
 
 const state = {
@@ -25,7 +26,9 @@ const state = {
   scrolling: false, lastTs: 0, overrides: {}, favorites: new Set(),
   libraries: [], importedSongs: [],
   footswitch: { play: 'Space', next: 'ArrowRight', prev: 'ArrowLeft' }, learningFootswitch: null,
-  annotations: {}, annotationMode: false, activeStroke: null
+  annotations: {}, annotationMode: false, activeStroke: null,
+  metronomeSettings: {}, metronomeRunning: false, metronomeTimer: null, metronomeBeat: 0, metronomeAudio: null, tapTimes: [],
+  pdfScroll: { page: 1, pages: 0, fallbackProgress: 0 }
 };
 
 async function getJSON(path) {
@@ -64,6 +67,7 @@ function loadLocalState() {
   state.footswitch = { ...state.footswitch, ...safeParse(localStorage.getItem(STORAGE.footswitch), {}) };
   state.annotations = safeParse(localStorage.getItem(STORAGE.annotations), {});
   state.songSpeeds = safeParse(localStorage.getItem(STORAGE.songSpeeds), {});
+  state.metronomeSettings = safeParse(localStorage.getItem(STORAGE.metronome), {});
 }
 
 function mergeSongs() {
@@ -473,7 +477,7 @@ async function init() {
     loadLocalState(); mergeSongs(); bindUI(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.4', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.5', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -494,7 +498,7 @@ function bindUI() {
   $('#resetSetlistBtn').onclick = resetActiveSetlist;
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
-  $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = () => { const panel = activeScrollPanel(); if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' }); };
+  $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = scrollActiveToTop;
   $('#transportToggleBtn').onclick = () => setTransportCollapsed(!document.body.classList.contains('transport-collapsed'), true);
   $('#miniStartStopBtn').onclick = toggleScroll; $('#miniPrevBtn').onclick = () => stepSong(-1); $('#miniNextBtn').onclick = () => stepSong(1); $('#miniTransposeDownBtn').onclick = () => changeTranspose(-1); $('#miniTransposeUpBtn').onclick = () => changeTranspose(1);
   $('#lyricsTabBtn').onclick = () => setPlayerPanel('lyrics'); $('#tabsTabBtn').onclick = () => setPlayerPanel('tabs'); $('#notesTabBtn').onclick = () => setPlayerPanel('notes'); $('#pdfTabBtn').onclick = () => setPlayerPanel('pdf');
@@ -515,6 +519,8 @@ function bindUI() {
     if (state.currentId) { state.songSpeeds[state.currentId] = state.scrollSpeed; saveSongSpeeds(); }
   };
   $('#speedAutoBtn').onclick = resetCurrentSongSpeedToAuto;
+  $('#metronomeStartBtn').onclick = toggleMetronome; $('#miniMetronomeBtn').onclick = toggleMetronome; $('#metronomeTapBtn').onclick = tapTempo;
+  $('#metronomeBpm').onchange = saveCurrentMetronomeSettings; $('#metronomeMeter').onchange = saveCurrentMetronomeSettings; $('#metronomeSound').onchange = saveCurrentMetronomeSettings;
   ['darkToggle','contrastToggle','uiFontRange','fontRange','lineRange','chordColor'].forEach(id => $(`#${id}`).oninput = saveSettings);
   $('#resetDisplayBtn').onclick = resetDisplaySettings;
   $('#footswitchSettingsBtn').onclick = openFootswitchSettings; $('#learnPlayKeyBtn').onclick = () => beginFootswitchLearning('play'); $('#learnNextKeyBtn').onclick = () => beginFootswitchLearning('next'); $('#learnPrevKeyBtn').onclick = () => beginFootswitchLearning('prev'); $('#resetFootswitchBtn').onclick = resetFootswitch;
@@ -678,6 +684,7 @@ function resetActiveSetlist() { const list = activeSetlist(); if (!list || !conf
 async function openSong(id, changeView = true) {
   const item = song(id); if (!item) return; stopScroll(); state.currentId = id; localStorage.setItem(STORAGE.current, id);
   applySpeedForSong(item);
+  applyMetronomeForSong(item);
   const semitones = Number(item.transpose || 0);
   $('#songTitle').textContent = item.title;
   $('#songMeta').textContent = [item.artist, item.genre, meta(item), semitones ? `Transponiert ${semitones > 0 ? '+' : ''}${semitones}` : ''].filter(Boolean).join(' · ');
@@ -776,7 +783,8 @@ async function renderPdf(item) {
     const blob = await getPdfBlob(item.id);
     if (!blob) throw new Error('PDF-Datei nicht mehr im lokalen Speicher gefunden');
     activePdfObjectUrl = URL.createObjectURL(blob);
-    host.innerHTML = `<div class="pdf-actions"><a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">📄 PDF separat öffnen</a><small>${esc(item.pdfName || 'Song-PDF')}</small></div><iframe class="pdf-frame" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#view=FitH"></iframe>`;
+    state.pdfScroll.pages = await estimatePdfPageCount(blob); state.pdfScroll.page = 1; state.pdfScroll.fallbackProgress = 0;
+    host.innerHTML = `<div class="pdf-actions"><a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">📄 PDF separat öffnen</a><small>${esc(item.pdfName || 'Song-PDF')}</small></div><div class="pdf-scroll-status"><span>▶ Auto-Scroll funktioniert auch in der PDF-Ansicht.</span><strong id="pdfPageStatus">Seite 1${state.pdfScroll.pages ? ` / ${state.pdfScroll.pages}` : ''}</strong></div><div class="pdf-scroll-viewer" id="pdfScrollViewer"><iframe id="pdfFrame" class="pdf-frame" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#page=1&view=FitH"></iframe></div>`;
   } catch (error) {
     host.innerHTML = `<p class="empty">PDF konnte nicht geladen werden: ${esc(error.message)}</p>`;
   }
@@ -823,7 +831,7 @@ function clearCurrentAnnotations() {
 
 function setPlayerPanel(name) {
   const names = ['lyrics', 'tabs', 'notes', 'pdf'];
-  if (state.scrolling && name !== 'lyrics') stopScroll();
+  if (state.scrolling && !['lyrics','pdf'].includes(name)) stopScroll();
   names.forEach(panel => {
     const element = document.querySelector(`[data-panel="${panel}"]`);
     const button = $(`#${panel === 'lyrics' ? 'lyricsTabBtn' : panel === 'tabs' ? 'tabsTabBtn' : panel === 'notes' ? 'notesTabBtn' : 'pdfTabBtn'}`);
@@ -835,8 +843,13 @@ function setPlayerPanel(name) {
 
 function activeScrollPanel() {
   const active = document.querySelector('#playerView .player-panel.active:not([hidden])');
-  if (!active || active.dataset.panel === 'pdf') return $('#songSheet');
+  if (!active) return $('#songSheet');
+  if (active.dataset.panel === 'pdf') return $('#pdfScrollViewer') || active;
   return active;
+}
+
+function activePanelName() {
+  return document.querySelector('#playerView .player-panel.active:not([hidden])')?.dataset?.panel || 'lyrics';
 }
 
 function isCompactPlayback() {
@@ -1070,21 +1083,129 @@ function importBackupData(data) {
   if (Array.isArray(data.favorites)) state.favorites=new Set(data.favorites);
   if (data.activeSetlistId && state.setlists.some(list=>list.id===data.activeSetlistId)) state.activeSetlistId=data.activeSetlistId;
   if (data.display) localStorage.setItem(STORAGE.display,JSON.stringify(data.display));
-  if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); }
+  if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); }
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.4", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-4-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
-async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
+function exportData() { const data = { version: "9.6.5", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-5-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
+
+async function estimatePdfPageCount(blob) {
+  try {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const sample = new TextDecoder('latin1').decode(bytes);
+    const matches = sample.match(/\/Type\s*\/Page\b/g);
+    return Math.max(0, matches?.length || 0);
+  } catch { return 0; }
+}
+
+function updatePdfPageStatus() {
+  const status = $('#pdfPageStatus');
+  if (status) status.textContent = `Seite ${state.pdfScroll.page}${state.pdfScroll.pages ? ` / ${state.pdfScroll.pages}` : ''}`;
+}
+
+function setPdfPage(page) {
+  const frame = $('#pdfFrame'); if (!frame || !activePdfObjectUrl) return;
+  const max = state.pdfScroll.pages || 100;
+  state.pdfScroll.page = Math.max(1, Math.min(max, page));
+  frame.src = `${activePdfObjectUrl}#page=${state.pdfScroll.page}&view=FitH`;
+  updatePdfPageStatus();
+}
+
+function scrollPdfBy(distance) {
+  const frame = $('#pdfFrame');
+  if (!frame) return true;
+  // On Safari and some Android viewers the PDF frame can be scrolled directly.
+  try {
+    const win = frame.contentWindow;
+    const doc = win?.document;
+    const root = doc?.scrollingElement || doc?.documentElement;
+    if (win && root && root.scrollHeight > root.clientHeight + 2) {
+      win.scrollBy(0, distance);
+      return root.scrollTop + root.clientHeight >= root.scrollHeight - 3;
+    }
+  } catch (_) { /* Browser PDF viewer is isolated; use page-advance fallback below. */ }
+  // Chrome often isolates its built-in PDF viewer. In that case advance pages
+  // after roughly one visible-page worth of auto-scroll distance.
+  state.pdfScroll.fallbackProgress += distance;
+  const pageDistance = Math.max(520, ($('#pdfScrollViewer')?.clientHeight || 700) * 0.92);
+  if (state.pdfScroll.fallbackProgress >= pageDistance) {
+    state.pdfScroll.fallbackProgress = 0;
+    if (state.pdfScroll.pages && state.pdfScroll.page >= state.pdfScroll.pages) return true;
+    setPdfPage(state.pdfScroll.page + 1);
+  }
+  return false;
+}
+
+function scrollActiveToTop() {
+  if (activePanelName() === 'pdf') { state.pdfScroll.fallbackProgress = 0; setPdfPage(1); try { $('#pdfFrame')?.contentWindow?.scrollTo(0, 0); } catch (_) {} return; }
+  const panel = activeScrollPanel(); if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function currentMetronomeSettings(item = song(state.currentId)) {
+  const saved = state.metronomeSettings[item?.id] || {};
+  return { bpm: Math.max(30, Math.min(260, Number(saved.bpm || item?.bpm || 100))), meter: [3,4,6].includes(Number(saved.meter)) ? Number(saved.meter) : 4, sound: saved.sound !== false };
+}
+function saveMetronomeState() { localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); }
+function applyMetronomeForSong(item = song(state.currentId)) {
+  if (!item) return; const m = currentMetronomeSettings(item);
+  if ($('#metronomeBpm')) $('#metronomeBpm').value = m.bpm;
+  if ($('#metronomeMeter')) $('#metronomeMeter').value = String(m.meter);
+  if ($('#metronomeSound')) $('#metronomeSound').checked = m.sound;
+  renderMetronomeBeats(m.meter, 0);
+}
+function saveCurrentMetronomeSettings() {
+  const item = song(state.currentId); if (!item) return;
+  const bpm = Math.max(30, Math.min(260, Number($('#metronomeBpm').value) || Number(item.bpm) || 100));
+  const meter = [3,4,6].includes(Number($('#metronomeMeter').value)) ? Number($('#metronomeMeter').value) : 4;
+  const sound = $('#metronomeSound').checked;
+  state.metronomeSettings[item.id] = { bpm, meter, sound }; saveMetronomeState(); renderMetronomeBeats(meter, state.metronomeBeat);
+  if (state.metronomeRunning) { stopMetronome(); startMetronome(); }
+}
+function renderMetronomeBeats(meter, active = 0) {
+  const host = $('#metronomeBeatDisplay'); if (!host) return;
+  host.innerHTML = Array.from({length: meter}, (_, i) => `<i class="${i === active ? 'active' : ''}"></i>`).join('');
+}
+function ensureMetronomeAudio() {
+  if (!state.metronomeAudio) { const Ctx = window.AudioContext || window.webkitAudioContext; if (Ctx) state.metronomeAudio = new Ctx(); }
+  if (state.metronomeAudio?.state === 'suspended') state.metronomeAudio.resume();
+  return state.metronomeAudio;
+}
+function metronomeClick(accent = false) {
+  const settings = currentMetronomeSettings(); if (!settings.sound) return; const ctx = ensureMetronomeAudio(); if (!ctx) return;
+  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.frequency.value = accent ? 1250 : 880; gain.gain.setValueAtTime(accent ? 0.16 : 0.09, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.055);
+  osc.connect(gain).connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.06);
+}
+function metronomeTick() {
+  if (!state.metronomeRunning) return; const m = currentMetronomeSettings();
+  renderMetronomeBeats(m.meter, state.metronomeBeat); metronomeClick(state.metronomeBeat === 0);
+  state.metronomeBeat = (state.metronomeBeat + 1) % m.meter;
+  state.metronomeTimer = setTimeout(metronomeTick, 60000 / m.bpm);
+}
+function startMetronome() {
+  if (state.metronomeRunning) return; ensureMetronomeAudio(); state.metronomeRunning = true; state.metronomeBeat = 0; metronomeTick();
+  $('#metronomeStartBtn').textContent = '⏸ Metronom'; $('#miniMetronomeBtn').textContent = '⏸'; $('#miniMetronomeBtn').classList.add('primary');
+}
+function stopMetronome() {
+  state.metronomeRunning = false; clearTimeout(state.metronomeTimer); state.metronomeTimer = null;
+  $('#metronomeStartBtn').textContent = '▶ Metronom'; $('#miniMetronomeBtn').textContent = '♩'; $('#miniMetronomeBtn').classList.remove('primary'); renderMetronomeBeats(currentMetronomeSettings().meter, 0);
+}
+function toggleMetronome() { state.metronomeRunning ? stopMetronome() : startMetronome(); }
+function tapTempo() {
+  const now = performance.now(); state.tapTimes = [...state.tapTimes.filter(t => now - t < 2500), now].slice(-5);
+  if (state.tapTimes.length >= 2) { const intervals = state.tapTimes.slice(1).map((t,i)=>t-state.tapTimes[i]); const avg = intervals.reduce((a,b)=>a+b,0)/intervals.length; const bpm = Math.max(30, Math.min(260, Math.round(60000/avg))); $('#metronomeBpm').value=bpm; saveCurrentMetronomeSettings(); }
+}
 
 function toggleScroll() { state.scrolling ? stopScroll() : startScroll(); }
 function startScroll() {
+  const name = activePanelName();
+  if (!['lyrics','pdf'].includes(name)) setPlayerPanel('lyrics');
   const panel = activeScrollPanel();
   if (!panel) return;
-  if (panel.dataset.panel !== 'lyrics') setPlayerPanel('lyrics');
   state.scrolling = true;
   state.lastTs = performance.now();
-  $('#startStopBtn').textContent = '⏸ Pause';
+  $('#startStopBtn').textContent = name === 'pdf' ? '⏸ PDF Pause' : '⏸ Pause';
   syncMiniPlayerButtons();
   setPlaybackChromeHidden(true);
   requestAnimationFrame(scrollFrame);
@@ -1098,12 +1219,17 @@ function stopScroll() {
 }
 function scrollFrame(timestamp) {
   if (!state.scrolling) return;
-  const panel = activeScrollPanel();
-  if (!panel) { stopScroll(); return; }
   const delta = Math.min((timestamp - state.lastTs) / 1000, 0.1);
   state.lastTs = timestamp;
-  panel.scrollTop += state.scrollSpeed * delta;
-  if (panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 3) { stopScroll(); return; }
+  const distance = state.scrollSpeed * delta;
+  if (activePanelName() === 'pdf') {
+    if (scrollPdfBy(distance)) { stopScroll(); return; }
+  } else {
+    const panel = activeScrollPanel();
+    if (!panel) { stopScroll(); return; }
+    panel.scrollTop += distance;
+    if (panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 3) { stopScroll(); return; }
+  }
   requestAnimationFrame(scrollFrame);
 }
 
