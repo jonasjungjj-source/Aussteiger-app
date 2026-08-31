@@ -481,7 +481,7 @@ async function init() {
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
     switchView('dashboard');
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.7', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.8', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -534,6 +534,12 @@ function bindUI() {
   };
   $('#speedAutoBtn').onclick = resetCurrentSongSpeedToAuto;
   $('#metronomeStartBtn').onclick = toggleMetronome; $('#miniMetronomeBtn').onclick = toggleMetronome; $('#metronomeTapBtn').onclick = tapTempo;
+  $('#miniMoreBtn').onclick = () => {
+    document.body.classList.remove('playback-focus');
+    setTransportCollapsed(false, true);
+    updatePlayerLayout();
+  };
+
   $('#metronomeBpm').onchange = saveCurrentMetronomeSettings; $('#metronomeMeter').onchange = saveCurrentMetronomeSettings; $('#metronomeSound').onchange = saveCurrentMetronomeSettings;
   $('#gigModeBtn').onclick = toggleGigMode; $('#countInBtn').onclick = startCountIn;
   ['Play','Next','Prev'].forEach(k => { const el=$(`#footAction${k}`); if(el) el.onchange=saveFootswitchActions; });
@@ -547,7 +553,7 @@ function bindUI() {
   $$('.player-panel').forEach(panel => panel.addEventListener('click', handlePlayerPanelTap));
 }
 
-function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); renderDashboard(); }
+function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); renderDashboard(); requestAnimationFrame(updatePlayerLayout); }
 function openDrawer() { $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#backdrop').hidden = false; }
 function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); $('#backdrop').hidden = true; }
 function switchView(name) {
@@ -556,6 +562,7 @@ function switchView(name) {
   $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', player:'Player', about:'Hinweise' }[name];
   document.body.classList.toggle('player-mode', name === 'player');
   if (name !== 'player') setPlaybackChromeHidden(false);
+  requestAnimationFrame(updatePlayerLayout);
   closeDrawer();
 }
 
@@ -891,6 +898,7 @@ function setPlayerPanel(name) {
     if (element) { element.hidden = !active; element.classList.toggle('active', active); }
     if (button) { button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); }
   });
+  requestAnimationFrame(updatePlayerLayout);
 }
 
 function activeScrollPanel() {
@@ -914,8 +922,36 @@ function setTransportCollapsed(collapsed, persist = false) {
   const full = $('#transportFull'); const mini = $('#transportMini'); const toggle = $('#transportToggleBtn');
   if (full) full.hidden = isCollapsed;
   if (mini) mini.hidden = !isCollapsed;
-  if (toggle) { toggle.setAttribute('aria-expanded', String(!isCollapsed)); toggle.textContent = isCollapsed ? '▴ Bedienung einblenden' : '▾ Bedienung ausblenden'; }
+  if (toggle) {
+    toggle.setAttribute('aria-expanded', String(!isCollapsed));
+    toggle.textContent = isCollapsed ? '▴ Bedienung anzeigen' : '▾ Bedienung ausblenden';
+  }
   if (persist) localStorage.setItem(STORAGE.transportCollapsed, isCollapsed ? '1' : '0');
+  requestAnimationFrame(updatePlayerLayout);
+}
+
+
+function updatePlayerLayout() {
+  const player = $('#playerView');
+  if (!player || !player.classList.contains('active')) return;
+  const panels = $$('#playerView .player-panel');
+  if (!isCompactPlayback()) {
+    panels.forEach(panel => { panel.style.removeProperty('height'); panel.style.removeProperty('max-height'); panel.style.removeProperty('min-height'); });
+    return;
+  }
+  const active = document.querySelector('#playerView .player-panel.active:not([hidden])');
+  if (!active) return;
+  const topbar = document.querySelector('.topbar');
+  const head = $('#playerView .player-head');
+  const tabs = $('#playerView .player-tabs');
+  const transport = $('#playerTransport');
+  const visibleHeight = el => (!el || getComputedStyle(el).display === 'none') ? 0 : el.getBoundingClientRect().height;
+  const chrome = visibleHeight(topbar) + visibleHeight(head) + visibleHeight(tabs) + visibleHeight(transport);
+  const safe = 18;
+  const available = Math.max(220, window.innerHeight - chrome - safe);
+  active.style.height = `${available}px`;
+  active.style.maxHeight = `${available}px`;
+  active.style.minHeight = `${Math.min(available, 320)}px`;
 }
 
 function syncMiniPlayerButtons() {
@@ -928,6 +964,7 @@ function setPlaybackChromeHidden(hidden) {
   document.body.classList.toggle('playback-focus', focus);
   if (focus) setTransportCollapsed(true, false);
   else if (state.scrolling && isCompactPlayback()) setTransportCollapsed(false, false);
+  requestAnimationFrame(updatePlayerLayout);
 }
 
 function handlePlayerPanelTap(event) {
@@ -1150,7 +1187,7 @@ function importBackupData(data) {
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.7", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-7-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+function exportData() { const data = { version: "9.6.8", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-8-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
 async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 async function estimatePdfPageCount(blob) {
@@ -1408,6 +1445,17 @@ function resetDisplaySettings() {
 }
 
 
+
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  if (document.body.classList.contains('playback-focus') || state.live.gigMode) {
+    document.body.classList.remove('playback-focus');
+    if (state.live.gigMode) toggleGigMode();
+    setTransportCollapsed(false, false);
+    updatePlayerLayout();
+  }
+});
+
 const TUTORIAL_KEY = 'band-v966-tutorial-seen';
 const TUTORIAL_STEPS = [
   { view:'dashboard', target:'#dashboardView', icon:'🏠', title:'Übersicht', text:'Die App startet jetzt auf dem Dashboard. Hier siehst du aktive Setliste, letzten Song, Bibliothek, Favoriten und die nächsten Songs.' },
@@ -1461,7 +1509,8 @@ function showTutorialStep(){
   });
 }
 function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); const overlay=$('#tutorialOverlay'); overlay.hidden=true; overlay.classList.remove('has-target'); $('#tutorialCard')?.classList.remove('tutorial-card-top'); $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('setlists'); }
-window.addEventListener('resize',()=>{ if(!$('#tutorialOverlay')?.hidden) showTutorialStep(); });
+window.addEventListener('resize',()=>{ updatePlayerLayout(); if(!$('#tutorialOverlay')?.hidden) showTutorialStep(); });
+window.addEventListener('orientationchange',()=>setTimeout(updatePlayerLayout,120));
 document.addEventListener('click',e=>{ if(e.target?.id==='tutorialNextBtn'){ tutorialIndex++; showTutorialStep(); } if(e.target?.id==='tutorialBackBtn'){ tutorialIndex=Math.max(0,tutorialIndex-1); showTutorialStep(); } if(e.target?.id==='tutorialSkipBtn') finishTutorial(); });
 setTimeout(()=>startTutorial(false),2600);
 

@@ -1,0 +1,13 @@
+Aussteiger Band-App v9.6.8 – Mobile Player UX / Stabilitätsfix
+
+Behoben:
+- große Bedienleiste kann auf kleinen Displays nicht mehr außerhalb des sichtbaren Bereichs verschwinden
+- Ein-/Ausblenden der Bedienung ist jederzeit erreichbar
+- volle Bedienleiste hat auf dem Handy eine eigene interne Scrollfläche
+- nur Song/Tabs/PDF scrollen im Player unabhängig
+- Mini-Leiste enthält einen ⋯-Button zum sofortigen Wiederanzeigen der vollen Bedienung
+- Player-Höhe wird dynamisch an sichtbare Kopf-/Tab-/Transportleisten angepasst
+- Fokus-/Gig-Modus haben einen sicheren Rückweg
+- Orientierung/Resize berechnen das Layout neu
+
+Enthält weiterhin Dashboard, SOT/EOT-Tabs, Metronom, Count-in, PDF-Autoscroll und Tutorial.

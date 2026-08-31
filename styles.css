@@ -397,13 +397,13 @@ body.transport-collapsed main{padding-bottom:calc(110px + env(safe-area-inset-bo
 .speed-auto-btn{min-height:40px;padding:.45rem .7rem}
 @media(max-width:600px){.speed-label{grid-template-columns:minmax(0,1fr) auto auto}.speed-label span{grid-column:1/-1}.speed-auto-btn{min-height:44px}}
 
-/* Version 9.6.7: metronome + PDF autoscroll */
+/* Version 9.6.8: metronome + PDF autoscroll */
 .metronome{max-width:960px;margin:10px auto 0;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--surface-2) 62%,transparent)}
 .metronome-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.metronome-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.metronome-controls label{display:flex;align-items:center;gap:6px;font-size:.9em}.metronome-controls input[type=number]{width:76px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);padding:0 8px}.metronome-controls select{min-height:44px}.metronome-sound{min-height:44px;padding:0 8px}.metronome-beats{display:flex;align-items:center;gap:6px;min-height:20px}.metronome-beats i{display:block;width:10px;height:10px;border-radius:50%;background:var(--line);transition:transform .07s ease,background .07s ease}.metronome-beats i.active{background:var(--accent);transform:scale(1.45)}
 .pdf-scroll-viewer{height:68vh;overflow:hidden;position:relative;border-radius:10px;background:#fff;overscroll-behavior:contain}.pdf-scroll-viewer .pdf-frame{height:100%;border-radius:0}.pdf-scroll-status{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:.45rem 0;color:var(--muted);font-size:.84em}.pdf-scroll-status strong{color:var(--text)}
 @media(max-width:600px){.metronome{padding:9px}.metronome-head{margin-bottom:6px}.metronome-controls{display:grid;grid-template-columns:1fr 1fr}.metronome-controls label{justify-content:space-between}.metronome-controls label.metronome-sound{justify-content:flex-start}.metronome-controls #metronomeStartBtn,.metronome-controls #metronomeTapBtn{width:100%}.pdf-scroll-viewer{height:70vh}}
 
-/* Version 9.6.7: Live Performance */
+/* Version 9.6.8: Live Performance */
 .live-tools{border-top:1px solid var(--border);padding-top:.65rem;margin-top:.35rem}
 .live-tools-head,.countin-controls,.section-jumps{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .live-tools-head{justify-content:space-between}.countin-controls{margin:.55rem 0}.section-jumps{overflow-x:auto;flex-wrap:nowrap;padding-bottom:.2rem}
@@ -413,7 +413,7 @@ body.gig-mode .player-head{padding-top:.25rem} body.gig-mode #transportFull .son
 body.gig-mode #playerView{padding-top:.25rem}
 @media(max-width:700px){.countin-controls label{font-size:.88em}.live-tools{padding:.45rem}.section-jumps button{min-height:40px}}
 
-/* v9.6.7 Dashboard */
+/* v9.6.8 Dashboard */
 .dashboard-hero{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0 1.1rem}
 .dashboard-hero h1{margin:.15rem 0 .35rem}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;font-weight:800;color:var(--muted)}
 .dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
@@ -424,7 +424,7 @@ body.gig-mode #playerView{padding-top:.25rem}
 @media(max-width:600px){.dashboard-hero{align-items:flex-start;flex-direction:column}.dashboard-hero .big{width:100%}.dashboard-grid{grid-template-columns:1fr 1fr}.dashboard-card{padding:.75rem;min-height:98px}.dashboard-card .dashboard-icon{font-size:1.45rem}.dashboard-next-list li button{grid-template-columns:1.6rem minmax(0,1fr)}.dashboard-next-list small{grid-column:2}}
 @media(max-width:380px){.dashboard-grid{grid-template-columns:1fr}}
 
-/* v9.6.7 Tab editor and mobile tab view */
+/* v9.6.8 Tab editor and mobile tab view */
 .editor-tab-tools{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin:.35rem 0}.editor-tab-tools small{color:var(--muted)}
 .tab-sheet{--tab-font:14px;overflow:hidden}
 .tab-view-toolbar{display:flex;align-items:center;gap:.6rem;justify-content:space-between;flex-wrap:wrap;padding:.35rem 0 .55rem}.tab-view-toolbar span{font-size:.8rem;color:var(--muted)}.tab-view-toolbar>div{display:flex;gap:.35rem}
@@ -433,3 +433,105 @@ body.gig-mode #playerView{padding-top:.25rem}
 .tab-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;padding:.65rem .7rem;background:var(--sheet-bg,#fff);max-width:100%}
 .tab-scroll pre{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:var(--tab-font);line-height:1.32;white-space:pre;min-width:max-content}
 @media(max-width:700px){.tab-view-toolbar{position:sticky;top:0;z-index:2;background:var(--surface);padding:.4rem}.tab-scroll{padding:.55rem .45rem}.tab-block summary{padding:.55rem}.tab-sheet{--tab-font:12px}}
+
+/* v9.6.8 mobile player stability / regression fix */
+body.player-mode{overflow:hidden}
+body.player-mode main{overflow:hidden}
+body.player-mode #playerView.active{overflow:hidden;min-height:0}
+body.player-mode #playerView .player-panel.active{
+  overflow-y:auto!important;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  min-height:220px;
+}
+body.player-mode .transport{
+  left:0;
+  right:0;
+  width:100%;
+  z-index:35;
+}
+#transportFull{
+  min-height:0;
+}
+@media(max-width:700px){
+  body.player-mode main{
+    padding-bottom:calc(82px + env(safe-area-inset-bottom));
+  }
+  body.player-mode .transport{
+    max-height:46dvh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:var(--bg);
+    border-top:1px solid var(--line);
+    box-shadow:0 -8px 24px rgba(0,0,0,.16);
+  }
+  body.player-mode .transport-collapse-row{
+    flex:0 0 auto;
+    display:flex!important;
+    order:0;
+    margin:0 0 5px;
+    padding-top:1px;
+    background:var(--bg);
+  }
+  body.player-mode .transport-toggle{
+    position:relative;
+    z-index:2;
+    min-height:38px;
+    background:var(--surface-2,var(--panel));
+  }
+  body.player-mode #transportFull{
+    flex:1 1 auto;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:calc(8px + env(safe-area-inset-bottom));
+  }
+  body.player-mode #transportMini{
+    flex:0 0 auto;
+    grid-template-columns:42px minmax(50px,1.2fr) 42px 40px 40px 40px 40px;
+    gap:4px;
+    overflow:visible;
+  }
+  body.player-mode #transportMini button{
+    min-width:0;
+    min-height:44px;
+    padding:.35rem .2rem;
+  }
+  body.transport-collapsed.player-mode .transport{
+    max-height:none;
+  }
+  body.transport-collapsed.player-mode main{
+    padding-bottom:calc(105px + env(safe-area-inset-bottom));
+  }
+
+  /* Focus mode: the mini bar is always a visible escape hatch. */
+  body.playback-focus{overflow:hidden}
+  body.playback-focus #playerView .transport{
+    display:flex!important;
+    max-height:none;
+  }
+  body.playback-focus #playerView .transport-collapse-row{
+    display:none!important;
+  }
+  body.playback-focus #playerView #transportMini{
+    display:grid!important;
+  }
+  body.playback-focus #playerView #transportFull{
+    display:none!important;
+  }
+
+  /* Gig mode must never trap the user: compact controls stay visible. */
+  body.gig-mode #playerView .transport{
+    display:flex!important;
+  }
+  body.gig-mode.transport-collapsed #transportMini{
+    display:grid!important;
+  }
+}
+@media(min-width:701px){
+  body.player-mode{overflow:auto}
+  body.player-mode main{overflow:visible}
+}

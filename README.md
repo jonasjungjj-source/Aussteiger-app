@@ -1,6 +1,6 @@
-# Aussteiger Band-App – Version 9.6.7
+# Aussteiger Band-App – Version 9.6.8
 
-## Neu in Version 9.6.7
+## Neu in Version 9.6.8
 - Die Auto-Scroll-Geschwindigkeit wird jetzt pro Song gespeichert.
 - Beim ersten Öffnen wird ein Startwert automatisch aus BPM und dem eingestellten Zeilenabstand berechnet.
 - Eine manuelle Änderung am Geschwindigkeitsregler gilt nur für den aktuellen Song.
@@ -8,7 +8,7 @@
 - Song-Geschwindigkeiten werden im Backup mitgesichert.
 
 
-## Neu in Version 9.6.7
+## Neu in Version 9.6.8
 
 - PDFs können jetzt nachträglich an bereits bestehende Songs angehängt werden.
 - Im Song-Editor: PDF hinzufügen, ersetzen oder entfernen.
@@ -72,6 +72,6 @@ Alle Dateien und Ordner direkt in das Stammverzeichnis des GitHub-Pages-Reposito
 ## Interaktives Tutorial (v9.6)
 Beim ersten Start erscheint ein geführtes Overlay-Tutorial. Es kann jederzeit über „? App-Tutorial“ im Menü erneut gestartet werden.
 
-## Version 9.6.7
+## Version 9.6.8
 - Metronom pro Song mit BPM, Tap Tempo, 3/4, 4/4 und 6/8 sowie optionalem Ton.
 - PDF-Ansicht kann mit derselben Play/Scroll-Funktion automatisch weiterlaufen. Je nach Browser wird im eingebetteten PDF weich gescrollt oder seitenweise weitergeschaltet.

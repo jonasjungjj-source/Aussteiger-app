@@ -1,4 +1,4 @@
-Aussteiger Band-App v9.6.7
+Aussteiger Band-App v9.6.8
 
 Neu:
 - Dashboard als Startseite
