@@ -1,7 +1,7 @@
-const CACHE = 'aussteiger-bandapp-v9-6-9-metronome-pdf-scroll';
+const CACHE = 'aussteiger-bandapp-v9-6-10-metronome-pdf-scroll';
 const APP_SHELL = [
   './', './index.html', './chords.html',
-  './app.js?v=9.6.9', './styles.css?v=9.6.9', './manifest.json?v=9.6.9',
+  './app.js?v=9.6.10', './styles.css?v=9.6.10', './manifest.json?v=9.6.10',
   './songs.json', './setlists.json',
   './assets/images/logo.jpg', './assets/icons/icon.svg',
   './assets/icons/icon-180.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png'

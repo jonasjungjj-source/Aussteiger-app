@@ -1,4 +1,4 @@
-Aussteiger Band-App v9.6.9
+Aussteiger Band-App v9.6.10
 
 Neu:
 - Gig starten: Setliste vorher auswählen

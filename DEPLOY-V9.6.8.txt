@@ -1,4 +1,4 @@
-Aussteiger Band-App v9.6.9 – Mobile Player UX / Stabilitätsfix
+Aussteiger Band-App v9.6.10 – Mobile Player UX / Stabilitätsfix
 
 Behoben:
 - große Bedienleiste kann auf kleinen Displays nicht mehr außerhalb des sichtbaren Bereichs verschwinden

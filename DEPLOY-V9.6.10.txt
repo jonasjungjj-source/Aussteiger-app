@@ -1,0 +1,13 @@
+Aussteiger Band-App v9.6.10
+
+Neu:
+- „Songs importieren“ als eigene Seite im Hauptmenü
+- Mehrfachimport und Drag & Drop
+- Jede Datei wird soweit möglich als eigener Song angelegt
+- Titel werden aus Frontmatter/ChordPro oder Dateinamen erkannt
+- Dateinamen wie „Artist - Titel.ext“ werden als Interpret/Titel erkannt
+- Metadaten wie Interpret, Tonart, BPM, Capo, Sänger, Genre und Tags werden übernommen, wenn vorhanden
+- Importquelle und ursprünglicher Dateiname werden lokal gespeichert
+- neu importierte Songs erhalten einen grünen „NEU“-Indikator
+- „NEU“ verschwindet nach dem ersten Öffnen des Songs
+- Tutorial um den neuen Import-Workflow erweitert

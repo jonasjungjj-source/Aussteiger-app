@@ -16,7 +16,8 @@ const STORAGE = {
   annotations: 'band-v9-annotations',
   transportCollapsed: 'band-v9-transport-collapsed',
   metronome: 'band-v965-metronome',
-  live: 'band-v966-live'
+  live: 'band-v966-live',
+  newSongs: 'band-v9610-new-songs'
 };
 
 const state = {
@@ -32,6 +33,7 @@ const state = {
   pdfScroll: { page: 1, pages: 0, fallbackProgress: 0 },
   live: { gigMode:false, countInTimer:null, countInBeat:0, sectionIndex:0 },
   pendingSetlistSongId: null,
+  newSongIds: new Set(),
   tuner: { stream:null, ctx:null, analyser:null, raf:null, buffer:null }
 };
 
@@ -72,6 +74,7 @@ function loadLocalState() {
   state.annotations = safeParse(localStorage.getItem(STORAGE.annotations), {});
   state.songSpeeds = safeParse(localStorage.getItem(STORAGE.songSpeeds), {});
   state.metronomeSettings = safeParse(localStorage.getItem(STORAGE.metronome), {});
+  state.newSongIds = new Set(safeParse(localStorage.getItem(STORAGE.newSongs), []));
   state.footswitch.actions = { scroll:'scroll', next:'next', prev:'prev', ...(state.footswitch.actions || {}) };
 }
 
@@ -182,8 +185,10 @@ function parseMarkdownSong(text, filename) {
     }
     body.push(raw);
   }
-  const fallbackName = filename.replace(/\.[^.]+$/, '');
+  const guessed = inferFilenameMetadata(filename);
+  const fallbackName = guessed.title;
   if (!title) title = fallbackName;
+  if (!artist) artist = guessed.artist;
   return { title, artist, key: key || undefined, capo: capo ? Number(capo) : undefined, bpm: bpm ? Number(bpm) : undefined, singer, content: normalizePastedSongText(body.join('\n')) };
 }
 
@@ -319,64 +324,84 @@ function parseChordProText(text, filename) {
     if (/^\{(start_of|end_of|soc|eoc|sot|eot|comment)/i.test(line)) continue;
     content.push(rawLine);
   }
-  const fallbackName = filename.replace(/\.[^.]+$/, '');
-  if (!title) {
-    const guess = fallbackName.split(/\s*-\s*/);
-    if (guess.length >= 2) { artist = artist || guess[0].trim(); title = guess.slice(1).join(' - ').trim(); }
-    else title = fallbackName;
-  }
+  const guessed = inferFilenameMetadata(filename);
+  const fallbackName = guessed.title;
+  if (!title) title = guessed.title;
+  if (!artist) artist = guessed.artist;
   return { title: title || fallbackName, artist, key: key || undefined, capo: capo ? Number(capo) : undefined, content: content.join('\n').trim() };
 }
 
-async function importSongFiles(fileList) {
-  const files = [...fileList]; if (!files.length) return;
-  const libraryName = prompt('Name für diese Songbibliothek (z. B. „Hochzeitsband Setlist“):', files[0].name.replace(/\.[^.]+$/, ''));
-  if (!libraryName?.trim()) return;
-  const libraryId = `lib-${slugify(libraryName)}-${Date.now().toString(36)}`;
-  const newSongs = [];
-  let failCount = 0;
-  for (const file of files) {
-    try {
-      const lower = file.name.toLowerCase();
-      if (lower.endsWith('.pdf') || file.type === 'application/pdf') {
-        const title = file.name.replace(/\.pdf$/i, '');
-        const id = uniqueSongId(slugify(`${title}-pdf`));
-        await savePdfBlob(id, file);
-        newSongs.push({ id, library: libraryId, title, artist: '', tags: ['PDF-Import'], pdfAttachment: true, pdfName: file.name, content: `[PDF]\nOriginal-Songblatt ist im Reiter „PDF“ gespeichert.` });
+async function importSongFiles(fileList, options={}) {
+  const files=[...fileList]; if(!files.length) return [];
+  let libraryName=options.libraryName;
+  if(!libraryName){
+    const fallback=files.length>1 ? `Import ${new Date().toLocaleDateString('de')}` : cleanImportFilename(files[0].name);
+    libraryName=prompt('Name für diese Songbibliothek:',fallback);
+    if(!libraryName?.trim()) return [];
+  }
+  const libraryId=`lib-${slugify(libraryName)}-${Date.now().toString(36)}`;
+  const newSongs=[], failures=[], batchIds=new Set();
+  const batchUniqueId=base=>{
+    let id=uniqueSongId(base), n=2;
+    while(batchIds.has(id)){ id=`${base}-${n++}`; }
+    batchIds.add(id); return id;
+  };
+  for(const file of files){
+    try{
+      const lower=file.name.toLowerCase();
+      if(lower.endsWith('.pdf')||file.type==='application/pdf'){
+        const guessed=inferFilenameMetadata(file.name);
+        const id=batchUniqueId(slugify(`${guessed.title}-${guessed.artist||'pdf'}`));
+        await savePdfBlob(id,file);
+        newSongs.push(enrichImportedSong({id,library:libraryId,title:guessed.title,artist:guessed.artist,tags:[],pdfAttachment:true,pdfName:file.name,content:'[PDF]\\nOriginal-Songblatt ist im Reiter „PDF“ gespeichert.'},file.name,'PDF-Import'));
         continue;
       }
-      const text = await file.text();
-      if (lower.endsWith('.json')) {
-        const parsed = JSON.parse(text);
-        const items = Array.isArray(parsed) ? parsed : Array.isArray(parsed.songs) ? parsed.songs : [parsed];
-        items.forEach(item => {
-          if (!item || (!item.title && !item.content && !item.lyrics)) return;
-          const id = uniqueSongId(item.id ? String(item.id) : slugify(`${item.title || 'song'}-${item.artist || ''}`));
-          newSongs.push({
-            id, library: libraryId,
-            title: String(item.title || id), artist: String(item.artist || ''),
-            genre: item.genre || '', tags: Array.isArray(item.tags) ? item.tags : [],
-            key: item.key || undefined, bpm: item.bpm ? Number(item.bpm) : undefined,
-            capo: item.capo !== undefined ? Number(item.capo) : undefined, singer: item.singer || '',
-            content: String(item.content || item.lyrics || '')
-          });
+      const text=await file.text();
+      if(lower.endsWith('.json')){
+        const parsed=JSON.parse(text);
+        const items=Array.isArray(parsed)?parsed:Array.isArray(parsed.songs)?parsed.songs:[parsed];
+        let validInFile=0;
+        items.forEach((item,index)=>{
+          if(!item||(!item.title&&!item.content&&!item.lyrics)) return;
+          const guessed=inferFilenameMetadata(file.name);
+          const title=item.title|| (items.length===1?guessed.title:`${guessed.title} ${index+1}`);
+          const id=batchUniqueId(item.id?String(item.id):slugify(`${title}-${item.artist||guessed.artist||''}`));
+          newSongs.push(enrichImportedSong({
+            id,library:libraryId,title:String(title),artist:String(item.artist||guessed.artist||''),
+            genre:item.genre||'',tags:Array.isArray(item.tags)?item.tags:[],
+            key:item.key||undefined,bpm:item.bpm?Number(item.bpm):undefined,
+            capo:item.capo!==undefined&&item.capo!==''?Number(item.capo):undefined,
+            singer:item.singer||'',notes:item.notes||'',content:String(item.content||item.lyrics||'')
+          },file.name,'JSON-Import')); validInFile++;
         });
-      } else if (lower.endsWith('.md') || lower.endsWith('.markdown')) {
-        const song = parseMarkdownSong(text, file.name);
-        const id = uniqueSongId(slugify(`${song.title}-${song.artist || 'markdown'}`));
-        newSongs.push({ id, library: libraryId, ...song, tags: ['Markdown-Import'] });
-      } else if (lower.endsWith('.cho') || lower.endsWith('.crd') || lower.endsWith('.pro') || lower.endsWith('.chopro') || lower.endsWith('.chordpro') || lower.endsWith('.txt')) {
-        const song = parseChordProText(text, file.name);
-        const id = uniqueSongId(slugify(`${song.title}-${song.artist}`));
-        newSongs.push({ id, library: libraryId, ...song, tags: [] });
-      } else { failCount += 1; }
-    } catch (error) { failCount += 1; console.error(error); }
+        if(!validInFile) throw new Error('Keine Songs im JSON erkannt');
+      }else if(lower.endsWith('.md')||lower.endsWith('.markdown')){
+        const parsed=parseMarkdownSong(text,file.name);
+        const id=batchUniqueId(slugify(`${parsed.title}-${parsed.artist||'markdown'}`));
+        newSongs.push(enrichImportedSong({id,library:libraryId,...parsed},file.name,'Markdown-Import'));
+      }else if(/\.(cho|crd|pro|chopro|chordpro|txt)$/i.test(lower)){
+        const parsed=parseChordProText(text,file.name);
+        const id=batchUniqueId(slugify(`${parsed.title}-${parsed.artist||'text'}`));
+        newSongs.push(enrichImportedSong({id,library:libraryId,...parsed},file.name,lower.endsWith('.txt')?'Text-Import':'ChordPro-Import'));
+      }else{
+        failures.push(`${file.name}: Format nicht unterstützt`);
+      }
+    }catch(error){
+      failures.push(`${file.name}: ${error.message||'Importfehler'}`); console.error(error);
+    }
   }
-  if (!newSongs.length) { alert('Keine passenden Songs gefunden. Unterstützt werden JSON, Markdown, ChordPro/Text und PDF.'); return; }
-  state.libraries.push({ id: libraryId, name: libraryName.trim(), importedAt: new Date().toISOString(), count: newSongs.length });
+  if(!newSongs.length){
+    const msg='Keine passenden Songs gefunden.'+(failures.length?`\\n\\n${failures.join('\\n')}`:'');
+    alert(msg); return [];
+  }
+  state.libraries.push({id:libraryId,name:libraryName.trim(),importedAt:new Date().toISOString(),count:newSongs.length});
   state.importedSongs.push(...newSongs);
-  saveLibraries(); renderAll(); renderLibraryFilterOptions();
-  alert(`${newSongs.length} Song(s) in neue Bibliothek „${libraryName.trim()}“ importiert${failCount ? ` (${failCount} Datei(en) übersprungen)` : ''}.`);
+  markSongsNew(newSongs.map(s=>s.id));
+  saveLibraries(); renderAll(); renderLibraryFilterOptions(); renderLibrariesManager();
+  const result=$('#importResult');
+  if(result) result.innerHTML=`<strong>${newSongs.length} Song(s) importiert.</strong><span>Bibliothek: ${esc(libraryName.trim())}</span>${failures.length?`<small>${failures.length} Datei(en) übersprungen.</small>`:''}`;
+  if(!options.silent) alert(`${newSongs.length} Song(s) importiert${failures.length?` · ${failures.length} Datei(en) übersprungen`:''}. Neue Songs sind mit „NEU“ markiert.`);
+  return newSongs;
 }
 
 async function removeLibrary(libraryId) {
@@ -457,6 +482,33 @@ function saveFavorites() {
   localStorage.setItem(STORAGE.favorites, JSON.stringify([...state.favorites]));
 }
 
+function saveNewSongIds(){ localStorage.setItem(STORAGE.newSongs, JSON.stringify([...state.newSongIds])); }
+function markSongsNew(ids){ ids.forEach(id=>state.newSongIds.add(id)); saveNewSongIds(); }
+function markSongSeen(id){ if(state.newSongIds.delete(id)){ saveNewSongIds(); renderAll(); } }
+
+function cleanImportFilename(filename='Song'){
+  return String(filename).replace(/\.[^.]+$/,'').replace(/^\s*\d{1,3}\s*[-_. )]+\s*/,'').replace(/[_]+/g,' ').replace(/\s{2,}/g,' ').trim();
+}
+function inferFilenameMetadata(filename='Song'){
+  const clean=cleanImportFilename(filename);
+  const parts=clean.split(/\s+-\s+/).map(x=>x.trim()).filter(Boolean);
+  if(parts.length>=2) return { artist:parts[0], title:parts.slice(1).join(' - ') };
+  return { title:clean, artist:'' };
+}
+function enrichImportedSong(songData, filename, importTag){
+  const guessed=inferFilenameMetadata(filename);
+  const song={...songData};
+  song.title=String(song.title||guessed.title||'Song').trim();
+  song.artist=String(song.artist||guessed.artist||'').trim();
+  song.genre=String(song.genre||'').trim();
+  song.singer=String(song.singer||'').trim();
+  song.tags=[...new Set([...(Array.isArray(song.tags)?song.tags:[]), importTag].filter(Boolean))];
+  song.importedAt=new Date().toISOString();
+  song.importFilename=filename;
+  return song;
+}
+
+
 function activeSetlist() {
   return state.setlists.find(list => list.id === state.activeSetlistId) || state.setlists[0] || null;
 }
@@ -483,7 +535,7 @@ async function init() {
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
     switchView('dashboard');
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.9', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.10', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -529,6 +581,13 @@ function bindUI() {
   $('#attachPdfBtn').onclick = promptPdfForCurrentSong; $('#removePdfBtn').onclick = removePdfFromCurrentSong; $('#attachPdfInput').onchange = handlePdfAttachmentSelection;
   $('#exportBtn').onclick = exportData; $('#importFile').onchange = importUniversalFile;
   $('#importSongsFile').onchange = event => { importSongFiles(event.target.files); event.target.value = ''; };
+  $('#mainImportSongsFile').onchange=async event=>{ await importSongFiles(event.target.files); event.target.value=''; };
+  const dropzone=$('#mainImportDropzone');
+  ['dragenter','dragover'].forEach(type=>dropzone.addEventListener(type,e=>{e.preventDefault();dropzone.classList.add('dragover');}));
+  ['dragleave','drop'].forEach(type=>dropzone.addEventListener(type,e=>{e.preventDefault();dropzone.classList.remove('dragover');}));
+  dropzone.addEventListener('drop',e=>importSongFiles(e.dataTransfer.files));
+  dropzone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#mainImportSongsFile').click();}});
+  dropzone.onclick=()=>$('#mainImportSongsFile').click();
   $('#openChordieImportBtn').onclick = openChordieImport;
   $('#searchChordieBtn').onclick = searchChordie;
   $('#readClipboardBtn').onclick = readClipboardIntoImporter;
@@ -573,7 +632,7 @@ function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').set
 function switchView(name) {
   $$('.view').forEach(view => view.classList.remove('active')); $(`#${name}View`).classList.add('active');
   $$('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-  $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', metronome:'Metronom', tuner:'Stimmgerät', player:'Player', about:'Hinweise' }[name];
+  $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', metronome:'Metronom', tuner:'Stimmgerät', import:'Songs importieren', player:'Player', about:'Hinweise' }[name];
   document.body.classList.toggle('player-mode', name === 'player');
   if (name !== 'player') setPlaybackChromeHidden(false);
   if(name !== 'tuner' && state.tuner?.stream) stopTuner();
@@ -714,7 +773,7 @@ function bindSetlistDrag(row, handle) {
 
 function songCard(item) {
   const card = document.createElement('article'); card.className = 'card'; const inList = activeSetlist()?.songs.includes(item.id);
-  card.innerHTML = `<div class="card-title"><div><h3>${esc(item.title)}</h3><p>${esc(item.artist)}</p></div><button class="star" aria-label="Favorit">${state.favorites.has(item.id) ? '★' : '☆'}</button></div><small>${esc([item.genre, meta(item)].filter(Boolean).join(' · '))}</small><div class="card-actions"><button class="primary open">Öffnen</button><button class="add">${inList ? '✓ In Setliste' : '+ Setliste'}</button></div>`;
+  const isNew=state.newSongIds.has(item.id); card.innerHTML = `<div class="card-title"><div class="song-badges">${isNew?'<span class="new-song-badge">NEU</span>':''}</div><div><h3>${esc(item.title)}</h3><p>${esc(item.artist)}</p></div><button class="star" aria-label="Favorit">${state.favorites.has(item.id) ? '★' : '☆'}</button></div><small>${esc([item.genre, meta(item)].filter(Boolean).join(' · '))}</small><div class="card-actions"><button class="primary open">Öffnen</button><button class="add">${inList ? '✓ In Setliste' : '+ Setliste'}</button></div>`;
   card.querySelector('.open').onclick = () => openSong(item.id); card.querySelector('.star').onclick = () => toggleFavorite(item.id);
   card.querySelector('.add').onclick = () => openSongToSetlist(item.id); return card;
 }
@@ -802,7 +861,7 @@ async function openSong(id, changeView = true) {
   $('#transposeResetBtn').textContent = semitones ? `${semitones > 0 ? '+' : ''}${semitones}` : '0';
   const directRef = /^https:\/\/(?:www\.)?chordie\.com\//i.test(item?.source?.url || item?.chordieUrl || '');
   $('#songSourceStatus').textContent = directRef ? 'Chordie-Referenz gespeichert.' : 'Chordie öffnet eine Suche nach Titel und Interpret.';
-  updateFavoriteButton(); scrollTo({ top: 0 }); if (changeView) switchView('player');
+  updateFavoriteButton(); markSongSeen(id); scrollTo({ top: 0 }); if (changeView) switchView('player');
 }
 
 function isChordOnlySourceLine(line) {
@@ -1222,10 +1281,17 @@ function importSharedSetlist(data, filename='Setliste') {
   alert(`Setliste „${payload.name || filename}“ mit ${importedIds.length} Song(s) importiert.`);
 }
 function importSongJsonObject(data, filename='Song') {
-  const items = Array.isArray(data) ? data : [data];
-  const valid = items.filter(item => item && item.title && (item.content || item.lyrics || item.pdfAttachment)); if (!valid.length) throw new Error('Kein Songformat erkannt.');
-  const libraryId=`lib-import-${Date.now().toString(36)}`; const songs=valid.map(item => ({...item, id:uniqueSongId(item.id?String(item.id):slugify(`${item.title}-${item.artist||''}`)), library:libraryId, pdfAttachment:false}));
-  state.libraries.push({id:libraryId,name:`Import: ${filename.replace(/\.json$/i,'')}`,importedAt:new Date().toISOString(),count:songs.length}); state.importedSongs.push(...songs); saveLibraries(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll(); alert(`${songs.length} Song(s) importiert.`);
+  const items=Array.isArray(data)?data:[data];
+  const valid=items.filter(item=>item&&item.title&&(item.content||item.lyrics||item.pdfAttachment));
+  if(!valid.length) throw new Error('Kein Songformat erkannt.');
+  const libraryId=`lib-import-${Date.now().toString(36)}`;
+  const songs=valid.map(item=>{
+    const id=uniqueSongId(item.id?String(item.id):slugify(`${item.title}-${item.artist||''}`));
+    return enrichImportedSong({...item,id,library:libraryId,pdfAttachment:false},filename,'JSON-Import');
+  });
+  state.libraries.push({id:libraryId,name:`Import: ${cleanImportFilename(filename)}`,importedAt:new Date().toISOString(),count:songs.length});
+  state.importedSongs.push(...songs); markSongsNew(songs.map(s=>s.id)); saveLibraries(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
+  alert(`${songs.length} Song(s) importiert. Neue Songs sind mit „NEU“ markiert.`);
 }
 async function importUniversalFile(event) {
   const file=event.target.files?.[0]; if (!file) return;
@@ -1246,12 +1312,12 @@ function importBackupData(data) {
   if (Array.isArray(data.favorites)) state.favorites=new Set(data.favorites);
   if (data.activeSetlistId && state.setlists.some(list=>list.id===data.activeSetlistId)) state.activeSetlistId=data.activeSetlistId;
   if (data.display) localStorage.setItem(STORAGE.display,JSON.stringify(data.display));
-  if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); }
+  if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } if(Array.isArray(data.newSongIds)){state.newSongIds=new Set(data.newSongIds);saveNewSongIds();}
   saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
 }
 
-function exportData() { const data = { version: "9.6.9", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-9-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
-async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
+function exportData() { const data = { version: "9.6.10", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, newSongIds:[...state.newSongIds], speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-10-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
+async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } if(Array.isArray(data.newSongIds)){state.newSongIds=new Set(data.newSongIds);saveNewSongIds();} saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 async function estimatePdfPageCount(blob) {
   try {
@@ -1625,7 +1691,7 @@ function stopTuner(){
   $('#tunerNote').textContent='–'; $('#tunerFrequency').textContent='–'; $('#tunerCents').textContent='0 Cent'; $('#tunerNeedle').style.transform='translateX(0)';
 }
 
-const TUTORIAL_KEY = 'band-v969-tutorial-seen';
+const TUTORIAL_KEY = 'band-v9610-tutorial-seen';
 const TUTORIAL_STEPS = [
   { view:'dashboard', target:'#dashboardView', icon:'🏠', title:'Übersicht', text:'Die App startet auf dem Dashboard. Hier findest du Setliste, letzten Song, Bibliothek, Favoriten und den Gig-Start.' },
   { view:'dashboard', target:'#dashboardGigBtn', icon:'🎤', title:'Gig starten', text:'Beim Gig-Start wählst du zuerst die Setliste. Danach öffnet die App deren ersten Song im reduzierten Live-Modus.' },
@@ -1645,7 +1711,8 @@ const TUTORIAL_STEPS = [
   { view:'player', panel:'lyrics', target:'.song-tools', icon:'♯', title:'Akkorde', text:'Akkorde lassen sich live transponieren und farblich anpassen.' },
   { view:'player', target:'#editSongBtn', icon:'✎', title:'Song bearbeiten', text:'Lyrics, Akkorde, SOT/EOT-Tabs, Notizen, BPM, Capo und PDF können direkt am Song bearbeitet werden.' },
   { view:'player', target:'#footswitchSettingsBtn', action:'footswitch', icon:'🦶', title:'Fußschalter', text:'Pedaltasten können Play, Songwechsel, Metronom, Count-in, Abschnitte und PDF-Seiten steuern.' },
-  { view:'about', target:'#importSongsFile', icon:'📥', title:'Import', text:'Songs können als Markdown, ChordPro/Text, JSON oder PDF importiert werden.' },
+  { view:'import', target:'#importView', icon:'📥', title:'Songs importieren', text:'Der Import ist jetzt eine eigene Hauptmenü-Seite. Du kannst mehrere Dateien gleichzeitig auswählen oder hineinziehen.' },
+  { view:'import', target:'#mainImportSongsFile', icon:'🆕', title:'Neue Songs', text:'Für jede erkannte Datei wird ein Song angelegt. Titel und Metadaten werden soweit möglich automatisch übernommen. Neu importierte Songs tragen „NEU“, bis du sie erstmals öffnest.' },
   { view:'dashboard', target:'#dashboardView', icon:'✅', title:'Bereit', text:'Damit sind die wichtigsten Probe- und Bühnenfunktionen eingerichtet. Das Tutorial kannst du jederzeit im Menü erneut starten.' }
 ];
 let tutorialIndex = 0;
