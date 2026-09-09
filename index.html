@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="AusSteiger">
-  <link rel="manifest" href="./manifest.json?v=9.6.10">
+  <link rel="manifest" href="./manifest.json?v=9.7.0">
   <link rel="apple-touch-icon" href="./assets/icons/icon-180.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=9.6.10">
+  <link rel="stylesheet" href="./styles.css?v=9.7.0">
   <title>AusSteiger & Friends</title>
 </head>
 <body>
@@ -21,6 +21,7 @@
   <div class="splash-hint">Tippen zum Starten</div>
 </div>
 <header class="topbar">
+  <button id="backBtn" class="icon-btn back-btn" aria-label="Zurück" hidden>‹<span class="back-label"></span></button>
   <button id="menuBtn" class="icon-btn" aria-label="Menü öffnen">☰</button>
   <div class="title-block"><strong>AusSteiger &amp; Friends</strong><span id="viewTitle">Übersicht</span></div>
   <button id="settingsBtn" class="icon-btn" aria-label="Anzeige einstellen">Aa</button>
@@ -84,9 +85,10 @@
       <button id="exportSetlistBtn">↗ Setliste teilen</button>
     </div>
     <div class="toolbar wrap">
-      <button id="addSongBtn" class="primary">+ Song hinzufügen</button>
-      <button id="resetSetlistBtn">Original wiederherstellen</button>
+      <button id="addSongBtn" class="primary" type="button">+ Song hinzufügen</button>
+      <button id="resetSetlistBtn" type="button">Original wiederherstellen</button>
     </div>
+    <p class="hint">„+ Song hinzufügen“ öffnet die Liste aller Songs. Reihenfolge per Ziehen am Griff ⠿ ändern.</p>
     <p id="setlistSummary" class="hint"></p>
     <ol id="setlist" class="song-list"></ol>
   </section>
@@ -95,13 +97,24 @@
     <div class="library-controls">
       <input id="searchInput" type="search" placeholder="Titel, Interpret, Genre oder Tag suchen">
       <select id="libraryFilter" aria-label="Songfilter">
-        <option value="all">Alle Songs</option>
-        <option value="setlist">Aktive Setliste</option>
-        <option value="public-domain">Public Domain</option>
-        <option value="favorites">Favoriten</option>
+        <optgroup label="Ansichten">
+          <option value="all">Alle Songs</option>
+          <option value="setlist">Aktive Setliste</option>
+          <option value="favorites">Favoriten</option>
+          <option value="new">Neu importiert</option>
+          <option value="pdf">Mit Liedblatt</option>
+          <option value="public-domain">Public Domain</option>
+        </optgroup>
       </select>
     </div>
-    <p id="librarySummary" class="hint"></p>
+    <div class="library-meta">
+      <p id="librarySummary" class="hint"></p>
+      <div class="library-meta-actions">
+        <button id="librarySearchClearBtn" type="button">Filter zurücksetzen</button>
+        <button id="openImportViewBtn" type="button">Songs importieren</button>
+      </div>
+    </div>
+    <div id="importedBanner" class="import-banner" hidden></div>
     <div id="library" class="library-grid"></div>
   </section>
 
@@ -153,7 +166,7 @@
   <section id="playerView" class="view player-view">
     <div class="player-head">
       <div><h1 id="songTitle">Kein Song gewählt</h1><p id="songMeta" class="subtle"></p></div>
-      <div class="song-nav"><button id="prevSongBtn" aria-label="Vorheriger Song">◀</button><button id="nextSongBtn" aria-label="Nächster Song">▶</button></div>
+      <div class="song-nav"><button id="playerSetlistBtn" type="button" aria-label="Zur Setliste" title="Zur Setliste">📋</button><button id="prevSongBtn" aria-label="Vorheriger Song">◀</button><button id="nextSongBtn" aria-label="Nächster Song">▶</button></div>
     </div>
     <div class="player-tabs" role="tablist" aria-label="Songansicht">
       <button id="lyricsTabBtn" type="button" class="active" role="tab" aria-selected="true">🎤 Song</button>
@@ -234,10 +247,15 @@
       <p class="hint">Bei mehreren Dateien wird für jede erkannte Datei ein eigener Song angelegt. Vorhandene Titel, Interpret, Tonart, BPM, Capo, Sänger und Tags werden übernommen, soweit sie im Format enthalten sind.</p>
       <div id="importResult" class="import-result" aria-live="polite"></div>
     </div>
+    <div class="tool-card">
+      <h2 class="card-heading">Importierte Bibliotheken</h2>
+      <p class="hint">Jeder Import wird als eigene Bibliothek gesammelt. Sie erscheint zusätzlich als Filter in „Alle Songs“ – die Songs selbst liegen immer auch in „Alle Songs“.</p>
+      <div id="librariesManagerImport" class="picker-list"></div>
+    </div>
   </section>
 
   <section id="aboutView" class="view prose">
-    <h2>Version 9.6.10 – GitHub Pages</h2>
+    <h2>Version 9.7.0 – GitHub Pages</h2>
     <p>Alle Songs aus <code>songs.json</code> werden in der Bibliothek angezeigt. Im Menü findest du zusätzlich ein offline verfügbares Akkordlexikon mit Griffbildern und Übungshilfen. Du kannst mehrere lokale Setlisten anlegen, Favoriten markieren und Songs durchsuchen.</p>
     <p>Bearbeitungen, Setlisten und Favoriten werden lokal im Browser gespeichert. Aktive Setlisten kannst du als eigene Datei teilen; beim Import erkennt die App automatisch Song, Setliste oder Backup.</p>
     <div class="toolbar wrap"><button id="exportBtn">Gesamt-Backup exportieren</button><label class="file-btn">Datei automatisch importieren<input id="importFile" type="file" accept=".json,.md,.markdown,.cho,.chordpro,.crd,.pro,.chopro,.txt,.pdf,application/json,application/pdf,text/plain,text/markdown"></label></div><p class="hint">JSON wird automatisch als Song, geteilte Setliste oder Gesamt-Backup erkannt. Andere unterstützte Formate werden als Song importiert.</p>
@@ -245,15 +263,33 @@
     <p class="hint">Öffne eine gezielte Suche auf Chordie, kopiere dort die von dir ausgewählte Fassung und füge sie anschließend hier ein. Der Import wird nur durch dich ausgelöst und lokal auf diesem Gerät gespeichert.</p>
     <div class="toolbar wrap"><button id="openChordieImportBtn" class="primary">🔎 Chordie suchen &amp; importieren</button></div>
     <h2>Songs aus Dateien importieren</h2>
-    <p class="hint">Importiere JSON, Markdown, ChordPro/Text oder PDF. Markdown mit Akkorden in eckigen Klammern positioniert die Akkorde direkt über der Textstelle. Auch klassische zweizeilige Akkordblätter mit Leerzeichenpositionen werden erhalten. PDFs werden lokal auf diesem Gerät gespeichert und sind über den PDF-Reiter im Player verfügbar.</p>
+    <p class="hint">Importiere JSON, Markdown, ChordPro/Text oder PDF. Markdown mit Akkorden in eckigen Klammern positioniert die Akkorde direkt über der Textstelle. Auch klassische zweizeilige Akkordblätter mit Leerzeichenpositionen werden erhalten. PDFs werden lokal auf diesem Gerät gespeichert und im PDF-Reiter des Players direkt angezeigt – auch auf iPhone und iPad, wo eingebettete PDF-Rahmen sonst leer bleiben.</p>
     <div class="toolbar wrap"><label class="file-btn">Song-Dateien / PDF wählen<input id="importSongsFile" type="file" accept=".json,.md,.markdown,.cho,.chordpro,.crd,.pro,.chopro,.txt,.pdf,text/plain,text/markdown,application/json,application/pdf" multiple></label></div>
     <h3>Importierte Bibliotheken</h3>
     <div id="librariesManager" class="picker-list"></div>
   </section>
 </main>
 
-<dialog id="songPicker"><form method="dialog"><div class="dialog-head"><h2>Song hinzufügen</h2><button value="cancel">✕</button></div><label class="picker-target">Zu Setliste hinzufügen <select id="pickerSetlistSelect"></select></label>
-<input id="pickerSearch" type="search" placeholder="Suchen"><div id="pickerList" class="picker-list"></div></form></dialog>
+<dialog id="songPicker" class="sheet-dialog" aria-labelledby="songPickerTitle">
+  <form method="dialog" class="picker-form">
+    <div class="dialog-head">
+      <div><h2 id="songPickerTitle">Alle Songs</h2><p id="pickerTargetName" class="dialog-intro"></p></div>
+      <button value="cancel" aria-label="Auswahl schließen">✕</button>
+    </div>
+    <label class="picker-target">Ziel-Setliste <select id="pickerSetlistSelect"></select></label>
+    <input id="pickerSearch" type="search" placeholder="Titel, Interpret oder Genre suchen">
+    <div id="pickerChips" class="picker-chips" role="group" aria-label="Songauswahl filtern"></div>
+    <p id="pickerSummary" class="hint"></p>
+    <div id="pickerList" class="picker-list"></div>
+    <div class="picker-footer">
+      <span id="pickerCount" class="hint"></span>
+      <div class="picker-footer-actions">
+        <button id="pickerAddVisibleBtn" type="button" hidden>Alle hinzufügen</button>
+        <button value="cancel" class="primary">Fertig</button>
+      </div>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="gigStartDialog" aria-labelledby="gigStartTitle">
   <form method="dialog">
@@ -272,7 +308,7 @@
   </form>
 </dialog>
 
-<dialog id="displaySettings" aria-labelledby="displaySettingsTitle"><form method="dialog" class="settings-form"><div class="dialog-head"><div><h2 id="displaySettingsTitle">Anzeige &amp; Barrierefreiheit</h2><p class="dialog-intro">Darstellung für Bühne, Smartphone und persönliche Bedürfnisse anpassen. <strong>Version 9.6.10</strong></p></div><button value="cancel" class="close-dialog" aria-label="Einstellungen schließen">✕</button></div><div class="settings-grid"><section class="settings-group" aria-labelledby="themeSettingsTitle"><h3 id="themeSettingsTitle">Farben &amp; Kontrast</h3><label class="color-setting chord-color-setting" for="chordColor"><span><strong>🎸 Akkordfarbe ändern</strong><small>Tippe auf das große Farbfeld. Die Änderung wird sofort im Songblatt sichtbar.</small></span><span class="color-control"><input id="chordColor" type="color" value="#2563eb" aria-label="Akkordfarbe auswählen"><output id="chordColorValue">#2563EB</output></span></label><label class="toggle-setting"><span><strong>Dark Mode</strong><small>Modernes neutrales Schwarz und Grau – ohne Brauntöne</small></span><input id="darkToggle" type="checkbox" role="switch"></label><label class="toggle-setting"><span><strong>Hoher Kontrast</strong><small>Schwarz, Weiß und Gelb für maximale Erkennbarkeit</small></span><input id="contrastToggle" type="checkbox" role="switch"></label></section><section class="settings-group" aria-labelledby="readingSettingsTitle"><h3 id="readingSettingsTitle">Lesbarkeit</h3><label class="range-setting" for="uiFontRange"><span><strong>App-Schriftgröße</strong><output id="uiFontValue">100 %</output></span><input id="uiFontRange" type="range" min="85" max="130" step="5" value="100"></label><label class="range-setting" for="fontRange"><span><strong>Lyrics-Schriftgröße</strong><output id="fontValue">26 px</output></span><input id="fontRange" type="range" min="16" max="42" step="1" value="26"></label><label class="range-setting" for="lineRange"><span><strong>Zeilenabstand</strong><output id="lineValue">1.6</output></span><input id="lineRange" type="range" min="120" max="220" step="5" value="160"></label></section></div><div class="settings-actions"><button id="resetDisplayBtn" type="button">Standard wiederherstellen</button><button id="footswitchSettingsBtn" type="button">🦶 Fußschalter</button><button id="fullscreenBtn" type="button">Vollbild umschalten</button><button value="cancel" class="primary">Fertig</button></div></form></dialog>
+<dialog id="displaySettings" aria-labelledby="displaySettingsTitle"><form method="dialog" class="settings-form"><div class="dialog-head"><div><h2 id="displaySettingsTitle">Anzeige &amp; Barrierefreiheit</h2><p class="dialog-intro">Darstellung für Bühne, Smartphone und persönliche Bedürfnisse anpassen. <strong>Version 9.7.0</strong></p></div><button value="cancel" class="close-dialog" aria-label="Einstellungen schließen">✕</button></div><div class="settings-grid"><section class="settings-group" aria-labelledby="themeSettingsTitle"><h3 id="themeSettingsTitle">Farben &amp; Kontrast</h3><label class="color-setting chord-color-setting" for="chordColor"><span><strong>🎸 Akkordfarbe ändern</strong><small>Tippe auf das große Farbfeld. Die Änderung wird sofort im Songblatt sichtbar.</small></span><span class="color-control"><input id="chordColor" type="color" value="#2563eb" aria-label="Akkordfarbe auswählen"><output id="chordColorValue">#2563EB</output></span></label><label class="toggle-setting"><span><strong>Dark Mode</strong><small>Modernes neutrales Schwarz und Grau – ohne Brauntöne</small></span><input id="darkToggle" type="checkbox" role="switch"></label><label class="toggle-setting"><span><strong>Hoher Kontrast</strong><small>Schwarz, Weiß und Gelb für maximale Erkennbarkeit</small></span><input id="contrastToggle" type="checkbox" role="switch"></label></section><section class="settings-group" aria-labelledby="readingSettingsTitle"><h3 id="readingSettingsTitle">Lesbarkeit</h3><label class="range-setting" for="uiFontRange"><span><strong>App-Schriftgröße</strong><output id="uiFontValue">100 %</output></span><input id="uiFontRange" type="range" min="85" max="130" step="5" value="100"></label><label class="range-setting" for="fontRange"><span><strong>Lyrics-Schriftgröße</strong><output id="fontValue">26 px</output></span><input id="fontRange" type="range" min="16" max="42" step="1" value="26"></label><label class="range-setting" for="lineRange"><span><strong>Zeilenabstand</strong><output id="lineValue">1.6</output></span><input id="lineRange" type="range" min="120" max="220" step="5" value="160"></label></section></div><div class="settings-actions"><button id="resetDisplayBtn" type="button">Standard wiederherstellen</button><button id="footswitchSettingsBtn" type="button">🦶 Fußschalter</button><button id="fullscreenBtn" type="button">Vollbild umschalten</button><button value="cancel" class="primary">Fertig</button></div></form></dialog>
 
 <dialog id="chordieImportDialog" aria-labelledby="chordieImportTitle"><form method="dialog" class="chordie-import-form"><div class="dialog-head"><div><h2 id="chordieImportTitle">Chordie-Suche &amp; Import</h2><p class="dialog-intro">1. Song suchen · 2. Lyrics und Akkorde kopieren · 3. Hier einfügen und lokal speichern</p></div><button value="cancel" aria-label="Dialog schließen">✕</button></div><div class="chordie-search-row"><label>Songtitel<input id="chordieSongTitle" type="text" placeholder="z. B. Ring of Fire"></label><label>Interpret<input id="chordieArtist" type="text" placeholder="z. B. Johnny Cash"></label></div><button id="searchChordieBtn" type="button">🔎 Auf Chordie suchen</button><div class="clipboard-actions"><button id="readClipboardBtn" type="button">📋 Aus Zwischenablage einfügen</button><span class="hint">Falls der Browser den Zugriff blockiert, unten lange drücken und „Einfügen“ wählen.</span></div><label>Lyrics &amp; Akkorde<textarea id="chordiePasteText" rows="18" spellcheck="false" placeholder="Kopierten Inhalt hier einfügen …"></textarea></label><p id="chordieImportStatus" class="hint" aria-live="polite"></p><div class="dialog-actions"><button value="cancel">Abbrechen</button><button id="saveClipboardSongBtn" type="button" class="primary">Song lokal importieren</button></div></form></dialog>
 <dialog id="songEditor"><form method="dialog" id="songEditorForm"><div class="dialog-head"><h2>Song bearbeiten</h2><button value="cancel">✕</button></div><label>Titel<input id="editTitle" type="text"></label><label>Interpret<input id="editArtist" type="text"></label><label>Chordie-Referenz oder Suchlink<input id="editChordieUrl" type="url" inputmode="url" placeholder="https://www.chordie.com/..."></label><div class="editor-grid"><label>BPM<input id="editBpm" type="number" min="1" max="300"></label><label>Capo<input id="editCapo" type="number" min="0" max="12"></label><label>Sänger<input id="editSinger" type="text"></label></div><section class="editor-pdf-section" aria-labelledby="editorPdfTitle"><div><strong id="editorPdfTitle">📄 PDF-Liedblatt</strong><small id="editPdfStatus">Kein PDF hinterlegt.</small></div><div class="editor-pdf-actions"><button id="attachPdfBtn" type="button">+ PDF hinzufügen</button><button id="removePdfBtn" type="button">PDF entfernen</button></div></section><label>Notizen<textarea id="editNotes" rows="5" placeholder="Eigene Bühnen- oder Spielhinweise …"></textarea></label><label>Songblatt
@@ -300,7 +336,8 @@
     <div class="tutorial-actions"><button id="tutorialBackBtn" type="button">Zurück</button><button id="tutorialNextBtn" type="button" class="primary">Weiter</button></div>
   </section>
 </div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <div id="errorBanner" class="error-banner" hidden></div>
-<script src="./app.js?v=9.6.10" type="module"></script>
+<script src="./app.js?v=9.7.0" type="module"></script>
 </body>
 </html>

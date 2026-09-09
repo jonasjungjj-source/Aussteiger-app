@@ -1,4 +1,32 @@
-# Aussteiger Band-App – Version 9.6.10
+# Aussteiger Band-App – Version 9.7.0
+
+## Neu in Version 9.7.0
+
+### Zurück auf jeder Ebene
+- Zurück-Pfeil oben links auf jeder Seite außer der Übersicht; er nennt sein Ziel.
+- Aus dem Player geht es zurück in die Liste, aus der der Song geöffnet wurde.
+- Offene Dialoge und das Menü werden zuerst geschlossen, dann wird navigiert.
+- Zurück-Taste, Wischgeste und Escape nutzen denselben Weg.
+
+### PDF-Liedblätter zuverlässig auf iPhone und iPad
+- PDFs liegen jetzt als Datei-Inhalt in IndexedDB statt als Datei-Referenz.
+  Auf iOS wurden solche Referenzen nach einem Neustart ungültig – daher der
+  Verknüpfungsfehler mit grauer Platzhalterkachel.
+- Vorhandene PDFs werden beim ersten Öffnen automatisch umgestellt.
+- Die Seiten werden in der App gezeichnet (pdf.js liegt offline in
+  `assets/vendor/pdfjs/`), inklusive Seitenzähler, Zoom und Autoscroll.
+- Songs, die nur aus einem PDF bestehen, öffnen direkt im PDF-Reiter.
+
+### Songs in Setlisten aufnehmen
+- „+ Song hinzufügen“ öffnet die vollflächige Liste „Alle Songs“ mit Suche,
+  Filtern, Zähler und „Alle N hinzufügen“. Ein zweiter Tipp entfernt wieder.
+- Leere Setlisten führen direkt zur Auswahl.
+
+### Import nachvollziehbar
+- Nach dem Import öffnet „Alle Songs“ gefiltert auf die neue Bibliothek,
+  mit Titelliste, „Öffnen“ je Song und „Alle zur aktiven Setliste“.
+- Bibliotheken lassen sich auf der Importseite anzeigen, umbenennen, entfernen.
+- Neue Filter „Neu importiert“ und „Mit Liedblatt“.
 
 ## Neu in Version 9.6.10
 - Die Auto-Scroll-Geschwindigkeit wird jetzt pro Song gespeichert.

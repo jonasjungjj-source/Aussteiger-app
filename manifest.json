@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#f3f4f6",
   "theme_color": "#0b0d10",
-  "description": "Live-Songbook mit Setlisten, PDF/Markdown-Import, Akkordpositionierung, Tabs, Gesangsmarkierungen und Fußschalter.",
+  "description": "Live-Songbook mit Setlisten, Zurück-Navigation, PDF-Liedblättern, Akkordpositionierung, Tabs, Gesangsmarkierungen und Fußschalter.",
   "icons": [
     {
       "src": "./assets/icons/icon-192.png",

@@ -1,0 +1,47 @@
+Aussteiger Band-App v9.7.0
+
+WICHTIG BEIM HOCHLADEN
+- Alle Dateien und Ordner in das Stammverzeichnis des GitHub-Pages-Repositories legen
+  und vorhandene Dateien ersetzen.
+- Neu hinzugekommen ist der Ordner assets/vendor/pdfjs/ (PDF-Anzeige, ca. 2,6 MB).
+  Ohne diesen Ordner werden PDFs nur noch über "Original oeffnen" angezeigt.
+- Nach dem Deploy die App einmal schliessen und neu oeffnen: der Service-Worker
+  laedt Version 9.7.0 (neuer Cache-Name aussteiger-bandapp-v9-7-0-back-nav-pdf-canvas).
+
+1. ZURUECK-NAVIGATION
+- Zurueck-Pfeil oben links auf jeder Seite ausser der Uebersicht, mit Ziel im Namen.
+- Player -> zurueck zur Liste, aus der der Song geoeffnet wurde.
+- Unterseiten -> zurueck zur Uebersicht.
+- Schliesst zuerst offene Dialoge und das Menue, dann wird navigiert.
+- Zurueck-Taste bzw. Wischgeste des Geraets und die Escape-Taste nutzen denselben Weg.
+- Im Player fuehrt zusaetzlich ein Listen-Symbol direkt zur Setliste.
+
+2. PDF-LIEDBLAETTER
+- PDFs werden als Datei-Inhalt gespeichert statt als Datei-Referenz.
+  Damit bleiben sie auf iPhone/iPad nach einem Neustart lesbar.
+- Bereits gespeicherte PDFs werden beim ersten Oeffnen automatisch umgestellt.
+- Die Seiten werden in der App selbst gezeichnet (pdf.js, offline enthalten).
+  Damit entfaellt die leere Platzhalterkachel mit "Oeffnen"-Knopf unter iOS.
+- Neu: Seitenzaehler, Zoom (75-300 %, wird gespeichert), Seitensprung, Autoscroll.
+- Songs, die nur aus einem PDF bestehen, oeffnen direkt im PDF-Reiter.
+- Fehlt eine Datei, erscheint eine klare Meldung mit "PDF neu hinzufuegen".
+
+3. SONGS IN SETLISTEN
+- "+ Song hinzufuegen" oeffnet die vollflaechige Liste "Alle Songs".
+- Suche, Filter (Favoriten / Neu importiert / Mit Liedblatt / letzte Bibliotheken),
+  Zaehler, "Alle N hinzufuegen"; ein zweiter Tipp entfernt den Song wieder.
+- Leere Setlisten zeigen direkt einen Auswahl-Knopf.
+
+4. IMPORT UEBERSICHTLICHER
+- Nach dem Import springt die App in "Alle Songs", gefiltert auf die neue Bibliothek.
+- Hinweisfeld mit allen importierten Titeln, je Titel "Oeffnen",
+  dazu "Alle zur aktiven Setliste".
+- Bibliotheken koennen auf der Importseite angezeigt, umbenannt und entfernt werden.
+- Filter "Neu importiert" und "Mit Liedblatt" in "Alle Songs".
+- Songs mit Liedblatt sind in Bibliothek und Setliste gekennzeichnet.
+
+5. KLEINERES
+- Stoerende Meldungsfenster durch kurze Einblendungen ersetzt.
+- Fehlerhafte Zeichenfolge im Songblatt importierter PDFs bereinigt.
+- Tutorial um Zurueck-Navigation, Songauswahl und PDF-Anzeige erweitert
+  und laeuft einmalig neu an.

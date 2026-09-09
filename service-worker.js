@@ -1,14 +1,22 @@
-const CACHE = 'aussteiger-bandapp-v9-6-10-metronome-pdf-scroll';
+const CACHE = 'aussteiger-bandapp-v9-7-0-back-nav-pdf-canvas';
 const APP_SHELL = [
   './', './index.html', './chords.html',
-  './app.js?v=9.6.10', './styles.css?v=9.6.10', './manifest.json?v=9.6.10',
+  './app.js?v=9.7.0', './styles.css?v=9.7.0', './manifest.json?v=9.7.0',
   './songs.json', './setlists.json',
   './assets/images/logo.jpg', './assets/icons/icon.svg',
   './assets/icons/icon-180.png', './assets/icons/icon-192.png', './assets/icons/icon-512.png'
 ];
 
+// PDF-Anzeige: wird zusätzlich vorgeladen, blockiert die Installation aber nicht.
+const PDF_ENGINE = [
+  './assets/vendor/pdfjs/pdf.min.mjs',
+  './assets/vendor/pdfjs/pdf.worker.min.mjs'
+];
+
 self.addEventListener('install', event => event.waitUntil(
-  caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
+  caches.open(CACHE)
+    .then(cache => cache.addAll(APP_SHELL).then(() => cache.addAll(PDF_ENGINE).catch(error => console.warn('PDF-Anzeige nicht vorgeladen', error))))
+    .then(() => self.skipWaiting())
 ));
 
 self.addEventListener('activate', event => event.waitUntil(

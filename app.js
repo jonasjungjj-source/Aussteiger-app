@@ -17,7 +17,17 @@ const STORAGE = {
   transportCollapsed: 'band-v9-transport-collapsed',
   metronome: 'band-v965-metronome',
   live: 'band-v966-live',
-  newSongs: 'band-v9610-new-songs'
+  newSongs: 'band-v9610-new-songs',
+  pdfZoom: 'band-v970-pdf-zoom'
+};
+
+const VIEW_LABELS = {
+  dashboard: 'Übersicht', setlists: 'Setlisten', library: 'Alle Songs', favorites: 'Favoriten',
+  metronome: 'Metronom', tuner: 'Stimmgerät', import: 'Songs importieren', player: 'Player', about: 'Hinweise'
+};
+const VIEW_PARENTS = {
+  dashboard: '', setlists: 'dashboard', library: 'dashboard', favorites: 'dashboard',
+  metronome: 'dashboard', tuner: 'dashboard', import: 'dashboard', about: 'dashboard', player: 'setlists'
 };
 
 const state = {
@@ -31,6 +41,11 @@ const state = {
   annotations: {}, annotationMode: false, activeStroke: null,
   metronomeSettings: {}, metronomeRunning: false, metronomeTimer: null, metronomeBeat: 0, metronomeAudio: null, tapTimes: [],
   pdfScroll: { page: 1, pages: 0, fallbackProgress: 0 },
+  pdfPanel: { songId: null, loaded: false, loading: false },
+  pdfView: { doc: null, observer: null, tasks: [], sizes: [], zoom: 1 },
+  nav: { current: 'dashboard', stack: [], playerOrigin: 'setlists', guarded: false },
+  picker: { filter: 'all', added: 0 },
+  lastImport: null,
   live: { gigMode:false, countInTimer:null, countInBeat:0, sectionIndex:0 },
   pendingSetlistSongId: null,
   newSongIds: new Set(),
@@ -75,6 +90,8 @@ function loadLocalState() {
   state.songSpeeds = safeParse(localStorage.getItem(STORAGE.songSpeeds), {});
   state.metronomeSettings = safeParse(localStorage.getItem(STORAGE.metronome), {});
   state.newSongIds = new Set(safeParse(localStorage.getItem(STORAGE.newSongs), []));
+  const storedZoom = Number(localStorage.getItem(STORAGE.pdfZoom));
+  state.pdfView.zoom = storedZoom >= 0.75 && storedZoom <= 3 ? storedZoom : 1;
   state.footswitch.actions = { scroll:'scroll', next:'next', prev:'prev', ...(state.footswitch.actions || {}) };
 }
 
@@ -106,7 +123,34 @@ function uniqueSongId(baseId) {
 
 const PDF_DB = 'aussteiger-bandapp-files-v1';
 const PDF_STORE = 'pdfs';
+const PDFJS_BASE = './assets/vendor/pdfjs/';
 let activePdfObjectUrl = '';
+let pdfEnginePromise = null;
+
+function isAppleTouchDevice() {
+  const ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1);
+}
+
+function vendorUrl(file) {
+  return new URL(`${PDFJS_BASE}${file}`, document.baseURI).href;
+}
+
+// pdf.js wird erst geladen, wenn wirklich ein PDF angezeigt werden soll.
+function loadPdfEngine() {
+  if (!pdfEnginePromise) {
+    pdfEnginePromise = import(vendorUrl('pdf.min.mjs'))
+      .then(module => {
+        const lib = module?.getDocument ? module : module?.default;
+        if (!lib?.getDocument) throw new Error('PDF-Anzeige konnte nicht initialisiert werden.');
+        try { lib.GlobalWorkerOptions.workerSrc = vendorUrl('pdf.worker.min.mjs'); }
+        catch (error) { console.warn('PDF-Worker nicht setzbar, Hauptthread wird genutzt', error); }
+        return lib;
+      })
+      .catch(error => { pdfEnginePromise = null; throw error; });
+  }
+  return pdfEnginePromise;
+}
 
 function openPdfDb() {
   return new Promise((resolve, reject) => {
@@ -120,25 +164,83 @@ function openPdfDb() {
   });
 }
 
-async function savePdfBlob(songId, file) {
+async function writePdfRecord(songId, record) {
   const db = await openPdfDb();
   await new Promise((resolve, reject) => {
     const tx = db.transaction(PDF_STORE, 'readwrite');
-    tx.objectStore(PDF_STORE).put(file, songId);
+    tx.objectStore(PDF_STORE).put(record, songId);
     tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
   });
   db.close();
 }
 
-async function getPdfBlob(songId) {
+// PDFs werden als Bytes gespeichert, nicht als File-Referenz.
+// Auf iOS/iPadOS werden gespeicherte File-Objekte nach einem Neustart teils ungültig.
+async function savePdfBlob(songId, file) {
+  const buffer = await file.arrayBuffer();
+  if (!buffer?.byteLength) throw new Error('Die Datei ist leer oder konnte nicht gelesen werden.');
+  const record = {
+    format: 'bytes-v1', data: buffer,
+    type: file.type || 'application/pdf',
+    name: file.name || 'Song.pdf',
+    size: buffer.byteLength,
+    savedAt: new Date().toISOString()
+  };
+  await writePdfRecord(songId, record);
+  return record;
+}
+
+async function readPdfEntry(songId) {
   const db = await openPdfDb();
   const value = await new Promise((resolve, reject) => {
     const tx = db.transaction(PDF_STORE, 'readonly');
     const request = tx.objectStore(PDF_STORE).get(songId);
-    request.onsuccess = () => resolve(request.result || null);
+    request.onsuccess = () => resolve(request.result ?? null);
     request.onerror = () => reject(request.error);
   });
   db.close(); return value;
+}
+
+function toArrayBuffer(data) {
+  if (!data || typeof data !== 'object') return null;
+  if (typeof data.byteLength !== 'number') return null;
+  // TypedArray / DataView
+  if (data.buffer && typeof data.byteOffset === 'number') {
+    return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+  }
+  // ArrayBuffer
+  if (typeof data.slice === 'function') return data;
+  return null;
+}
+
+function isBlobLike(value) {
+  return !!value && typeof value === 'object' && typeof value.arrayBuffer === 'function' && typeof value.size === 'number';
+}
+
+async function getPdfRecord(songId) {
+  const raw = await readPdfEntry(songId);
+  if (!raw) return null;
+  if (isBlobLike(raw)) {
+    // Altbestand: Blob/File direkt gespeichert -> einmalig in Bytes umschreiben.
+    const buffer = await raw.arrayBuffer();
+    const record = {
+      format: 'bytes-v1', data: buffer,
+      type: raw.type || 'application/pdf',
+      name: raw.name || 'Song.pdf',
+      size: buffer.byteLength,
+      savedAt: new Date().toISOString()
+    };
+    try { await writePdfRecord(songId, record); } catch (error) { console.warn('PDF-Umwandlung fehlgeschlagen', error); }
+    return record;
+  }
+  const data = toArrayBuffer(raw.data);
+  if (!data?.byteLength) return null;
+  return { ...raw, data };
+}
+
+async function getPdfBlob(songId) {
+  const record = await getPdfRecord(songId);
+  return record ? new Blob([record.data], { type: record.type || 'application/pdf' }) : null;
 }
 
 async function deletePdfBlob(songId) {
@@ -261,7 +363,7 @@ function openChordieImport() {
   $('#chordieArtist').value = current?.artist || '';
   $('#chordiePasteText').value = '';
   $('#chordieImportStatus').textContent = '';
-  $('#chordieImportDialog').showModal();
+  openDialog('#chordieImportDialog');
 }
 
 function searchChordie() {
@@ -353,7 +455,7 @@ async function importSongFiles(fileList, options={}) {
         const guessed=inferFilenameMetadata(file.name);
         const id=batchUniqueId(slugify(`${guessed.title}-${guessed.artist||'pdf'}`));
         await savePdfBlob(id,file);
-        newSongs.push(enrichImportedSong({id,library:libraryId,title:guessed.title,artist:guessed.artist,tags:[],pdfAttachment:true,pdfName:file.name,content:'[PDF]\\nOriginal-Songblatt ist im Reiter „PDF“ gespeichert.'},file.name,'PDF-Import'));
+        newSongs.push(enrichImportedSong({id,library:libraryId,title:guessed.title,artist:guessed.artist,tags:[],pdfAttachment:true,pdfOnly:true,pdfName:file.name,content:'[PDF-Liedblatt]\nDieser Song öffnet direkt das importierte Liedblatt.'},file.name,'PDF-Import'));
         continue;
       }
       const text=await file.text();
@@ -391,17 +493,45 @@ async function importSongFiles(fileList, options={}) {
     }
   }
   if(!newSongs.length){
-    const msg='Keine passenden Songs gefunden.'+(failures.length?`\\n\\n${failures.join('\\n')}`:'');
+    const msg='Keine passenden Songs gefunden.'+(failures.length?`\n\n${failures.join('\n')}`:'');
     alert(msg); return [];
   }
   state.libraries.push({id:libraryId,name:libraryName.trim(),importedAt:new Date().toISOString(),count:newSongs.length});
   state.importedSongs.push(...newSongs);
   markSongsNew(newSongs.map(s=>s.id));
-  saveLibraries(); renderAll(); renderLibraryFilterOptions(); renderLibrariesManager();
+  saveLibraries();
+  state.lastImport={libraryId,name:libraryName.trim(),ids:newSongs.map(s=>s.id),skipped:failures};
+  renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
   const result=$('#importResult');
-  if(result) result.innerHTML=`<strong>${newSongs.length} Song(s) importiert.</strong><span>Bibliothek: ${esc(libraryName.trim())}</span>${failures.length?`<small>${failures.length} Datei(en) übersprungen.</small>`:''}`;
-  if(!options.silent) alert(`${newSongs.length} Song(s) importiert${failures.length?` · ${failures.length} Datei(en) übersprungen`:''}. Neue Songs sind mit „NEU“ markiert.`);
+  if(result){
+    result.innerHTML=`<strong>${newSongs.length} Song(s) importiert</strong><span>Bibliothek „${esc(libraryName.trim())}“</span>${failures.length?`<small>${failures.length} Datei(en) übersprungen: ${esc(failures.join(' · '))}</small>`:''}<button id="importShowSongsBtn" type="button" class="primary">Importierte Songs öffnen</button>`;
+    const show=$('#importShowSongsBtn'); if(show) show.onclick=()=>showLibrary(libraryId);
+  }
+  if(!options.silent){
+    showLibrary(libraryId);
+    showToast(`${newSongs.length} Song(s) in „${libraryName.trim()}“ importiert`, 'success');
+  }
   return newSongs;
+}
+
+// Öffnet „Alle Songs“ gefiltert auf eine importierte Bibliothek.
+function showLibrary(libraryId) {
+  renderLibraryFilterOptions();
+  const select = $('#libraryFilter');
+  if (select) select.value = libraryId ? `lib:${libraryId}` : 'all';
+  const search = $('#searchInput'); if (search) search.value = '';
+  switchView('library');
+  renderLibrary();
+}
+
+function renameLibrary(libraryId) {
+  const lib = state.libraries.find(item => item.id === libraryId);
+  if (!lib) return;
+  const name = prompt('Neuer Name der Bibliothek:', lib.name);
+  if (!name?.trim()) return;
+  lib.name = name.trim();
+  saveLibraries(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
+  showToast('Bibliothek umbenannt', 'success');
 }
 
 async function removeLibrary(libraryId) {
@@ -411,30 +541,62 @@ async function removeLibrary(libraryId) {
   for (const item of removing) if (item.pdfAttachment) { try { await deletePdfBlob(item.id); } catch (error) { console.warn(error); } }
   state.libraries = state.libraries.filter(item => item.id !== libraryId);
   state.importedSongs = state.importedSongs.filter(item => item.library !== libraryId);
-  saveLibraries(); renderAll(); renderLibraryFilterOptions(); renderLibrariesManager();
+  if (state.lastImport?.libraryId === libraryId) state.lastImport = null;
+  const select = $('#libraryFilter');
+  if (select?.value === `lib:${libraryId}`) select.value = 'all';
+  saveLibraries(); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
+  showToast(`Bibliothek „${lib.name}“ entfernt`);
 }
 
 function renderLibraryFilterOptions() {
   const select = $('#libraryFilter'); if (!select) return;
   const current = select.value;
-  [...select.querySelectorAll('option[data-library]')].forEach(option => option.remove());
-  state.libraries.forEach(lib => {
-    const option = document.createElement('option');
-    option.value = `lib:${lib.id}`; option.dataset.library = '1';
-    option.textContent = `Bibliothek: ${lib.name} (${lib.count})`;
-    select.append(option);
-  });
+  select.querySelector('optgroup[data-libraries]')?.remove();
+  if (state.libraries.length) {
+    const group = document.createElement('optgroup');
+    group.label = 'Importierte Bibliotheken';
+    group.dataset.libraries = '1';
+    state.libraries.forEach(lib => {
+      const option = document.createElement('option');
+      option.value = `lib:${lib.id}`;
+      option.textContent = `${lib.name} (${lib.count})`;
+      group.append(option);
+    });
+    select.append(group);
+  }
   if ([...select.options].some(option => option.value === current)) select.value = current;
 }
 
+function libraryFilterLabel(filter) {
+  if (filter?.startsWith('lib:')) {
+    const lib = state.libraries.find(item => `lib:${item.id}` === filter);
+    return lib ? `Bibliothek „${lib.name}“` : 'Bibliothek';
+  }
+  return {
+    all: 'Alle Songs', setlist: 'Aktive Setliste', favorites: 'Favoriten',
+    new: 'Neu importiert', pdf: 'Songs mit Liedblatt', 'public-domain': 'Public Domain'
+  }[filter] || 'Alle Songs';
+}
+
 function renderLibrariesManager() {
-  const host = $('#librariesManager'); if (!host) return; host.innerHTML = '';
-  if (!state.libraries.length) { host.innerHTML = '<p class="empty">Noch keine Songbibliotheken importiert.</p>'; return; }
-  state.libraries.forEach(lib => {
-    const row = document.createElement('div'); row.className = 'picker-item';
-    row.innerHTML = `<div><strong>${esc(lib.name)}</strong><small>${lib.count} Song(s) · importiert ${new Date(lib.importedAt).toLocaleDateString('de')}</small></div><button type="button">Entfernen</button>`;
-    row.querySelector('button').onclick = () => removeLibrary(lib.id);
-    host.append(row);
+  ['#librariesManager', '#librariesManagerImport'].forEach(selector => {
+    const host = $(selector);
+    if (!host) return;
+    host.innerHTML = '';
+    if (!state.libraries.length) {
+      host.innerHTML = '<p class="empty">Noch keine Songs importiert. Importierte Dateien werden hier als Bibliothek gesammelt.</p>';
+      return;
+    }
+    state.libraries.forEach(lib => {
+      const row = document.createElement('div');
+      row.className = 'picker-item library-row';
+      row.innerHTML = `<div><strong>${esc(lib.name)}</strong><small>${lib.count} Song(s) · importiert ${new Date(lib.importedAt).toLocaleDateString('de')}</small></div>`
+        + '<div class="library-row-actions"><button type="button" data-act="show">Anzeigen</button><button type="button" data-act="rename">Umbenennen</button><button type="button" data-act="remove">Entfernen</button></div>';
+      row.querySelector('[data-act="show"]').onclick = () => showLibrary(lib.id);
+      row.querySelector('[data-act="rename"]').onclick = () => renameLibrary(lib.id);
+      row.querySelector('[data-act="remove"]').onclick = () => removeLibrary(lib.id);
+      host.append(row);
+    });
   });
 }
 
@@ -519,6 +681,22 @@ function meta(item) { return [item.key && `Tonart ${item.key}`, item.bpm && `${i
 function searchable(item) { return [item.title, item.artist, item.genre, ...(item.tags || [])].join(' ').toLowerCase(); }
 function isPublicDomain(item) { return item.tags?.some(tag => /public domain|gemeinfrei/i.test(tag)) || /public domain|gemeinfrei/i.test(item.source?.lyricsLicense || ''); }
 
+// Kurze, nicht blockierende Rückmeldung – ersetzt Alert-Fenster.
+let toastTimer = null;
+function showToast(message, tone = 'info') {
+  const host = $('#toast');
+  if (!host) { console.info(message); return; }
+  host.textContent = message;
+  host.dataset.tone = tone;
+  host.hidden = false;
+  host.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    host.classList.remove('visible');
+    setTimeout(() => { host.hidden = true; }, 260);
+  }, 3200);
+}
+
 function dismissSplash() {
   const splash = $('#splash'); if (!splash) return;
   let dismissed = false;
@@ -531,11 +709,13 @@ async function init() {
   try {
     state.baseSongs = await getJSON('./songs.json');
     state.defaultSetlists = normalizeSetlists(await getJSON('./setlists.json'));
-    loadLocalState(); mergeSongs(); bindUI(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
+    loadLocalState(); mergeSongs(); bindUI(); setupBackNavigation(); applySettings(); setTransportCollapsed(localStorage.getItem(STORAGE.transportCollapsed) === '1', false); renderLibraryFilterOptions(); renderLibrariesManager(); renderAll();
     const initial = song(state.currentId) ? state.currentId : activeSetlist()?.songs.find(id => song(id)) || state.songs[0]?.id;
     if (initial) await openSong(initial, false);
+    state.nav.stack = [];
     switchView('dashboard');
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.6.10', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
+    updateBackButton();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register(new URL('./service-worker.js?v=9.7.0', document.baseURI), { scope: './', updateViaCache: 'none' }).then(registration => registration.update()).catch(console.error);
     dismissSplash();
   } catch (error) {
     $('#errorBanner').hidden = false;
@@ -546,6 +726,7 @@ async function init() {
 
 function bindUI() {
   $('#menuBtn').onclick = openDrawer; $('#backdrop').onclick = closeDrawer;
+  $('#backBtn').onclick = () => handleBack();
   $('#dashboardSetlistBtn').onclick = () => switchView('setlists');
   $('#dashboardOpenSetlistBtn').onclick = () => switchView('setlists');
   $('#dashboardLibraryBtn').onclick = () => switchView('library');
@@ -556,13 +737,14 @@ function bindUI() {
   $('#insertEotBtn').onclick = () => insertEditorText('\n{eot}');
   $('#insertTabBlockBtn').onclick = () => insertEditorText('{sot: Intro}\ne|----------------|\nB|----------------|\nG|----------------|\nD|----------------|\nA|----------------|\nE|----------------|\n{eot}\n');
 
-  $$('.nav-item').forEach(button => button.onclick = () => switchView(button.dataset.view));
-  $('#settingsBtn').onclick = () => $('#displaySettings').showModal();
+  $$('.nav-item').forEach(button => button.onclick = () => switchView(button.dataset.view, { root: true }));
+  $('#settingsBtn').onclick = () => openDialog('#displaySettings');
   $('#tutorialBtn').onclick = () => { closeDrawer(); startTutorial(true); };
   $('#setlistSelect').onchange = event => { state.activeSetlistId = event.target.value; saveSetlists(); renderAll(); };
+  $('#playerSetlistBtn').onclick = () => switchView('setlists');
   $('#newSetlistBtn').onclick = createSetlist; $('#renameSetlistBtn').onclick = renameSetlist; $('#deleteSetlistBtn').onclick = deleteSetlist;
   $('#exportSetlistBtn').onclick = exportActiveSetlist;
-  $('#addSongBtn').onclick = () => { fillSetlistSelect($('#pickerSetlistSelect')); renderPicker(); $('#songPicker').showModal(); };
+  $('#addSongBtn').onclick = () => openSongPicker();
   $('#pickerSetlistSelect').onchange = renderPicker;
   $('#confirmSongToSetlistBtn').onclick = confirmSongToSetlist;
   $('#gigSetlistSelect').onchange = updateGigSetlistInfo;
@@ -570,6 +752,8 @@ function bindUI() {
   $('#endGigBtn').onclick = endGig;
   $('#resetSetlistBtn').onclick = resetActiveSetlist;
   $('#searchInput').oninput = renderLibrary; $('#libraryFilter').onchange = renderLibrary;
+  $('#librarySearchClearBtn').onclick = () => { $('#searchInput').value = ''; $('#libraryFilter').value = 'all'; renderLibrary(); $('#searchInput').focus(); };
+  $('#openImportViewBtn').onclick = () => switchView('import');
   $('#favoriteSearch').oninput = renderFavorites; $('#pickerSearch').oninput = renderPicker;
   $('#startStopBtn').onclick = toggleScroll; $('#toTopBtn').onclick = scrollActiveToTop;
   $('#transportToggleBtn').onclick = () => setTransportCollapsed(!document.body.classList.contains('transport-collapsed'), true);
@@ -627,17 +811,122 @@ function bindUI() {
 }
 
 function renderAll() { renderSetlistSelect(); renderSetlist(); renderLibrary(); renderFavorites(); updateFavoriteButton(); renderDashboard(); updateSetlistTargetControls(); syncMetronomeTool(); requestAnimationFrame(updatePlayerLayout); }
-function openDrawer() { $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#backdrop').hidden = false; }
+function openDrawer() { $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#backdrop').hidden = false; syncHistoryGuard(); }
 function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); $('#backdrop').hidden = true; }
-function switchView(name) {
-  $$('.view').forEach(view => view.classList.remove('active')); $(`#${name}View`).classList.add('active');
+function switchView(name, options = {}) {
+  const view = $(`#${name}View`);
+  if (!view) return;
+  const previous = state.nav.current;
+  const changed = previous !== name;
+  if (options.root) {
+    // Sprung über das Hauptmenü: Zurück führt danach eine Ebene nach oben.
+    state.nav.stack = [];
+  } else if (changed && !options.fromBack) {
+    state.nav.stack.push(previous);
+    if (state.nav.stack.length > 25) state.nav.stack.shift();
+  }
+  state.nav.current = name;
+  $$('.view').forEach(item => item.classList.remove('active')); view.classList.add('active');
   $$('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-  $('#viewTitle').textContent = { dashboard:'Übersicht', setlists:'Setlisten', library:'Alle Songs', favorites:'Favoriten', metronome:'Metronom', tuner:'Stimmgerät', import:'Songs importieren', player:'Player', about:'Hinweise' }[name];
+  $('#viewTitle').textContent = VIEW_LABELS[name] || '';
   document.body.classList.toggle('player-mode', name === 'player');
-  if (name !== 'player') setPlaybackChromeHidden(false);
-  if(name !== 'tuner' && state.tuner?.stream) stopTuner();
+  if (name !== 'player') {
+    setPlaybackChromeHidden(false);
+    if (state.scrolling) stopScroll();
+  }
+  if (name !== 'tuner' && state.tuner?.stream) stopTuner();
+  if (name === 'player' && activePanelName() === 'pdf') ensurePdfLoaded();
+  updateBackButton();
+  syncHistoryGuard();
+  if (changed) window.scrollTo({ top: 0 });
   requestAnimationFrame(updatePlayerLayout);
   closeDrawer();
+}
+
+// „Eine Ebene nach oben“: zuletzt besuchte Ansicht, sonst die übergeordnete Ansicht.
+function backTarget() {
+  const current = state.nav.current;
+  for (let index = state.nav.stack.length - 1; index >= 0; index -= 1) {
+    const candidate = state.nav.stack[index];
+    if (candidate && candidate !== current && $(`#${candidate}View`)) return { name: candidate, index };
+  }
+  if (current === 'player') return { name: state.nav.playerOrigin || 'setlists', index: -1 };
+  return { name: VIEW_PARENTS[current] || 'dashboard', index: -1 };
+}
+
+function updateBackButton() {
+  const button = $('#backBtn');
+  if (!button) return;
+  const isRoot = state.nav.current === 'dashboard';
+  button.hidden = isRoot;
+  if (isRoot) return;
+  const label = VIEW_LABELS[backTarget().name] || 'Übersicht';
+  button.setAttribute('aria-label', `Zurück zu ${label}`);
+  button.title = `Zurück zu ${label}`;
+  const text = button.querySelector('.back-label');
+  if (text) text.textContent = label;
+}
+
+function anyLayerOpen() {
+  return !!($('#drawer')?.classList.contains('open')
+    || document.querySelector('dialog[open]')
+    || ($('#tutorialOverlay') && !$('#tutorialOverlay').hidden));
+}
+
+function closeTopLayer() {
+  const tutorial = $('#tutorialOverlay');
+  if (tutorial && !tutorial.hidden) { finishTutorial(); return true; }
+  if ($('#drawer')?.classList.contains('open')) { closeDrawer(); return true; }
+  const dialogs = [...document.querySelectorAll('dialog')].filter(item => item.open);
+  if (dialogs.length) { dialogs[dialogs.length - 1].close('cancel'); return true; }
+  if (state.live.gigMode) { endGig(); return true; }
+  if (document.body.classList.contains('playback-focus')) { setPlaybackChromeHidden(false); return true; }
+  return false;
+}
+
+// Ein Rücksprung: erst offene Ebenen schließen, dann eine Ansicht nach oben.
+function handleBack() {
+  if (closeTopLayer()) return true;
+  if (state.nav.current === 'dashboard') return false;
+  const target = backTarget();
+  state.nav.stack.length = target.index >= 0 ? target.index : 0;
+  switchView(target.name, { fromBack: true });
+  return true;
+}
+
+function openDialog(selector) {
+  const dialog = typeof selector === 'string' ? $(selector) : selector;
+  if (!dialog) return null;
+  if (!dialog.open) {
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+  }
+  syncHistoryGuard();
+  return dialog;
+}
+
+// Hält einen History-Eintrag vor, damit die Gerätetaste/Wischgeste „zurück“
+// in der App navigiert statt die App zu verlassen.
+function syncHistoryGuard() {
+  if (typeof history === 'undefined') return;
+  const needsGuard = state.nav.current !== 'dashboard' || anyLayerOpen();
+  if (needsGuard && !state.nav.guarded) {
+    try { history.pushState({ appGuard: true, view: state.nav.current }, ''); state.nav.guarded = true; }
+    catch (error) { /* History nicht verfügbar */ }
+  }
+}
+
+function setupBackNavigation() {
+  try { history.replaceState({ appRoot: true }, ''); } catch (error) { /* ignorieren */ }
+  window.addEventListener('popstate', () => {
+    state.nav.guarded = false;
+    if (handleBack()) syncHistoryGuard();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if ($('#drawer')?.classList.contains('open')) { closeDrawer(); return; }
+    if (!document.querySelector('dialog[open]') && state.nav.current !== 'dashboard') handleBack();
+  });
 }
 
 
@@ -685,9 +974,15 @@ function renderSetlist() {
   if (!list) { $('#setlistSummary').textContent = 'Noch keine Setliste vorhanden.'; return; }
   const validIds = list.songs.filter(id => song(id));
   $('#setlistSummary').textContent = `${list.name}: ${validIds.length} Songs${list.description ? ` · ${list.description}` : ''}`;
+  if (!validIds.length) {
+    host.innerHTML = `<li class="setlist-empty"><strong>„${esc(list.name)}“ ist noch leer</strong><p>Songs kommen aus der Liste „Alle Songs“.</p><button id="setlistEmptyAddBtn" type="button" class="primary">+ Songs auswählen</button></li>`;
+    const add = $('#setlistEmptyAddBtn');
+    if (add) add.onclick = () => openSongPicker(list.id);
+    return;
+  }
   validIds.forEach((id, index) => {
     const item = song(id); const li = document.createElement('li'); li.className = 'song-row'; li.dataset.songId = id;
-    li.innerHTML = `<button class="drag-handle" type="button" aria-label="${esc(item.title)} verschieben. Gedrückt halten und ziehen." title="Zum Verschieben ziehen">⠿</button><button class="song-main"><span class="number">${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.artist)}${meta(item) ? ` · ${esc(meta(item))}` : ''}</small></span></button><div class="row-actions"><button class="favorite" aria-label="Favorit">${state.favorites.has(id) ? '★' : '☆'}</button><button class="move-up" aria-label="Nach oben">↑</button><button class="move-down" aria-label="Nach unten">↓</button><button class="remove" aria-label="Entfernen">✕</button></div>`;
+    li.innerHTML = `<button class="drag-handle" type="button" aria-label="${esc(item.title)} verschieben. Gedrückt halten und ziehen." title="Zum Verschieben ziehen">⠿</button><button class="song-main"><span class="number">${index + 1}</span><span><strong>${esc(item.title)}${item.pdfAttachment ? ' <span class="row-pdf-mark" title="Liedblatt vorhanden">📄</span>' : ''}</strong><small>${esc(item.artist)}${meta(item) ? ` · ${esc(meta(item))}` : ''}</small></span></button><div class="row-actions"><button class="favorite" aria-label="Favorit">${state.favorites.has(id) ? '★' : '☆'}</button><button class="move-up" aria-label="Nach oben">↑</button><button class="move-down" aria-label="Nach unten">↓</button><button class="remove" aria-label="Entfernen">✕</button></div>`;
     li.querySelector('.song-main').onclick = () => openSong(id); li.querySelector('.favorite').onclick = () => toggleFavorite(id);
     li.querySelector('.move-up').onclick = () => moveSong(index, -1); li.querySelector('.move-down').onclick = () => moveSong(index, 1);
     li.querySelector('.remove').onclick = () => { const pos = list.songs.indexOf(id); if (pos >= 0) list.songs.splice(pos, 1); saveSetlists(); renderAll(); };
@@ -772,10 +1067,20 @@ function bindSetlistDrag(row, handle) {
 }
 
 function songCard(item) {
-  const card = document.createElement('article'); card.className = 'card'; const inList = activeSetlist()?.songs.includes(item.id);
-  const isNew=state.newSongIds.has(item.id); card.innerHTML = `<div class="card-title"><div class="song-badges">${isNew?'<span class="new-song-badge">NEU</span>':''}</div><div><h3>${esc(item.title)}</h3><p>${esc(item.artist)}</p></div><button class="star" aria-label="Favorit">${state.favorites.has(item.id) ? '★' : '☆'}</button></div><small>${esc([item.genre, meta(item)].filter(Boolean).join(' · '))}</small><div class="card-actions"><button class="primary open">Öffnen</button><button class="add">${inList ? '✓ In Setliste' : '+ Setliste'}</button></div>`;
-  card.querySelector('.open').onclick = () => openSong(item.id); card.querySelector('.star').onclick = () => toggleFavorite(item.id);
-  card.querySelector('.add').onclick = () => openSongToSetlist(item.id); return card;
+  const card = document.createElement('article'); card.className = 'card';
+  const inList = activeSetlist()?.songs.includes(item.id);
+  const isNew = state.newSongIds.has(item.id);
+  const badges = [
+    isNew ? '<span class="new-song-badge">NEU</span>' : '',
+    item.pdfAttachment ? '<span class="pdf-song-badge">Liedblatt</span>' : ''
+  ].join('');
+  card.innerHTML = `<div class="card-title"><div class="song-badges">${badges}</div><div><h3>${esc(item.title)}</h3><p>${esc(item.artist)}</p></div><button class="star" aria-label="Favorit">${state.favorites.has(item.id) ? '★' : '☆'}</button></div>`
+    + `<small>${esc([item.genre, meta(item)].filter(Boolean).join(' · '))}</small>`
+    + `<div class="card-actions"><button class="primary open" type="button">Öffnen</button><button class="add" type="button">${inList ? '✓ In Setliste' : '+ Setliste'}</button></div>`;
+  card.querySelector('.open').onclick = () => openSong(item.id);
+  card.querySelector('.star').onclick = () => toggleFavorite(item.id);
+  card.querySelector('.add').onclick = () => openSongToSetlist(item.id);
+  return card;
 }
 
 function filteredSongs(query, filter) {
@@ -783,15 +1088,48 @@ function filteredSongs(query, filter) {
   if (filter === 'setlist') { const ids = new Set(activeSetlist()?.songs || []); items = items.filter(item => ids.has(item.id)); }
   if (filter === 'public-domain') items = items.filter(isPublicDomain);
   if (filter === 'favorites') items = items.filter(item => state.favorites.has(item.id));
+  if (filter === 'new') items = items.filter(item => state.newSongIds.has(item.id));
+  if (filter === 'pdf') items = items.filter(item => item.pdfAttachment);
   if (filter?.startsWith('lib:')) { const libId = filter.slice(4); items = items.filter(item => item.library === libId); }
   if (q) items = items.filter(item => searchable(item).includes(q));
   return [...items].sort((a, b) => a.title.localeCompare(b.title, 'de'));
 }
 
 function renderLibrary() {
-  const items = filteredSongs($('#searchInput').value || '', $('#libraryFilter').value); const host = $('#library'); host.innerHTML = '';
-  $('#librarySummary').textContent = `${items.length} von ${state.songs.length} Songs angezeigt`;
-  if (!items.length) host.innerHTML = '<p class="empty">Keine Songs gefunden.</p>'; else items.forEach(item => host.append(songCard(item)));
+  const filter = $('#libraryFilter').value;
+  const items = filteredSongs($('#searchInput').value || '', filter);
+  const host = $('#library'); host.innerHTML = '';
+  $('#librarySummary').textContent = `${libraryFilterLabel(filter)}: ${items.length} von ${state.songs.length} Songs`;
+  renderImportBanner();
+  if (!items.length) {
+    host.innerHTML = filter === 'all'
+      ? '<p class="empty">Keine Songs gefunden. Suchbegriff ändern oder im Menü unter „Songs importieren“ neue Dateien laden.</p>'
+      : `<p class="empty">In „${esc(libraryFilterLabel(filter))}“ passt gerade kein Song. <button id="libraryShowAllBtn" type="button">Alle Songs zeigen</button></p>`;
+    const showAll = $('#libraryShowAllBtn');
+    if (showAll) showAll.onclick = () => { $('#libraryFilter').value = 'all'; renderLibrary(); };
+    return;
+  }
+  items.forEach(item => host.append(songCard(item)));
+}
+
+// Zeigt direkt nach einem Import, welche Songs angekommen sind.
+function renderImportBanner() {
+  const host = $('#importedBanner');
+  if (!host) return;
+  const info = state.lastImport;
+  const items = (info?.ids || []).map(id => song(id)).filter(Boolean);
+  if (!items.length) { host.hidden = true; host.innerHTML = ''; return; }
+  host.hidden = false;
+  host.innerHTML = `<div class="import-banner-head"><div><strong>${items.length} Song(s) importiert</strong><small>Bibliothek „${esc(info.name)}“</small></div><button id="importBannerCloseBtn" type="button" class="icon-btn" aria-label="Hinweis ausblenden">✕</button></div>`
+    + `<ul class="import-banner-list">${items.map(item => `<li><span><strong>${esc(item.title)}</strong><small>${esc(item.artist || '')}${item.pdfAttachment ? ' · Liedblatt' : ''}</small></span><button type="button" data-open-song="${esc(item.id)}">Öffnen</button></li>`).join('')}</ul>`
+    + '<div class="import-banner-actions"><button id="importAddAllBtn" type="button" class="primary">Alle zur aktiven Setliste</button></div>';
+  host.querySelectorAll('[data-open-song]').forEach(button => { button.onclick = () => openSong(button.dataset.openSong); });
+  $('#importBannerCloseBtn').onclick = () => { state.lastImport = null; renderImportBanner(); };
+  $('#importAddAllBtn').onclick = () => {
+    const added = addSongsToSetlist(items.map(item => item.id));
+    const list = activeSetlist();
+    showToast(added ? `${added} Song(s) zu „${list?.name || 'Setliste'}“ hinzugefügt` : 'Alle Songs sind schon in der Setliste', added ? 'success' : 'info');
+  };
 }
 
 function renderFavorites() {
@@ -800,32 +1138,120 @@ function renderFavorites() {
   if (!items.length) host.innerHTML = '<p class="empty">Noch keine Favoriten markiert.</p>'; else items.forEach(item => host.append(songCard(item)));
 }
 
-function renderPicker() {
-  const q = ($('#pickerSearch').value || '').toLowerCase(); const host = $('#pickerList'); host.innerHTML = '';
+function pickerTarget() {
   const targetId = $('#pickerSetlistSelect')?.value || state.activeSetlistId;
-  const target = state.setlists.find(list=>list.id===targetId) || activeSetlist();
-  filteredSongs(q, 'all').forEach(item => {
-    const row = document.createElement('div'); row.className = 'picker-item';
-    const exists = target?.songs.includes(item.id);
-    row.innerHTML = `<div><strong>${esc(item.title)}</strong><small>${esc(item.artist)}</small></div><button type="button">${exists ? '✓ Enthalten' : 'Hinzufügen'}</button>`;
-    row.querySelector('button').disabled = exists;
-    row.querySelector('button').onclick = () => { addToSetlist(item.id, target?.id); renderPicker(); };
-    host.append(row);
+  return state.setlists.find(list => list.id === targetId) || activeSetlist();
+}
+
+function openSongPicker(targetId = state.activeSetlistId) {
+  state.picker.filter = 'all';
+  state.picker.added = 0;
+  const search = $('#pickerSearch'); if (search) search.value = '';
+  fillSetlistSelect($('#pickerSetlistSelect'), targetId);
+  renderPickerChips();
+  renderPicker();
+  openDialog('#songPicker');
+  setTimeout(() => { const list = $('#pickerList'); if (list) list.scrollTop = 0; }, 40);
+}
+
+function renderPickerChips() {
+  const host = $('#pickerChips');
+  if (!host) return;
+  const chips = [
+    { value: 'all', label: 'Alle Songs' },
+    { value: 'favorites', label: '★ Favoriten' },
+    { value: 'new', label: 'Neu importiert' },
+    { value: 'pdf', label: 'Mit Liedblatt' },
+    ...state.libraries.slice(-3).reverse().map(lib => ({ value: `lib:${lib.id}`, label: lib.name }))
+  ];
+  host.innerHTML = chips
+    .map(chip => `<button type="button" class="chip${state.picker.filter === chip.value ? ' active' : ''}" data-picker-filter="${esc(chip.value)}">${esc(chip.label)}</button>`)
+    .join('');
+  host.querySelectorAll('[data-picker-filter]').forEach(button => {
+    button.onclick = () => {
+      state.picker.filter = button.dataset.pickerFilter;
+      renderPickerChips(); renderPicker();
+    };
   });
 }
 
+function renderPicker() {
+  const host = $('#pickerList');
+  if (!host) return;
+  const query = ($('#pickerSearch').value || '').toLowerCase();
+  const target = pickerTarget();
+  const items = filteredSongs(query, state.picker.filter || 'all');
+  const inList = new Set(target?.songs || []);
+  const targetName = $('#pickerTargetName');
+  if (targetName) targetName.textContent = target ? `Ziel: ${target.name} · ${inList.size} Songs` : 'Keine Setliste vorhanden';
+  const summary = $('#pickerSummary');
+  if (summary) summary.textContent = `${items.length} Song(s) zur Auswahl`;
+  host.innerHTML = '';
+  if (!items.length) {
+    host.innerHTML = '<p class="empty">Kein Song passt zur Suche.</p>';
+  } else {
+    items.forEach(item => {
+      const row = document.createElement('div');
+      const exists = inList.has(item.id);
+      row.className = `picker-item${exists ? ' in-list' : ''}`;
+      row.innerHTML = `<div><strong>${esc(item.title)}</strong><small>${esc(item.artist || '')}${item.pdfAttachment ? ' · Liedblatt' : ''}</small></div>`
+        + `<button type="button" class="${exists ? '' : 'primary'}">${exists ? '✓ Entfernen' : '+ Hinzufügen'}</button>`;
+      row.querySelector('button').onclick = () => {
+        if (exists) { removeFromSetlist(item.id, target?.id); state.picker.added = Math.max(0, state.picker.added - 1); }
+        else { if (addToSetlist(item.id, target?.id)) state.picker.added += 1; }
+        renderPicker();
+      };
+      host.append(row);
+    });
+  }
+  const count = $('#pickerCount');
+  if (count) {
+    count.textContent = state.picker.added
+      ? `${state.picker.added} Song(s) hinzugefügt`
+      : 'Tippe auf „Hinzufügen“, um Songs aufzunehmen.';
+  }
+  const addVisible = $('#pickerAddVisibleBtn');
+  if (addVisible) {
+    const missing = items.filter(item => !inList.has(item.id));
+    addVisible.hidden = missing.length < 2;
+    addVisible.textContent = `Alle ${missing.length} hinzufügen`;
+    addVisible.onclick = () => {
+      const added = addSongsToSetlist(missing.map(item => item.id), target?.id);
+      state.picker.added += added;
+      renderPicker();
+    };
+  }
+}
+
 function addToSetlist(id, setlistId = state.activeSetlistId) {
-  const list = state.setlists.find(item=>item.id===setlistId) || activeSetlist();
+  return addSongsToSetlist([id], setlistId) > 0;
+}
+
+function addSongsToSetlist(ids = [], setlistId = state.activeSetlistId) {
+  const list = state.setlists.find(item => item.id === setlistId) || activeSetlist();
+  if (!list) return 0;
+  let added = 0;
+  ids.filter(id => song(id)).forEach(id => {
+    if (list.songs.includes(id)) return;
+    list.songs.push(id); added += 1;
+  });
+  if (added) { saveSetlists(); renderAll(); }
+  return added;
+}
+
+function removeFromSetlist(id, setlistId = state.activeSetlistId) {
+  const list = state.setlists.find(item => item.id === setlistId) || activeSetlist();
   if (!list) return false;
-  if (!list.songs.includes(id)) { list.songs.push(id); saveSetlists(); renderAll(); return true; }
-  return false;
+  const position = list.songs.indexOf(id);
+  if (position < 0) return false;
+  list.songs.splice(position, 1); saveSetlists(); renderAll(); return true;
 }
 function openSongToSetlist(id){
   const item=song(id); if(!item) return;
   state.pendingSetlistSongId=id;
   $('#songToSetlistName').textContent=`${item.title}${item.artist ? ` · ${item.artist}` : ''}`;
   fillSetlistSelect($('#songTargetSetlistSelect'));
-  $('#songToSetlistDialog').showModal();
+  openDialog('#songToSetlistDialog');
 }
 function confirmSongToSetlist(){
   const id=state.pendingSetlistSongId, target=$('#songTargetSetlistSelect').value;
@@ -834,15 +1260,15 @@ function confirmSongToSetlist(){
   const added=addToSetlist(id,target);
   $('#songToSetlistDialog').close();
   state.pendingSetlistSongId=null;
-  if(added) alert(`Song zu „${list?.name || 'Setliste'}“ hinzugefügt.`);
-  else alert('Der Song ist bereits in dieser Setliste.');
+  if(added) showToast(`Zu „${list?.name || 'Setliste'}“ hinzugefügt`, 'success');
+  else showToast('Dieser Song ist in der Setliste schon enthalten');
 }
 function toggleFavorite(id) { if (!id || !song(id)) return; state.favorites.has(id) ? state.favorites.delete(id) : state.favorites.add(id); saveFavorites(); renderAll(); }
 function updateFavoriteButton() { const active = state.currentId && state.favorites.has(state.currentId); $('#favoriteCurrentBtn').textContent = active ? '★ Favorit' : '☆ Favorit'; }
 
 function createSetlist() { const name = prompt('Name der neuen Setliste:'); if (!name?.trim()) return; const id = `custom-${Date.now()}`; state.setlists.push({ id, name: name.trim(), description: 'Lokale Setliste', songs: [] }); state.activeSetlistId = id; saveSetlists(); renderAll(); }
 function renameSetlist() { const list = activeSetlist(); if (!list) return; const name = prompt('Neuer Name:', list.name); if (!name?.trim()) return; list.name = name.trim(); saveSetlists(); renderAll(); }
-function deleteSetlist() { const list = activeSetlist(); if (!list || state.setlists.length <= 1) { alert('Mindestens eine Setliste muss bestehen bleiben.'); return; } if (!confirm(`Setliste „${list.name}“ löschen?`)) return; state.setlists = state.setlists.filter(item => item.id !== list.id); state.activeSetlistId = state.setlists[0].id; saveSetlists(); renderAll(); }
+function deleteSetlist() { const list = activeSetlist(); if (!list || state.setlists.length <= 1) { showToast('Mindestens eine Setliste muss bestehen bleiben'); return; } if (!confirm(`Setliste „${list.name}“ löschen?`)) return; state.setlists = state.setlists.filter(item => item.id !== list.id); state.activeSetlistId = state.setlists[0].id; saveSetlists(); renderAll(); }
 function resetActiveSetlist() { const list = activeSetlist(); if (!list || !confirm(`„${list.name}“ zurücksetzen?`)) return; const original = state.defaultSetlists.find(item => item.id === list.id); list.songs = original ? [...original.songs] : []; saveSetlists(); renderAll(); }
 
 async function openSong(id, changeView = true) {
@@ -855,13 +1281,15 @@ async function openSong(id, changeView = true) {
   $('#songSheet').innerHTML = `<div class="song-render-content">${renderSong(item.content || item.lyrics || 'Noch kein Songblatt eingetragen. Tippe auf „Bearbeiten“.', semitones)}</div><svg id="annotationLayer" class="annotation-layer" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-label="Gesangsmarkierungen"></svg>`;
   renderAnnotations(item.id); setupAnnotationLayer();
   renderTabs(item, semitones); renderSectionJumps();
-  await renderPdf(item);
+  preparePdfPanel(item);
   $('#notesSheet').innerHTML = item.notes?.trim() ? `<div class="notes-content">${esc(item.notes).replace(/\n/g, '<br>')}</div>` : '<p class="empty">Für diesen Song sind noch keine Notizen gespeichert.</p>';
-  setPlayerPanel('lyrics');
+  if (changeView && state.nav.current !== 'player') state.nav.playerOrigin = state.nav.current;
   $('#transposeResetBtn').textContent = semitones ? `${semitones > 0 ? '+' : ''}${semitones}` : '0';
   const directRef = /^https:\/\/(?:www\.)?chordie\.com\//i.test(item?.source?.url || item?.chordieUrl || '');
   $('#songSourceStatus').textContent = directRef ? 'Chordie-Referenz gespeichert.' : 'Chordie öffnet eine Suche nach Titel und Interpret.';
-  updateFavoriteButton(); markSongSeen(id); scrollTo({ top: 0 }); if (changeView) switchView('player');
+  updateFavoriteButton(); markSongSeen(id); scrollTo({ top: 0 });
+  if (changeView) { switchView('player'); setPlayerPanel(isPdfOnlySong(item) ? 'pdf' : 'lyrics'); }
+  else setPlayerPanel(activePanelName());
 }
 
 function isChordOnlySourceLine(line) {
@@ -949,29 +1377,263 @@ function renderSong(text, semitones = 0) {
   return output.join('');
 }
 
-async function renderPdf(item) {
-  const host = $('#pdfSheet');
-  const button = $('#pdfTabBtn');
-  if (activePdfObjectUrl) { URL.revokeObjectURL(activePdfObjectUrl); activePdfObjectUrl = ''; }
-  button.disabled = false; button.setAttribute('aria-disabled', 'false');
-  if (!item?.pdfAttachment) {
-    host.innerHTML = '<div class="empty pdf-empty-state"><p>Für diesen Song ist kein PDF gespeichert.</p><button id="addPdfFromPlayerBtn" type="button" class="primary">+ PDF hinzufügen</button></div>';
-    $('#addPdfFromPlayerBtn').onclick = promptPdfForCurrentSong; return;
-  }
-  try {
-    const blob = await getPdfBlob(item.id);
-    if (!blob) throw new Error('PDF-Datei nicht mehr im lokalen Speicher gefunden');
-    activePdfObjectUrl = URL.createObjectURL(blob);
-    state.pdfScroll.pages = await estimatePdfPageCount(blob); state.pdfScroll.page = 1; state.pdfScroll.fallbackProgress = 0;
-    const pages=state.pdfScroll.pages;
-    const pageHtml=pages>0
-      ? Array.from({length:pages},(_,i)=>`<section class="pdf-page-card" data-pdf-page="${i+1}"><div class="pdf-page-label">Seite ${i+1} / ${pages}</div><iframe class="pdf-page-frame" title="${esc(item.title)} – Seite ${i+1}" src="${activePdfObjectUrl}#page=${i+1}&view=FitH&toolbar=0&navpanes=0"></iframe></section>`).join('')
-      : `<section class="pdf-page-card"><iframe id="pdfFrame" class="pdf-page-frame pdf-full-document" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#view=FitH"></iframe></section>`;
-    host.innerHTML=`<div class="pdf-actions"><a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">📄 PDF separat öffnen</a><small>${esc(item.pdfName||'Song-PDF')}</small></div><div class="pdf-scroll-status"><span>Alle ${pages||''} Seiten werden untereinander angezeigt.</span><strong id="pdfPageStatus">${pages?`${pages} Seiten`:'PDF'}</strong></div><div class="pdf-scroll-viewer pdf-pages-stack" id="pdfScrollViewer">${pageHtml}</div>`;
-  } catch(error){ host.innerHTML=`<p class="empty">PDF konnte nicht geladen werden: ${esc(error.message)}</p>`; }
+function isPdfOnlySong(item) {
+  if (!item?.pdfAttachment) return false;
+  if (item.pdfOnly) return true;
+  const text = String(item.content || item.lyrics || '')
+    .replace(/\[PDF[^\]]*\]/gi, '').replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.length < 90;
 }
 
+function releasePdfViewer() {
+  state.pdfView.tasks.forEach(task => { try { task.cancel(); } catch (error) { /* egal */ } });
+  state.pdfView.tasks = [];
+  if (state.pdfView.observer) { try { state.pdfView.observer.disconnect(); } catch (error) { /* egal */ } }
+  state.pdfView.observer = null;
+  if (state.pdfView.doc) { try { state.pdfView.doc.destroy(); } catch (error) { /* egal */ } }
+  state.pdfView.doc = null;
+  state.pdfView.sizes = [];
+  if (activePdfObjectUrl) { URL.revokeObjectURL(activePdfObjectUrl); activePdfObjectUrl = ''; }
+}
 
+// Setzt den PDF-Reiter für einen Song auf, lädt aber noch nichts.
+function preparePdfPanel(item) {
+  releasePdfViewer();
+  state.pdfPanel = { songId: item?.id || null, loaded: false, loading: false };
+  state.pdfScroll = { page: 1, pages: 0, fallbackProgress: 0 };
+  const button = $('#pdfTabBtn');
+  if (button) {
+    button.disabled = false; button.setAttribute('aria-disabled', 'false');
+    button.classList.toggle('has-pdf', !!item?.pdfAttachment);
+    button.textContent = item?.pdfAttachment ? '📄 PDF ●' : '📄 PDF';
+    button.title = item?.pdfAttachment ? `PDF vorhanden: ${item.pdfName || 'Song-PDF'}` : 'Kein PDF hinterlegt';
+  }
+  const host = $('#pdfSheet');
+  if (!host) return;
+  if (!item?.pdfAttachment) {
+    host.innerHTML = '<div class="empty pdf-empty-state"><p>Für diesen Song ist kein PDF gespeichert.</p><button id="addPdfFromPlayerBtn" type="button" class="primary">+ PDF hinzufügen</button></div>';
+    const add = $('#addPdfFromPlayerBtn'); if (add) add.onclick = promptPdfForCurrentSong;
+    return;
+  }
+  host.innerHTML = `<div class="pdf-standby"><strong>📄 ${esc(item.pdfName || 'Song-PDF')}</strong><button id="pdfLoadBtn" type="button" class="primary">Liedblatt anzeigen</button></div>`;
+  const load = $('#pdfLoadBtn'); if (load) load.onclick = () => ensurePdfLoaded(true);
+}
+
+async function ensurePdfLoaded(force = false) {
+  const item = song(state.currentId);
+  if (!item?.pdfAttachment) return;
+  if (state.pdfPanel.songId !== item.id) preparePdfPanel(item);
+  if (state.pdfPanel.loading) return;
+  if (state.pdfPanel.loaded && !force) return;
+  if (!force && !$('#playerView')?.classList.contains('active')) return;
+  state.pdfPanel.loading = true;
+  try { await renderPdf(item); } finally { state.pdfPanel.loading = false; }
+}
+
+async function renderPdf(item) {
+  const host = $('#pdfSheet');
+  if (!host || !item?.pdfAttachment) return;
+  const songId = item.id;
+  releasePdfViewer();
+  host.innerHTML = '<p class="empty">Liedblatt wird geladen …</p>';
+  try {
+    const record = await getPdfRecord(songId);
+    if (!record?.data?.byteLength) throw new Error('Die PDF-Datei liegt nicht mehr im Speicher dieses Geräts.');
+    if (state.currentId !== songId) return;
+    activePdfObjectUrl = URL.createObjectURL(new Blob([record.data], { type: record.type || 'application/pdf' }));
+    let doc = null;
+    try {
+      const pdfjs = await loadPdfEngine();
+      doc = await pdfjs.getDocument({
+        data: new Uint8Array(record.data.slice(0)),
+        standardFontDataUrl: vendorUrl('standard_fonts/'),
+        isEvalSupported: false
+      }).promise;
+    } catch (engineError) {
+      console.warn('PDF-Anzeige nicht verfügbar, einfache Ansicht wird genutzt', engineError);
+    }
+    if (state.currentId !== songId) { if (doc) { try { doc.destroy(); } catch (error) { /* egal */ } } return; }
+    if (doc) await buildPdfCanvasViewer(item, doc);
+    else buildPdfFallbackViewer(item);
+    state.pdfPanel = { songId, loaded: true, loading: false };
+    requestAnimationFrame(updatePlayerLayout);
+  } catch (error) {
+    console.error(error);
+    host.innerHTML = `<div class="pdf-error"><strong>Liedblatt lässt sich nicht öffnen</strong><p>${esc(error.message || 'Unbekannter Fehler')}</p><div class="pdf-error-actions"><button id="pdfRetryBtn" type="button">Erneut laden</button><button id="pdfReplaceBtn" type="button" class="primary">PDF neu hinzufügen</button></div></div>`;
+    const retry = $('#pdfRetryBtn'); if (retry) retry.onclick = () => ensurePdfLoaded(true);
+    const replace = $('#pdfReplaceBtn'); if (replace) replace.onclick = promptPdfForCurrentSong;
+  }
+}
+
+// Alle Seiten werden als Bilder gezeichnet. Das funktioniert auch dort,
+// wo eingebettete PDF-Rahmen blockiert sind (iPhone/iPad).
+async function buildPdfCanvasViewer(item, doc) {
+  const host = $('#pdfSheet');
+  const pages = doc.numPages || 0;
+  state.pdfView.doc = doc;
+  state.pdfScroll = { page: 1, pages, fallbackProgress: 0 };
+  const sizes = [];
+  const measured = Math.min(pages, 60);
+  for (let number = 1; number <= measured; number += 1) {
+    try {
+      const page = await doc.getPage(number);
+      const viewport = page.getViewport({ scale: 1 });
+      sizes.push({ width: viewport.width, height: viewport.height });
+      page.cleanup?.();
+    } catch (error) { sizes.push({ width: 595, height: 842 }); }
+  }
+  while (sizes.length < pages) sizes.push(sizes[0] || { width: 595, height: 842 });
+  state.pdfView.sizes = sizes;
+  const zoom = state.pdfView.zoom || 1;
+  const cards = Array.from({ length: pages }, (_, index) => {
+    const size = sizes[index] || { width: 595, height: 842 };
+    const ratio = (size.height / size.width) || 1.414;
+    return `<section class="pdf-page-card" data-pdf-page="${index + 1}" style="--pdf-ratio:${ratio.toFixed(4)}">`
+      + `<div class="pdf-page-label">Seite ${index + 1} / ${pages}</div>`
+      + '<div class="pdf-page-slot"><span class="pdf-page-note">wird gezeichnet …</span></div></section>';
+  }).join('');
+  host.innerHTML = `<div class="pdf-toolbar">
+      <div class="pdf-toolbar-info"><strong>${esc(item.pdfName || 'Song-PDF')}</strong><small id="pdfPageStatus">${pages} Seite${pages === 1 ? '' : 'n'}</small></div>
+      <div class="pdf-toolbar-actions">
+        <button id="pdfPrevPageBtn" type="button" aria-label="Vorige Seite">◀</button>
+        <button id="pdfNextPageBtn" type="button" aria-label="Nächste Seite">▶</button>
+        <button id="pdfZoomOutBtn" type="button" aria-label="Kleiner darstellen">−</button>
+        <output id="pdfZoomValue">${Math.round(zoom * 100)} %</output>
+        <button id="pdfZoomInBtn" type="button" aria-label="Größer darstellen">+</button>
+        <a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">↗ Original</a>
+      </div>
+    </div>
+    <div class="pdf-scroll-viewer pdf-pages-stack" id="pdfScrollViewer" style="--pdf-zoom:${zoom}">${cards}</div>`;
+  bindPdfViewerControls();
+  observePdfPages();
+}
+
+function buildPdfFallbackViewer(item) {
+  const host = $('#pdfSheet');
+  const apple = isAppleTouchDevice();
+  state.pdfScroll = { page: 1, pages: 1, fallbackProgress: 0 };
+  const body = apple
+    ? '<p class="empty">Diese Seite kann das Liedblatt gerade nicht selbst zeichnen. Mit „Original öffnen“ erscheint es im PDF-Viewer des Geräts.</p>'
+    : `<div class="pdf-scroll-viewer pdf-pages-stack" id="pdfScrollViewer"><section class="pdf-page-card" data-pdf-page="1"><iframe class="pdf-page-frame pdf-full-document" title="${esc(item.title)} PDF" src="${activePdfObjectUrl}#view=FitH"></iframe></section></div>`;
+  host.innerHTML = `<div class="pdf-toolbar">
+      <div class="pdf-toolbar-info"><strong>${esc(item.pdfName || 'Song-PDF')}</strong><small>Einfache Ansicht</small></div>
+      <div class="pdf-toolbar-actions">
+        <a class="pdf-open-link" href="${activePdfObjectUrl}" target="_blank" rel="noopener">↗ Original öffnen</a>
+        <button id="pdfRetryBtn" type="button">Erneut laden</button>
+      </div>
+    </div>${body}`;
+  const retry = $('#pdfRetryBtn');
+  if (retry) retry.onclick = () => { pdfEnginePromise = null; ensurePdfLoaded(true); };
+}
+
+function bindPdfViewerControls() {
+  const zoomOut = $('#pdfZoomOutBtn'); if (zoomOut) zoomOut.onclick = () => changePdfZoom(-0.25);
+  const zoomIn = $('#pdfZoomInBtn'); if (zoomIn) zoomIn.onclick = () => changePdfZoom(0.25);
+  const prev = $('#pdfPrevPageBtn'); if (prev) prev.onclick = () => setPdfPage(state.pdfScroll.page - 1);
+  const next = $('#pdfNextPageBtn'); if (next) next.onclick = () => setPdfPage(state.pdfScroll.page + 1);
+  const viewer = $('#pdfScrollViewer');
+  if (viewer) viewer.onscroll = () => updatePdfPageFromScroll();
+}
+
+function changePdfZoom(delta) {
+  const next = Math.min(3, Math.max(0.75, Math.round((state.pdfView.zoom + delta) * 4) / 4));
+  if (next === state.pdfView.zoom) return;
+  state.pdfView.zoom = next;
+  localStorage.setItem(STORAGE.pdfZoom, String(next));
+  const value = $('#pdfZoomValue'); if (value) value.textContent = `${Math.round(next * 100)} %`;
+  const viewer = $('#pdfScrollViewer');
+  if (!viewer) return;
+  viewer.style.setProperty('--pdf-zoom', String(next));
+  refreshPdfPages();
+}
+
+function refreshPdfPages() {
+  const viewer = $('#pdfScrollViewer');
+  if (!viewer || !state.pdfView.doc) return;
+  state.pdfView.tasks.forEach(task => { try { task.cancel(); } catch (error) { /* egal */ } });
+  state.pdfView.tasks = [];
+  viewer.querySelectorAll('[data-pdf-page]').forEach(card => {
+    card.dataset.state = '';
+    const slot = card.querySelector('.pdf-page-slot');
+    if (slot) slot.innerHTML = '<span class="pdf-page-note">wird gezeichnet …</span>';
+  });
+  observePdfPages();
+}
+
+function observePdfPages() {
+  const viewer = $('#pdfScrollViewer');
+  if (!viewer) return;
+  const cards = [...viewer.querySelectorAll('[data-pdf-page]')];
+  if (!cards.length) return;
+  if (state.pdfView.observer) { try { state.pdfView.observer.disconnect(); } catch (error) { /* egal */ } }
+  if (typeof IntersectionObserver === 'undefined') {
+    cards.slice(0, 4).forEach(card => renderPdfPage(Number(card.dataset.pdfPage)));
+    return;
+  }
+  const observer = new IntersectionObserver(entries => {
+    entries.filter(entry => entry.isIntersecting).forEach(entry => {
+      const number = Number(entry.target.dataset.pdfPage) || 1;
+      renderPdfPage(number);
+      renderPdfPage(number + 1);
+    });
+  }, { root: viewer, rootMargin: '500px 0px' });
+  cards.forEach(card => observer.observe(card));
+  state.pdfView.observer = observer;
+  renderPdfPage(1);
+}
+
+async function renderPdfPage(number) {
+  const doc = state.pdfView.doc;
+  if (!doc || number < 1 || number > (doc.numPages || 0)) return;
+  const viewer = $('#pdfScrollViewer');
+  const card = viewer?.querySelector(`[data-pdf-page="${number}"]`);
+  if (!card || card.dataset.state === 'ready' || card.dataset.state === 'rendering') return;
+  card.dataset.state = 'rendering';
+  const slot = card.querySelector('.pdf-page-slot') || card;
+  let task = null;
+  try {
+    const page = await doc.getPage(number);
+    const base = page.getViewport({ scale: 1 });
+    const cssWidth = Math.max(200, slot.clientWidth || card.clientWidth || 640);
+    const density = Math.min(window.devicePixelRatio || 1, 2);
+    let scale = (cssWidth / base.width) * density;
+    const maxPixels = 5.2e6;
+    const pixels = base.width * scale * base.height * scale;
+    if (pixels > maxPixels) scale *= Math.sqrt(maxPixels / pixels);
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.className = 'pdf-page-canvas';
+    canvas.width = Math.max(1, Math.floor(viewport.width));
+    canvas.height = Math.max(1, Math.floor(viewport.height));
+    const context = canvas.getContext('2d', { alpha: false });
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    task = page.render({ canvasContext: context, viewport });
+    state.pdfView.tasks.push(task);
+    await task.promise;
+    slot.replaceChildren(canvas);
+    card.dataset.state = 'ready';
+    page.cleanup?.();
+  } catch (error) {
+    if (error?.name === 'RenderingCancelledException') { card.dataset.state = ''; return; }
+    console.warn(`Seite ${number} konnte nicht gezeichnet werden`, error);
+    card.dataset.state = 'error';
+    slot.innerHTML = '<span class="pdf-page-note">Diese Seite lässt sich nicht darstellen.</span>';
+  } finally {
+    if (task) state.pdfView.tasks = state.pdfView.tasks.filter(entry => entry !== task);
+  }
+}
+
+function updatePdfPageFromScroll() {
+  const viewer = $('#pdfScrollViewer');
+  if (!viewer) return;
+  const cards = [...viewer.querySelectorAll('[data-pdf-page]')];
+  if (!cards.length) return;
+  const center = viewer.scrollTop + viewer.clientHeight * 0.35;
+  const current = cards.reduce((best, card) => Math.abs(card.offsetTop - center) < Math.abs(best.offsetTop - center) ? card : best, cards[0]);
+  state.pdfScroll.page = Number(current.dataset.pdfPage) || 1;
+  updatePdfPageStatus();
+}
 
 function saveAnnotations() { localStorage.setItem(STORAGE.annotations, JSON.stringify(state.annotations)); }
 function currentStrokes() { return state.currentId ? (state.annotations[state.currentId] || []) : []; }
@@ -1020,6 +1682,7 @@ function setPlayerPanel(name) {
     if (element) { element.hidden = !active; element.classList.toggle('active', active); }
     if (button) { button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); }
   });
+  if (name === 'pdf') ensurePdfLoaded();
   requestAnimationFrame(updatePlayerLayout);
 }
 
@@ -1146,7 +1809,7 @@ function footswitchLabel(code) {
 }
 function saveFootswitch() { localStorage.setItem(STORAGE.footswitch, JSON.stringify(state.footswitch)); updateFootswitchUI(); }
 function updateFootswitchUI() { $('#footswitchPlayValue').textContent = footswitchLabel(state.footswitch.play); $('#footswitchNextValue').textContent = footswitchLabel(state.footswitch.next); $('#footswitchPrevValue').textContent = footswitchLabel(state.footswitch.prev); if($('#footActionPlay')) $('#footActionPlay').value=state.footswitch.actions?.scroll||'scroll'; if($('#footActionNext')) $('#footActionNext').value=state.footswitch.actions?.next||'next'; if($('#footActionPrev')) $('#footActionPrev').value=state.footswitch.actions?.prev||'prev'; }
-function openFootswitchSettings() { state.learningFootswitch = null; updateFootswitchUI(); $('#footswitchStatus').textContent = 'Zum Testen Player öffnen und Pedal drücken.'; $('#footswitchDialog').showModal(); }
+function openFootswitchSettings() { state.learningFootswitch = null; updateFootswitchUI(); $('#footswitchStatus').textContent = 'Zum Testen Player öffnen und Pedal drücken.'; openDialog('#footswitchDialog'); }
 function beginFootswitchLearning(action) { state.learningFootswitch = action; $('#footswitchStatus').textContent = `Jetzt die Pedaltaste für ${action === 'play' ? 'Start / Pause' : action === 'next' ? 'Nächster Song' : 'Vorheriger Song'} drücken …`; }
 function resetFootswitch() { state.footswitch = { play:'Space', next:'ArrowRight', prev:'ArrowLeft' }; saveFootswitch(); $('#footswitchStatus').textContent = 'Standardbelegung wiederhergestellt.'; }
 function handleFootswitchKey(event) {
@@ -1184,7 +1847,7 @@ function insertEditorText(text) {
   field.setRangeText(text,start,end,'end'); field.focus();
 }
 
-function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editChordieUrl').value = item.source?.url || item.chordieUrl || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editNotes').value = item.notes || ''; $('#editContent').value = item.content || item.lyrics || ''; updateEditorPdfStatus(item); $('#songEditor').showModal(); }
+function openEditor() { const item = song(state.currentId); if (!item) return; $('#editTitle').value = item.title || ''; $('#editArtist').value = item.artist || ''; $('#editChordieUrl').value = item.source?.url || item.chordieUrl || ''; $('#editBpm').value = item.bpm || ''; $('#editCapo').value = item.capo ?? ''; $('#editSinger').value = item.singer || ''; $('#editNotes').value = item.notes || ''; $('#editContent').value = item.content || item.lyrics || ''; updateEditorPdfStatus(item); openDialog('#songEditor'); }
 
 function updateEditorPdfStatus(item = song(state.currentId)) {
   const status = $('#editPdfStatus'), remove = $('#removePdfBtn'), attach = $('#attachPdfBtn');
@@ -1196,7 +1859,7 @@ function updateEditorPdfStatus(item = song(state.currentId)) {
 }
 
 function promptPdfForCurrentSong() {
-  if (!state.currentId || !song(state.currentId)) { alert('Bitte zuerst einen Song öffnen.'); return; }
+  if (!state.currentId || !song(state.currentId)) { showToast('Bitte zuerst einen Song öffnen'); return; }
   const input = $('#attachPdfInput');
   if (!input) return;
   input.value = '';
@@ -1207,18 +1870,18 @@ async function handlePdfAttachmentSelection(event) {
   const file = event.target.files?.[0];
   const id = state.currentId;
   if (!file || !id) return;
-  if (!(file.type === 'application/pdf' || /\.pdf$/i.test(file.name))) { alert('Bitte eine PDF-Datei auswählen.'); event.target.value = ''; return; }
+  if (!(file.type === 'application/pdf' || /\.pdf$/i.test(file.name))) { showToast('Bitte eine PDF-Datei auswählen', 'error'); event.target.value = ''; return; }
   try {
     await savePdfBlob(id, file);
     state.overrides[id] = { ...(state.overrides[id] || {}), pdfAttachment: true, pdfName: file.name };
     saveOverrides();
     const updated = song(id);
     updateEditorPdfStatus(updated);
-    await renderPdf(updated);
-    $('#pdfTabBtn').disabled = false;
+    preparePdfPanel(updated);
     if (!$('#songEditor').open) setPlayerPanel('pdf');
+    showToast(`Liedblatt „${file.name}“ gespeichert`, 'success');
   } catch (error) {
-    alert(`PDF konnte nicht gespeichert werden: ${error.message}`);
+    showToast(`PDF konnte nicht gespeichert werden: ${error.message}`, 'error');
   } finally {
     event.target.value = '';
   }
@@ -1234,10 +1897,11 @@ async function removePdfFromCurrentSong() {
     saveOverrides();
     const updated = song(id);
     updateEditorPdfStatus(updated);
-    await renderPdf(updated);
+    preparePdfPanel(updated);
     setPlayerPanel('lyrics');
+    showToast('Liedblatt entfernt');
   } catch (error) {
-    alert(`PDF konnte nicht entfernt werden: ${error.message}`);
+    showToast(`PDF konnte nicht entfernt werden: ${error.message}`, 'error');
   }
 }
 
@@ -1313,11 +1977,11 @@ function importBackupData(data) {
   if (data.activeSetlistId && state.setlists.some(list=>list.id===data.activeSetlistId)) state.activeSetlistId=data.activeSetlistId;
   if (data.display) localStorage.setItem(STORAGE.display,JSON.stringify(data.display));
   if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } if(Array.isArray(data.newSongIds)){state.newSongIds=new Set(data.newSongIds);saveNewSongIds();}
-  saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();alert('Backup importiert.');
+  saveOverrides();saveSetlists();saveFavorites();applySettings();renderAll();showToast('Backup importiert', 'success');
 }
 
-function exportData() { const data = { version: "9.6.10", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, newSongIds:[...state.newSongIds], speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-6-10-backup.json'; link.click(); URL.revokeObjectURL(link.href); }
-async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } if(Array.isArray(data.newSongIds)){state.newSongIds=new Set(data.newSongIds);saveNewSongIds();} saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); alert('Import erfolgreich.'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
+function exportData() { const data = { version: "9.7.0", annotations: state.annotations, exportedAt: new Date().toISOString(), overrides: state.overrides, setlists: state.setlists, activeSetlistId: state.activeSetlistId, favorites: [...state.favorites], display: safeParse(localStorage.getItem(STORAGE.display), {}), songSpeeds: state.songSpeeds, metronomeSettings: state.metronomeSettings, newSongIds:[...state.newSongIds], speed: state.scrollSpeed }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'aussteiger-bandapp-v9-7-0-backup.json'; link.click(); URL.revokeObjectURL(link.href); showToast('Backup wurde erstellt', 'success'); }
+async function importData(event) { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (data.overrides && typeof data.overrides === 'object') state.overrides = data.overrides; if (Array.isArray(data.setlists)) state.setlists = normalizeSetlists(data.setlists); else if (Array.isArray(data.setlist)) activeSetlist().songs = data.setlist; if (Array.isArray(data.favorites)) state.favorites = new Set(data.favorites); if (data.activeSetlistId && state.setlists.some(list => list.id === data.activeSetlistId)) state.activeSetlistId = data.activeSetlistId; if (data.display) localStorage.setItem(STORAGE.display, JSON.stringify(data.display)); if (data.songSpeeds && typeof data.songSpeeds === 'object') { state.songSpeeds = data.songSpeeds; saveSongSpeeds(); } if (data.metronomeSettings && typeof data.metronomeSettings === 'object') { state.metronomeSettings = data.metronomeSettings; localStorage.setItem(STORAGE.metronome, JSON.stringify(state.metronomeSettings)); } if(Array.isArray(data.newSongIds)){state.newSongIds=new Set(data.newSongIds);saveNewSongIds();} saveOverrides(); saveSetlists(); saveFavorites(); applySettings(); renderAll(); showToast('Import erfolgreich', 'success'); } catch (error) { alert(`Import fehlgeschlagen: ${error.message}`); } finally { event.target.value = ''; } }
 
 async function estimatePdfPageCount(blob) {
   try {
@@ -1330,7 +1994,10 @@ async function estimatePdfPageCount(blob) {
 
 function updatePdfPageStatus() {
   const status = $('#pdfPageStatus');
-  if (status) status.textContent = `Seite ${state.pdfScroll.page}${state.pdfScroll.pages ? ` / ${state.pdfScroll.pages}` : ''}`;
+  if (!status) return;
+  status.textContent = state.pdfScroll.pages
+    ? `Seite ${state.pdfScroll.page} / ${state.pdfScroll.pages}`
+    : `Seite ${state.pdfScroll.page}`;
 }
 
 function setPdfPage(page) {
@@ -1477,7 +2144,7 @@ function runFootAction(action){
 function openGigStartDialog(){
   fillSetlistSelect($('#gigSetlistSelect'));
   updateGigSetlistInfo();
-  $('#gigStartDialog').showModal();
+  openDialog('#gigStartDialog');
 }
 function updateGigSetlistInfo(){
   const list=state.setlists.find(x=>x.id===$('#gigSetlistSelect')?.value);
@@ -1496,6 +2163,7 @@ async function confirmGigStart(){
   $('#gigModeBtn').textContent='⏹ Gig beenden';
   $('#gigExitBar').hidden=false;
   switchView('player');
+  setPlayerPanel(isPdfOnlySong(song(first)) ? 'pdf' : 'lyrics');
   setTransportCollapsed(true,false);
   updatePlayerLayout();
 }
@@ -1691,16 +2359,18 @@ function stopTuner(){
   $('#tunerNote').textContent='–'; $('#tunerFrequency').textContent='–'; $('#tunerCents').textContent='0 Cent'; $('#tunerNeedle').style.transform='translateX(0)';
 }
 
-const TUTORIAL_KEY = 'band-v9610-tutorial-seen';
+const TUTORIAL_KEY = 'band-v970-tutorial-seen';
 const TUTORIAL_STEPS = [
   { view:'dashboard', target:'#dashboardView', icon:'🏠', title:'Übersicht', text:'Die App startet auf dem Dashboard. Hier findest du Setliste, letzten Song, Bibliothek, Favoriten und den Gig-Start.' },
   { view:'dashboard', target:'#dashboardGigBtn', icon:'🎤', title:'Gig starten', text:'Beim Gig-Start wählst du zuerst die Setliste. Danach öffnet die App deren ersten Song im reduzierten Live-Modus.' },
+  { view:'library', target:'#backBtn', icon:'↩', title:'Immer eine Ebene zurück', text:'Oben links führt der Zurück-Pfeil von jeder Seite eine Ebene nach oben. Er schließt auch offene Fenster und funktioniert zusammen mit der Zurück-Taste bzw. Wischgeste des Geräts.' },
   { view:'setlists', target:'#setlistSelect', icon:'📋', title:'Setlisten', text:'Wähle eine aktive Setliste und ändere die Reihenfolge per Drag & Drop.' },
+  { view:'setlists', target:'#addSongBtn', icon:'➕', title:'Songs in die Setliste', text:'„+ Song hinzufügen“ öffnet direkt die Liste aller Songs. Dort suchen, filtern und antippen – ein zweiter Tipp entfernt den Song wieder.' },
   { view:'library', target:'#library', icon:'➕', title:'Song zu einer Setliste', text:'Bei + Setliste wählst du jetzt immer die gewünschte Ziel-Setliste – unabhängig davon, welche gerade aktiv ist.' },
   { view:'setlists', target:'#exportSetlistBtn', icon:'↗', title:'Setliste teilen', text:'Setlisten können als Datei weitergegeben und auf anderen Geräten wieder importiert werden.' },
   { view:'player', target:'.player-tabs', icon:'🎤', title:'Player', text:'Song, Tabs, Notizen und PDF sind getrennte Ansichten für eine mobile, übersichtliche Darstellung.' },
   { view:'player', panel:'tabs', target:'#tabSheet', icon:'🎸', title:'Tabs', text:'Tabs bleiben in Monospace-Schrift, lassen sich seitlich wischen und werden nicht mehr in den Lyrics umgebrochen.' },
-  { view:'player', panel:'pdf', target:'#pdfSheet', icon:'📄', title:'Mehrseitige PDFs', text:'Bei mehrseitigen PDFs werden alle Seiten untereinander angezeigt. Dadurch kann die PDF-Ansicht wie ein langes Liedblatt gescrollt werden.' },
+  { view:'player', panel:'pdf', target:'#pdfSheet', icon:'📄', title:'PDF-Liedblätter', text:'Liedblätter werden direkt in der App gezeichnet – alle Seiten untereinander, mit Zoom und Autoscroll. Songs, die nur aus einem PDF bestehen, öffnen sofort in diesem Reiter.' },
   { view:'player', panel:'lyrics', target:'#liveTools', icon:'🎤', title:'Live Performance', text:'Gig-Modus, Count-in und Sprungmarken bündeln die Bühnensteuerung.' },
   { view:'player', target:'#gigModeBtn', icon:'⏹', title:'Gig beenden', text:'Im Gig-Modus gibt es zusätzlich einen deutlich sichtbaren „Gig beenden“-Button in der reduzierten Player-Steuerung.' },
   { view:'player', target:'#countInControls', icon:'⏱', title:'Count-in', text:'Einzählen mit 1, 2 oder 4 Takten; optional startet danach automatisch der Autoscroll.' },
@@ -1749,7 +2419,15 @@ function showTutorialStep(){
   });
 }
 function finishTutorial(){ localStorage.setItem(TUTORIAL_KEY,'1'); const overlay=$('#tutorialOverlay'); overlay.hidden=true; overlay.classList.remove('has-target'); $('#tutorialCard')?.classList.remove('tutorial-card-top'); $$('.tutorial-highlight').forEach(el=>el.classList.remove('tutorial-highlight')); switchView('dashboard'); }
-window.addEventListener('resize',()=>{ updatePlayerLayout(); if(!$('#tutorialOverlay')?.hidden) showTutorialStep(); });
+let pdfResizeTimer = null;
+window.addEventListener('resize',()=>{
+  updatePlayerLayout();
+  if(!$('#tutorialOverlay')?.hidden) showTutorialStep();
+  if(state.pdfView.doc){
+    clearTimeout(pdfResizeTimer);
+    pdfResizeTimer = setTimeout(() => { if (state.pdfView.doc) refreshPdfPages(); }, 320);
+  }
+});
 window.addEventListener('orientationchange',()=>setTimeout(updatePlayerLayout,120));
 document.addEventListener('click',e=>{ if(e.target?.id==='tutorialNextBtn'){ tutorialIndex++; showTutorialStep(); } if(e.target?.id==='tutorialBackBtn'){ tutorialIndex=Math.max(0,tutorialIndex-1); showTutorialStep(); } if(e.target?.id==='tutorialSkipBtn') finishTutorial(); });
 setTimeout(()=>startTutorial(false),2600);
